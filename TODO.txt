@@ -1,0 +1,6 @@
+reported by chrissturm:
+- delete doesn't work for binary files
+- needs more progress info
+- crash when svn server is not available
+  http://pastie.caboo.se/private/wvvbc8th8dm7el1klrw
+

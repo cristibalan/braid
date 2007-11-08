@@ -38,7 +38,12 @@ module Giston
       end
 
       def sys(*args)
-        `#{args.join(" ")}`
+        `#{args.join(' ')}`
       end
+
+#      def sys(*args)
+#        res = system("#{args.join(' ')}")
+#        raise RepositoryNotFound unless res
+#      end
   end
 end

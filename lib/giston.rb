@@ -1,5 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 require "giston/version"
+require "giston/exceptions"
+
 require "giston/config"
 require "giston/command_line"
 require "giston/commands"

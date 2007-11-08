@@ -12,6 +12,8 @@ module Giston
       end
       mirrors ||= []
 
+      msg "No mirrors found" if mirrors.empty?
+
       mirrors.each do |mirror|
         update_one mirror
       end
@@ -25,8 +27,11 @@ module Giston
       local_revision = mirror["rev"]
       remote_revision = svn.remote_revision
 
+      msg "Local revision: #{local_revision}. Remote revision: #{remote_revision}"
+
       if git.local_directory_exists?(mirror["dir"])
         if local_revision.to_i >= remote_revision.to_i
+          msg %(Skipping "#{mirror["dir"]} (local revision is greater than remote revision)")
           return
         end
 
@@ -46,6 +51,10 @@ module Giston
       end
       mirror["rev"] = remote_revision
       config.write
+    rescue Giston::Git::RepositoryError => e
+      msg %(giston: Skipping "#{mirror["dir"]}". Error accessing git repositry")
+    rescue Giston::Svn::RepositoryNotFound => e
+      msg %(giston: Skipping "#{mirror["dir"]}". Error updating from "#{mirror["url"]}")
     end
 
     def self.add(*args)
@@ -64,7 +73,7 @@ module Giston
     end
 
     def self.msg(str)
-      puts str
+      puts "giston: " + str
     end
 
     private

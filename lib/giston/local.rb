@@ -11,8 +11,13 @@ module Giston
 
     private
       def sys(*args)
-        `#{args.join(" ")}`
+        `#{args.join(' ')}`
       end
+
+#      def sys(*args)
+#        res = system("#{args.join(' ')}")
+#        #raise  unless res
+#      end
   end
 end
 

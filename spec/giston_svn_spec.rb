@@ -32,9 +32,9 @@ describe "Giston::Svn" do
   end
 
   it "should cat files from remote svn repository" do
-    @svn.should_receive(:sys).with("svn cat -r 2 svn://1/img.gif > img.gif")
+    @svn.should_receive(:sys).with("svn cat -r 2 svn://1/img.gif > 1/img.gif")
 
-    @svn.cat("img.gif", 2)
+    @svn.cat("img.gif", 2, "1")
   end
 
 end

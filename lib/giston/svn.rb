@@ -24,8 +24,8 @@ module Giston
       f.path
     end
 
-    def cat(file, revision)
-      sys("svn cat -r #{revision} #{File.join(repo, file)} > #{file}")
+    def cat(file, revision, dir)
+      sys("svn cat -r #{revision} #{File.join(repo, file)} > #{File.join(dir, file)}")
     end
 
     def export(dir, revision)

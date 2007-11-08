@@ -39,7 +39,7 @@ module Giston
         local.patch(diff, mirror["dir"])
         binaries = local.extract_binaries_from_diff(diff)
         binaries.each do |binary|
-          svn.cat(binary, remote_revision)
+          svn.cat(binary, remote_revision, mirror["dir"])
         end
       else
         svn.export(mirror["dir"], remote_revision)

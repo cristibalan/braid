@@ -141,10 +141,10 @@ describe "@cmds.update_one" do
     @git.should_receive(:local_changes?).with("1").and_return(false)
 
     @svn.should_receive(:diff_file).with(1, 2).and_return(@diff)
-    @local.should_receive(:patch).with(@diff).and_return(true)
+    @local.should_receive(:patch).with(@diff, "1").and_return(true)
     @local.should_receive(:extract_binaries_from_diff).with(@diff).and_return(@binaries)
-    @svn.should_receive(:cat).with("some.gif", 2).and_return(true)
-    @svn.should_receive(:cat).with("other.gif", 2).and_return(true)
+    @svn.should_receive(:cat).with("some.gif", 2, "1").and_return(true)
+    @svn.should_receive(:cat).with("other.gif", 2, "1").and_return(true)
 
     @cmds.update_one("1")
   end

@@ -3,12 +3,14 @@ reported by chrissturm:
 
 - delete doesn't work for binary files
   idea:
-    - use Open3 to grab stderr when doing svn cat
+    - use Open3 (or 4?) to grab stderr when doing svn cat
     - if the file isn't in the repo, it was deleted, else it was added or changed
 
 - crash when svn server is not available
   http://pastie.caboo.se/private/wvvbc8th8dm7el1klrw
   idea:
     - use system instead of `` to be able to catch return code
-    - however, this makes us to lose the output. better use Open3
+    - however, this makes us to lose the output. better use Open3 (or 4?)
+
+- add LANG=C when shelling out
 

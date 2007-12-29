@@ -30,8 +30,13 @@ module Giston
       msg "Local revision: #{local_revision}. Remote revision: #{remote_revision}"
 
       if git.local_directory_exists?(mirror["dir"])
-        if local_revision.to_i >= remote_revision.to_i
+        if local_revision.to_i > remote_revision.to_i
           msg %(Skipping "#{mirror["dir"]} (local revision is greater than remote revision)")
+          return
+        end
+
+        if local_revision.to_i == remote_revision.to_i
+          msg %(Skipping "#{mirror["dir"]} (no changes between local and remote revision)")
           return
         end
 

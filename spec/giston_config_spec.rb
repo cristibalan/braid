@@ -36,6 +36,12 @@ describe "Giston::Config" do
     g.get("local/mirror1")["url"] = "svn://remote/mirror1"
   end
 
+  it "should get mirror from dir regardless of slashes" do
+    g = Giston::Config.new($config)
+    g.read
+    g.get("local/mirror1/")["url"] = "svn://remote/mirror1"
+  end
+
   it "should get actual mirror from mirror hash" do
     g = Giston::Config.new($config)
     g.read

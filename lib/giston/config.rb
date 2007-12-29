@@ -30,7 +30,7 @@ module Giston
     end
 
     def has_item?(dir)
-      @mirrors.find{|mirror| mirror["dir"] == dir}
+      @mirrors.find{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(dir)}
     end
 
     def get(dir_or_mirror_hash)
@@ -56,6 +56,12 @@ module Giston
     def has_mirror_on_disk?(dir)
       File.exists?(File.join(File.dirname(config_file), dir))
     end
+
+    private
+
+      def cleanup_dir(dir)
+        dir.chomp("/")
+      end
 
   end
 end

@@ -156,20 +156,22 @@ describe "@cmds.update" do
 
   before(:each) do
     @cmds = Giston::Commands
+    @config = mock('config')
+
+    @cmds.stub!(:config).and_return(@config)
     @cmds.stub!(:msg)
   end
 
-  it "should update given mirrors with update_one" do
+  it "should update given mirrors with update_one for the ones that exist" do
 
-    @cmds.should_receive(:update_one).twice
+    @config.should_receive(:get).and_return(valid_attributes, nil)
+    @cmds.should_receive(:update_one)
     @cmds.stub!(:update_one)
 
     @cmds.update(%w(1 2))
   end
 
   it "should update all mirrors with update_one" do
-    @config = mock('config')
-    @cmds.stub!(:config).and_return(@config)
     @config.should_receive(:mirrors).and_return([valid_attributes])
 
     @cmds.should_receive(:update_one)

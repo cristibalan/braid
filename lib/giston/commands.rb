@@ -8,7 +8,9 @@ module Giston
       else
         mirrors.map! do |mirror|
           config.get(mirror)
-        end.compact
+        end
+
+        mirrors = mirrors.compact
       end
       mirrors ||= []
 

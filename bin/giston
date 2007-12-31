@@ -1,4 +1,127 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+
+begin
+  require 'rubygems'
+  gem 'main'#, '~> 2.6.0'
+rescue
+  42
+end
+
+begin
+  require 'main'
+rescue
+  abort "gem install main"
+end
+
 require 'giston'
-Giston::CommandLine.run(ARGV)
+#Giston::CommandLine.run(ARGV)
+
+Home = File.expand_path(ENV['HOME'] || '~')
+
+# mostly blantantly stolen from ara's punch script
+# main kicks ass!
+Main {
+  description <<-txt
+    giston is a simple tool to help track changes to svn repositories in git.
+
+    run 'giston help commandname' for more info.
+  txt
+
+  examples <<-txt
+  txt
+
+  mode(:update){
+    description 'update a giston mirror, or all mirrors if not specified'
+
+    examples <<-txt
+      . giston update
+      . giston update vendor/rails
+      . giston update vendor/rails -r 6000
+      . giston update vendor/rails --revision 6000
+    txt
+
+    mixin :optional_mirror, :option_revision
+
+    run{
+      
+    }
+  }
+
+  mode(:add){
+    description <<-txt
+      add a new mirror to giston
+
+      only adds metadata, you must manually run "giston update mirrorname"
+    txt
+
+    examples <<-txt
+      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/
+      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/ -r 6000
+      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/ --revision 6000
+    txt
+
+    mixin :argument_mirror, :argument_repository, :option_revision
+
+    run{
+      
+    }
+  }
+
+  mode(:remove){
+    description <<-txt
+      remove a mirror from giston
+
+      only removes metadata, you must manually remove the local directory
+    txt
+
+    examples <<-txt
+      . giston remove vendor/rails
+    txt
+
+    mixin :argument_mirror
+
+    run{
+      
+    }
+  }
+
+  mode(:version){
+    description 'show giston version'
+
+    run{
+      puts "giston #{Giston::VERSION::STRING}"
+    }
+  }
+
+  mixin :argument_mirror do
+    argument(:mirror){
+      attr
+    }
+  end
+
+  mixin :optional_mirror do
+    argument(:mirror){
+      optional
+      attr
+    }
+  end
+
+  mixin :argument_repository do
+    argument(:repository){
+      attr
+    }
+  end
+
+  mixin :option_revision do
+    option(:revision, :r){
+      optional
+      desc 'remote svn revision'
+      default 'HEAD'
+      attr
+    }
+  end
+
+  run{ help! }
+}
+

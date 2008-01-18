@@ -10,6 +10,7 @@ module Giston
 
   class Config
     class MirrorNameAlreadyInUse < Giston::Exception; end
+    class MirrorDoesNotExist < Giston::Exception; end
   end
 
   class Svn

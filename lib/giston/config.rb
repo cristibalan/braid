@@ -3,11 +3,10 @@ require 'yaml'
 module Giston
   class Config
     DEFAULT_CONFIG_FILE = '.giston'
-    attr_accessor :mirrors, :config_file
+    attr_accessor :mirrors
 
     def initialize(config_file = DEFAULT_CONFIG_FILE)
       @config_file = config_file
-      @mirrors = []
       read
     end
 
@@ -17,11 +16,6 @@ module Giston
       @mirrors = []
     end
 
-    def reload
-      @mirrors = []
-      read
-    end
-
     def write(config_file = nil)
       config_file ||= @config_file
       File.open(@config_file, 'w') do |out|
@@ -29,8 +23,20 @@ module Giston
       end 
     end
 
-    def has_item?(dir)
-      @mirrors.find{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(dir)}
+    def has_item?(mirror_name)
+      @mirrors.find{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(mirror_name)}
+    end
+
+    def add(mirror)
+      raise MirrorNameAlreadyInUse if has_item?(mirror["dir"])
+      @mirrors << mirror
+      write
+    end
+
+    def remove(mirror_name)
+      raise MirrorDoesNotExist unless has_item?(mirror_name)
+      @mirrors.delete_if{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(mirror_name)}
+      write
     end
 
     def get(dir_or_mirror_hash)
@@ -40,21 +46,13 @@ module Giston
         when Hash
           dir = dir_or_mirror_hash["dir"]
       end
-      has_item?(dir)
+      has_item?(dir) #uh, using the sideeffect. lame
     end
 
-    def add(url, dir, rev)
-      @mirrors << {"url" => url, "dir" => dir, "rev" => rev} unless has_item?(dir)
-    end
-
-    def remove(dir)
-      if has_item?(dir)
-        @mirrors.delete_if{|mirror| mirror["dir"] == dir}
-      end
-    end
-
-    def has_mirror_on_disk?(dir)
-      File.exists?(File.join(File.dirname(config_file), dir))
+    def update(mirror_name, mirror)
+      raise MirrorDoesNotExist unless has_item?(mirror_name)
+      remove(mirror_name)
+      add(mirror)
     end
 
     private

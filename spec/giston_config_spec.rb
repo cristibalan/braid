@@ -1,114 +1,82 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-module ConfigSpecHelper
-  def valid_attributes
-    {
-      "dir" => '1',
-      "url" => 'svn://1',
-      "rev" => 1,
-    }
+describe "A new Giston::Config" do
+  before(:each) do
+    YAML.stub!(:load_file).and_return([])
+    @config = Giston::Config.new
   end
-  def valid_attributes_ary
-    ["svn://1",  "1", 1]
+  
+  it "should be empty" do
+    @config = Giston::Config.new
+
+    @config.mirrors.should be_empty
   end
 end
 
 describe "Giston::Config" do
-  include ConfigSpecHelper
-
-  it "should use default config file when none is passed" do
-    g = Giston::Config.new
-    g.config_file.should == '.giston'
-
-    g = Giston::Config.new('blah')
-    g.config_file.should == 'blah'
+  before(:each) do
+    YAML.should_receive(:load_file).and_return([{"dir" => "local/dir", "url" => "remote/path", "rev" => "4"}])
+    @config = Giston::Config.new
   end
 
   it "should check for existance of mirror by dir" do
-    g = Giston::Config.new($config)
-    g.read
-    g.should have_item("local/mirror1")
+    @config.should have_item("local/dir")
+    @config.should_not have_item("local/newdir")
   end
 
-  it "should get mirror from dir" do
-    g = Giston::Config.new($config)
-    g.read
-    g.get("local/mirror1")["url"] = "svn://remote/mirror1"
+  it "should raise when trying to add a duplicate mirror" do
+    lambda { @config.add({"dir" => "local/dir", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Giston::Config::MirrorNameAlreadyInUse)
+    lambda { @config.add({"dir" => "local/dir/", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Giston::Config::MirrorNameAlreadyInUse)
   end
 
-  it "should get mirror from dir regardless of slashes" do
-    g = Giston::Config.new($config)
-    g.read
-    g.get("local/mirror1/")["url"] = "svn://remote/mirror1"
+  it "should add a new mirror if it doesn't exist" do
+    File.should_receive(:open).twice
+    @config.add({"dir" => "local/newdir", "url" => "remote/newpath", "rev" => "13"})
+    @config.mirrors.length.should == 2
+    @config.add({"dir" => "local/anothernewdir/", "url" => "remote/anothernewpath", "rev" => "13"})
+    @config.mirrors.length.should == 3
   end
 
-  it "should get actual mirror from mirror hash" do
-    g = Giston::Config.new($config)
-    g.read
-    g.get({"dir" => "local/mirror1", "url" => "blah"})["url"] = "svn://remote/mirror1"
+  it "should raise when trying to remove a nonexistig mirror" do
+    lambda { @config.remove("local/newdir") }.should raise_error(Giston::Config::MirrorDoesNotExist)
+    lambda { @config.remove("local/newdir/") }.should raise_error(Giston::Config::MirrorDoesNotExist)
   end
 
-  it "should check if mirror directory exists on disk" do
-    File.should_receive(:exists?).with("path/local/mirror1").and_return(false)
-
-    g = Giston::Config.new("path/blah")
-    g.has_mirror_on_disk?("local/mirror1")
+  it "should remove an existing mirror" do
+    File.should_receive(:open)
+    @config.remove("local/dir")
+    @config.mirrors.length.should == 0
   end
 
-  it "should add mirror to mirror list" do
-    g = Giston::Config.new
-    g.add(*valid_attributes_ary)
-    g.should have_item("1")
+  it "should remove an existing mirror ignoring ending slash" do
+    File.should_receive(:open)
+    @config.remove("local/dir/")
+    @config.mirrors.length.should == 0
   end
 
-  it "should not add existing mirror to mirror list" do
-    g = Giston::Config.new
-    g.add(*valid_attributes_ary)
-    g.add(*valid_attributes_ary).should == nil
+  it "should get a mirror given it's name" do
+    mirror = @config.get("local/dir")
+    mirror["url"].should == "remote/path"
+    mirror = @config.get("local/dir/")
+    mirror["url"].should == "remote/path"
   end
 
-  it "should remove mirror given it's dir" do
-    g = Giston::Config.new($config)
-    g.read
-    g.should have_item("local/mirror1")
-
-    g.remove("local/mirror1")
-    g.should_not have_item("local/mirror1")
+  it "should get a mirror given a mirror (any hash with a dir key)" do
+    mirror = @config.get({"dir" => "local/dir"})
+    mirror["url"].should == "remote/path"
+    mirror = @config.get({"dir" => "local/dir/"})
+    mirror["url"].should == "remote/path"
   end
 
-  it "should load mirrors from given config_file" do
-    g = Giston::Config.new($config)
-    g.read
-    g.should have_item("local/mirror1")
+  it "should raise when trying to update a nonexisting mirror" do
+    lambda { @config.update("local/nonexistent", {"dir" => "local/nonexistent", "url" => "remote/path", "rev" => "13"}) }.should raise_error(Giston::Config::MirrorDoesNotExist)
   end
 
-  it "should write mirrors to config_file" do
-    g = Giston::Config.new($config + "2")
-    g.mirrors.should be_empty
-    g.mirrors << valid_attributes
-    g.write
+  it "should remove existing mirror and ad the new one when updating with valid parameters" do
+    @config.should_receive(:remove).with("local/dir")
+    @config.should_receive(:add).with({"dir" => "local/newdir", "url" => "remote/newpath", "rev" => "13"})
 
-    g = Giston::Config.new($config + "2")
-    g.read
-    g.should have_item("1")
-    File.delete($config + "2")
-  end
-
-  it "should reload mirrors form config_file" do
-    g1 = Giston::Config.new($config + "2")
-    g1.mirrors << valid_attributes
-
-    g2 = Giston::Config.new($config + "2")
-    g2.mirrors << valid_attributes.merge({"dir" => "2"})
-    g2.write
-
-    g1.should have_item("1")
-    g1.reload
-    g1.should_not have_item("1")
-    g1.should have_item("2")
-
-    File.delete($config + "2")
+    @config.update("local/dir", {"dir" => "local/newdir", "url" => "remote/newpath", "rev" => "13"}) 
   end
 
 end
-

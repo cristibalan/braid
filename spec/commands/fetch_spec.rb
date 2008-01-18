@@ -18,8 +18,8 @@ describe "Giston::Commands::Fetch" do
   end
 
   it "should export the mirror from the remote server and update the config" do
-    @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "svn://remote/path", "rev" => "HEAD"})
-    @svn.should_receive(:export).with({"dir" => "local/dir", "url" => "svn://remote/path", "rev" => "HEAD"}).and_return("4")
+    @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "svn://remote/path", "rev" => "4"})
+    @svn.should_receive(:export).with("svn://remote/path", "4", "local/dir")
     @config.should_receive(:update).with("local/dir", {"dir" => "local/dir", "url" => "svn://remote/path", "rev" => "4"})
 
     @fetch.run("local/dir")

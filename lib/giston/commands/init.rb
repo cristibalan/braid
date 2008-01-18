@@ -2,9 +2,10 @@ module Giston
   module Commands
     class Init < Giston::Command
 
-      def run(remote, mirror=extract_last_part(remote), revision = nil)
-        msg %(Adding mirror for #{remote} at revision #{revision} in #{mirror}.)
+      def run(remote, mirror=nil, revision=nil)
+        mirror ||= extract_last_part(remote)
         revision ||= svn.remote_revision(remote)
+        msg %(Adding mirror for #{remote} at revision #{revision} in #{mirror}.)
         config.add("dir" => mirror, "url" => remote, "rev" => revision)
       end
 

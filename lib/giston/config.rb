@@ -49,6 +49,10 @@ module Giston
       has_item?(dir) #uh, using the sideeffect. lame
     end
 
+    def get_from_remote(remote)
+      @mirrors.find{|mirror| cleanup_dir(mirror["url"]) == cleanup_dir(remote) && mirror["dir"] == extract_last_part(remote)}
+    end
+
     def update(mirror_name, mirror)
       raise MirrorDoesNotExist unless has_item?(mirror_name)
       remove(mirror_name)
@@ -59,6 +63,13 @@ module Giston
 
       def cleanup_dir(dir)
         dir.chomp("/")
+      end
+
+      # copy/paste from commands/init.rb
+      def extract_last_part(path)
+        last = File.basename(path)
+        last = File.basename(File.dirname(path)) if last == "trunk"
+        last
       end
 
   end

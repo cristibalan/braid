@@ -13,8 +13,8 @@ module Giston
     def self.run(command, *args)
       klass = Giston::Commands.const_get(command.to_s.capitalize)
       klass.new.run(*args)
-    #rescue Giston::Exception => e
-      #puts "giston: An exception has occured: #{e.message || e} (#{e})"
+    rescue Giston::Exception => e
+      puts "giston: An exception has occured: #{e.message || e} (#{e})"
     end
     
     private

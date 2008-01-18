@@ -84,7 +84,7 @@ describe "Giston::Commands::Update with favorable conditions" do
     @update.stub!(:msg)
 
     @config.stub!(:get).and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "4"})
-    @svn.stub!(:remote_revision).and_return("13")
+    @svn.stub!(:remote_revision).and_return("40")
     @git.stub!(:local_changes?).and_return(false)
   end
 

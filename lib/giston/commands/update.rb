@@ -29,7 +29,7 @@ module Giston
 
           binaries = local.extract_binaries_from_diff(diff)
           binaries.each do |binary|
-            svn.cat(remote, binary, remote_revision, mirror_name)
+            svn.cat(remote, binary, new_revision, mirror_name)
           end
 
           mirror["rev"] = new_revision

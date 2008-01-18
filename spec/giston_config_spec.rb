@@ -68,6 +68,19 @@ describe "Giston::Config" do
     mirror["url"].should == "remote/path"
   end
 
+  it "should get a mirror given it's remote url if the dir matches the last part of the path" do
+    File.stub!(:open)
+    @config.add({"dir" => "newpath", "url" => "remote/newpath", "rev" => "13"})
+    @config.add({"dir" => "otherpath", "url" => "remote/otherpath/trunk", "rev" => "13"})
+    mirror = @config.get_from_remote("remote/path")
+    mirror.should == nil
+
+    mirror = @config.get_from_remote("remote/newpath/")
+    mirror["dir"].should == "newpath"
+    mirror = @config.get_from_remote("remote/otherpath/trunk")
+    mirror["dir"].should == "otherpath"
+  end
+
   it "should raise when trying to update a nonexisting mirror" do
     lambda { @config.update("local/nonexistent", {"dir" => "local/nonexistent", "url" => "remote/path", "rev" => "13"}) }.should raise_error(Giston::Config::MirrorDoesNotExist)
   end

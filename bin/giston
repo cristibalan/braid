@@ -43,7 +43,7 @@ Main {
     mixin :argument_remote, :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:init, mirror, remote, revision)
+      Giston::Command.run(:init, remote, mirror, revision)
     }
   }
 
@@ -62,7 +62,7 @@ Main {
     mixin :argument_mirror
 
     run{
-      Giston::Command.run(:fetch, mirror, remote, revision)
+      Giston::Command.run(:fetch, mirror)
     }
   }
 
@@ -84,7 +84,7 @@ Main {
     mixin :argument_remote, :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:mirror, mirror, remote, revision)
+      Giston::Command.run(:mirror, remote, mirror, revision)
     }
   }
 
@@ -102,7 +102,7 @@ Main {
     mixin :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:update, mirror, remote, revision)
+      Giston::Command.run(:update, mirror, revision)
     }
   }
 
@@ -120,7 +120,7 @@ Main {
     mixin :argument_mirror
 
     run{
-      Giston::Command.run(:update, mirror, remote, revision)
+      Giston::Command.run(:forget, mirror)
     }
   }
 
@@ -154,8 +154,8 @@ Main {
   mixin :option_revision do
     option(:revision, :r){
       optional
+      argument :required
       desc 'remote svn revision'
-      default 'HEAD'
       attr
     }
   end

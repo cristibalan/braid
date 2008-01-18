@@ -18,10 +18,10 @@ module Giston
     end
 
     def cat(repository, file, revision, dir)
-      sys("svn cat -r #{revision} #{File.join(repository, file)} > #{File.join(dir, file)}")
+      sys("svn cat #{File.join(repository, file)}@#{revision} > #{File.join(dir, file)}")
     end
 
-    def export(repository, dir, revision)
+    def export(repository, revision, dir)
       sys("svn export -r #{revision} #{repository} #{dir}")
     end
 

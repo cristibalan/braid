@@ -32,9 +32,17 @@ describe "Giston::Svn" do
   end
 
   it "should cat files from remote svn repository" do
-    @svn.should_receive(:sys).with("svn cat -r 2 svn://remote/path/img.gif > local/dir/img.gif")
+    # strangely, the svn cat -r 2 blah doesn't work
+    @svn.should_receive(:sys).with("svn cat svn://remote/path/img.gif@2 > local/dir/img.gif")
 
     @svn.cat("svn://remote/path", "img.gif", 2, "local/dir")
   end
+
+  it "should export files for a given mirror to local directory" do
+    @svn.should_receive(:sys).with("svn export -r 2 svn://remote/path local/dir")
+
+    @svn.export("svn://remote/path", 2, "local/dir")
+  end
+
 
 end

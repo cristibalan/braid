@@ -3,19 +3,11 @@ $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
 
 begin
   require 'rubygems'
-  gem 'main'#, '~> 2.6.0'
 rescue
-  42
 end
-
-begin
-  require 'main'
-rescue
-  abort "gem install main"
-end
+require 'main'
 
 require 'giston'
-#Giston::CommandLine.run(ARGV)
 
 Home = File.expand_path(ENV['HOME'] || '~')
 
@@ -31,58 +23,104 @@ Main {
   examples <<-txt
   txt
 
-  mode(:update){
-    description 'update a giston mirror, or all mirrors if not specified'
+  mode(:init){
+    description <<-txt
+      initialize a new giston mirror
 
-    examples <<-txt
-      . giston update
-      . giston update vendor/rails
-      . giston update vendor/rails -r 6000
-      . giston update vendor/rails --revision 6000
+      only adds metadata to the config file, you must manually run "giston fetch mirrorname"
+
+      mirror defaults to the last part of the remote path.
+      if trunk is the last part, it is ignored and the previous part is used
     txt
 
-    mixin :optional_mirror, :option_revision
+    examples <<-txt
+      . giston init svn://remote/path
+      . giston init svn://remote/path local/dir
+      . giston init svn://remote/path local/dir -r 4
+      . giston init svn://remote/path local/dir --revision 13
+    txt
+
+    mixin :argument_remote, :optional_mirror, :option_revision
 
     run{
-      
+      Giston::Command.run(:init, mirror, remote, revision)
     }
   }
 
-  mode(:add){
+  mode(:fetch){
     description <<-txt
-      add a new mirror to giston
+      fetches files for a new giston mirror from remote svn remote
 
-      only adds metadata, you must manually run "giston update mirrorname"
+      only works if local directory does not exist.
+      if you actually want to update a mirror, see giston help update
     txt
 
     examples <<-txt
-      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/
-      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/ -r 6000
-      . giston add vendor/rails http://dev.rubyonrails.org/svn/rails/trunk/ --revision 6000
-    txt
-
-    mixin :argument_mirror, :argument_repository, :option_revision
-
-    run{
-      
-    }
-  }
-
-  mode(:remove){
-    description <<-txt
-      remove a mirror from giston
-
-      only removes metadata, you must manually remove the local directory
-    txt
-
-    examples <<-txt
-      . giston remove vendor/rails
+      . giston fetch local/dir
     txt
 
     mixin :argument_mirror
 
     run{
-      
+      Giston::Command.run(:fetch, mirror, remote, revision)
+    }
+  }
+
+  mode(:mirror){
+    description <<-txt
+      initialize and fetch files for a new giston mirror
+
+      mirror defaults to the last part of the remote path.
+      if trunk is the last part, it is ignored and the previous part is used
+    txt
+
+    examples <<-txt
+      . giston mirror svn://remote/path
+      . giston mirror svn://remote/path local/dir
+      . giston mirror svn://remote/path local/dir -r 4
+      . giston mirror svn://remote/path local/dir --revision 13
+    txt
+
+    mixin :argument_remote, :optional_mirror, :option_revision
+
+    run{
+      Giston::Command.run(:mirror, mirror, remote, revision)
+    }
+  }
+
+
+  mode(:update){
+    description 'update a giston mirror, or all mirrors if none specified'
+
+    examples <<-txt
+      . giston update
+      . giston update local/dir
+      . giston update local/dir -r 6000
+      . giston update local/dir --revision 6000
+    txt
+
+    mixin :optional_mirror, :option_revision
+
+    run{
+      Giston::Command.run(:update, mirror, remote, revision)
+    }
+  }
+
+  mode(:forget){
+    description <<-txt
+      remove a mirror from giston metadata
+
+      only removes metadata, you must manually remove the local directory
+    txt
+
+    examples <<-txt
+      . giston forget local/dir
+    txt
+
+    mixin :argument_mirror
+
+    run{
+      Giston::Command.run(:update, mirror, remote, revision)
     }
   }
 
@@ -107,8 +145,8 @@ Main {
     }
   end
 
-  mixin :argument_repository do
-    argument(:repository){
+  mixin :argument_remote do
+    argument(:remote){
       attr
     }
   end

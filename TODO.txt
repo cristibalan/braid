@@ -13,4 +13,5 @@ reported by chrissturm:
     - however, this makes us to lose the output. better use Open3 (or 4?)
 
 - add LANG=C when shelling out
-
+  http://rubyforge.org/tracker/?func=detail&atid=8179&aid=10717&group_id=2105
+  http://rubyforge.org/tracker/download.php/2105/8179/10717/1968/piston_language_fix.diff

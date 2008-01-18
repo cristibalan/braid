@@ -96,6 +96,8 @@ describe "Giston::Commands::Update with favorable conditions" do
     @svn.should_receive(:cat).with("remote/path", "some.gif", "13", "local/dir")
     @svn.should_receive(:cat).with("remote/path", "other.gif", "13", "local/dir")
 
+    @config.should_receive(:update).with("local/dir", {"dir" => "local/dir", "url" => "remote/path", "rev" => "13"})
+
     @update.run("local/dir", "13")
   end
 

@@ -31,6 +31,9 @@ module Giston
           binaries.each do |binary|
             svn.cat(remote, binary, remote_revision, mirror_name)
           end
+
+          mirror["rev"] = new_revision
+          config.update(mirror_name, mirror)
         end
 
     end

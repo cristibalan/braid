@@ -18,6 +18,4 @@ describe "Giston::Local" do
 
     @local.extract_binaries_from_diff("some.diff")
   end
-
-
 end

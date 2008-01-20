@@ -1,4 +1,5 @@
-reported by chrissturm:
+- fix giston update
+
 - needs more progress info
 
 - delete doesn't work for binary files
@@ -15,3 +16,12 @@ reported by chrissturm:
 - add LANG=C when shelling out
   http://rubyforge.org/tracker/?func=detail&atid=8179&aid=10717&group_id=2105
   http://rubyforge.org/tracker/download.php/2105/8179/10717/1968/piston_language_fix.diff
+
+- handle cases when files are missing on disc. does patch exit and applies only half of the patch?
+
+- add giston outdated to check for remote updates to mirrors
+
+- add giston lock/unlock so that mirrors can be skipepd during the global update
+
+- add mercurial, darcs, etc to giston and rename giston to something more "politically correct" like iston, ston, stoner, stonr, "any ston", anyston, aniston
+

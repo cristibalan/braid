@@ -20,11 +20,11 @@ describe "Giston::Svn" do
     pending("i'm lazy")
   end
 
-  it "should grab last commited from remote svn repository" do
-    @svn.remote_revision("svn://remote/path").should == 2954
+  it "should get revision from svn info output" do
+    @svn.remote_revision("svn://remote/path").should == @info["Revision"]
   end
 
-  it "should should call svn to get diff" do
+  it "should execute system call to svn in order to obtain diff" do
     @svn.should_receive(:sys).with("svn diff -r 1:2 svn://remote/path")
 
     @svn.diff("svn://remote/path", 1, 2)
@@ -48,6 +48,4 @@ describe "Giston::Svn" do
 
     @svn.export("svn://remote/path", 2, "local/dir")
   end
-
-
 end

@@ -11,10 +11,9 @@ module Giston
     end
 
     def diff_file(repository, r1, r2)
-      f = Tempfile.new("gistonsvndiff")
-      f << diff(repository, r1, r2)
-      f.close
-      f.path
+      with_temp_file "gistonsvndiff" do |tmpfile|
+        tmpfile << diff(repository, r1, r2)
+      end
     end
 
     def cat(repository, file, revision, dir)
@@ -26,17 +25,20 @@ module Giston
     end
 
     private
-      def info(repository)
-        YAML.load(sys("svn info #{repository}"))
+      def info(repository_path)
+        YAML.load(sys("svn info #{repository_path}"))
       end
 
       def sys(*args)
         `#{args.join(' ')}`
       end
 
-#      def sys(*args)
-#        res = system("#{args.join(' ')}")
-#        raise RepositoryNotFound unless res
-#      end
+      def with_temp_file(filename, &block)
+        tmpfile = Tempfile.new(filename)
+        block.call tmpfile
+        tmpfile.close
+
+        tmpfile.path
+      end
   end
 end

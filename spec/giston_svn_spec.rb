@@ -3,9 +3,14 @@ require 'yaml'
 
 describe "Giston::Svn" do
   before(:each) do
+    fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/fixtures/')
+
+    @svn_info_fixture_path = File.join(fixtures_dir, 'svninfo')
+    @diff_fixture_path     = File.join(fixtures_dir, 'some.diff')
+
     @svn = Giston::Svn.new
-    @info = YAML.load_file($svninfo)
-    @diff = File.read($somediff)
+    @info = YAML.load_file(@svn_info_fixture_path)
+    @diff = File.read(@diff_fixture_path)
 
     @svn.stub!(:info).and_return(@info)
     @svn.stub!(:sys)

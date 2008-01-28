@@ -1,23 +1,39 @@
-- fix giston update
+- fix giston update without a mirror name
 
-- needs more progress info
+- handle cases when mirror directory is missing on disc
+  Example:
+    giston mirror blah
+    rm -rf blah
+    git update blah # => borked
+    # it should exit and recommend using giston fetch to grab the mirror
 
 - delete doesn't work for binary files
   idea:
-    - use Open3 (or 4?) to grab stderr when doing svn cat
-    - if the file isn't in the repo, it was deleted, else it was added or changed
+    - use Open4 to grab stderr when doing svn cat
+    - if the file isn't in the repo when doing svn cat, it was deleted, else it was added or changed
 
 - crash when svn server is not available
   http://pastie.caboo.se/private/wvvbc8th8dm7el1klrw
   idea:
-    - use system instead of `` to be able to catch return code
-    - however, this makes us to lose the output. better use Open3 (or 4?)
+    - use Open4 to grab stderr and exit code from the svn call to handle this properly
 
-- add LANG=C when shelling out
+- add LANG=C when shelling out to be able to work correctly with svn in other languages. here's how piston handles it:
   http://rubyforge.org/tracker/?func=detail&atid=8179&aid=10717&group_id=2105
   http://rubyforge.org/tracker/download.php/2105/8179/10717/1968/piston_language_fix.diff
 
+- handle cases when mirror directory is missing on disc
+  Example:
+    giston mirror blah
+    rm -rf blah
+    git update blah # => borked
+    # it should exit and recommend using giston fetch to grab the mirror
+
+- needs more progress info
+
 - handle cases when files are missing on disc. does patch exit and applies only half of the patch?
+  idea:
+    - most likely using Open4 to check the output of patch would catch this
+    - ideally we should ignore missing files because most likely the git user removed them but they still receive updates in the remote svn
 
 - add giston outdated to check for remote updates to mirrors
 

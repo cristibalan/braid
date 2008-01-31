@@ -10,8 +10,6 @@ sudo ruby setup.rb
 
 = USAGE
 
-If your svn install is localized, make sure to add LANG=C before calling giston.
-
 Giston stores it's metadata in a file called ".giston" located in the currend directory where giston is run. You can use "giston add" and "giston remove" to change it or just manually edit it as it's just YAML.
 
 Run giston update to fetch changes from the remote repositories once you have stuff in your ".giston".

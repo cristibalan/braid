@@ -30,6 +30,8 @@ module Giston
       end
 
       def sys(*args)
+        ENV['LANG'] = 'C' unless ENV['LANG'] == 'C'
+
         `#{args.join(' ')}`
       end
 

@@ -17,10 +17,6 @@
   idea:
     - use Open4 to grab stderr and exit code from the svn call to handle this properly
 
-- add LANG=C when shelling out to be able to work correctly with svn in other languages. here's how piston handles it:
-  http://rubyforge.org/tracker/?func=detail&atid=8179&aid=10717&group_id=2105
-  http://rubyforge.org/tracker/download.php/2105/8179/10717/1968/piston_language_fix.diff
-
 - handle cases when mirror directory is missing on disc
   Example:
     giston mirror blah

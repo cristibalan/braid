@@ -48,4 +48,14 @@ describe "Giston::Svn" do
 
     @svn.export("svn://remote/path", 2, "local/dir")
   end
+
+  it "should system() with an LANG=C environment variable" do
+    @svn.stub!(:sys).and_return { ENV['LANG'].should == 'C' }
+  end
+
+  it "should system() with an LANG=C environment variable even when an other LANG was set." do
+    ENV['LANG'] = 'en-UK'
+
+    @svn.stub!(:sys).and_return { ENV['LANG'].should == 'C' }
+  end
 end

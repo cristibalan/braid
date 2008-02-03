@@ -1,6 +1,6 @@
 require 'tempfile'
 
-module Giston
+module Braid
   class Svn
     def remote_revision(repository)
       info(repository)["Revision"]
@@ -11,7 +11,7 @@ module Giston
     end
 
     def diff_file(repository, r1, r2)
-      with_temp_file "gistonsvndiff" do |tmpfile|
+      with_temp_file "braidsvndiff" do |tmpfile|
         tmpfile << diff(repository, r1, r2)
       end
     end

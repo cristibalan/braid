@@ -1,6 +1,6 @@
-module Giston
+module Braid
   module Commands
-    class Forget < Giston::Command
+    class Forget < Braid::Command
       def run(dir)
         config.remove(dir)
       end

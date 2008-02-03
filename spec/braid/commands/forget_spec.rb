@@ -1,15 +1,15 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
-module GistonCommandsForgetHelper
+module BraidCommandsForgetHelper
 end
 
-describe "Giston::Commands::Forget" do
-  include GistonCommandsForgetHelper
+describe "Braid::Commands::Forget" do
+  include BraidCommandsForgetHelper
 
   before(:each) do
     @config = mock("config")
 
-    @forget = Giston::Commands::Forget.new("config" => @config)
+    @forget = Braid::Commands::Forget.new("config" => @config)
     @forget.stub!(:msg)
   end
 

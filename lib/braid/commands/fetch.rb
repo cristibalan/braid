@@ -1,6 +1,6 @@
-module Giston
+module Braid
   module Commands
-    class Fetch < Giston::Command
+    class Fetch < Braid::Command
       def run(mirror_name)
         mirror = config.get(mirror_name)
         svn.export(mirror["url"], mirror["rev"], mirror["dir"])

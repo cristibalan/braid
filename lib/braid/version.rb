@@ -1,4 +1,4 @@
-module Giston #:nodoc:
+module Braid #:nodoc:
   module VERSION #:nodoc:
     MAJOR = 0
     MINOR = 2

@@ -1,19 +1,19 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
-module GistonCommandsFetchHelper
+module BraidCommandsFetchHelper
   def valid_mirror_hash
     {"dir" => "local/dir", "url" => "svn://remote/path", "rev" => "HEAD"}
   end
 end
 
-describe "Giston::Commands::Fetch" do
-  include GistonCommandsFetchHelper
+describe "Braid::Commands::Fetch" do
+  include BraidCommandsFetchHelper
 
   before(:each) do
     @config = mock("config")
     @config.stub!(:write)
     @svn = mock("svn")
-    @fetch = Giston::Commands::Fetch.new("config" => @config, "svn" => @svn)
+    @fetch = Braid::Commands::Fetch.new("config" => @config, "svn" => @svn)
     @fetch.stub!(:msg)
   end
 

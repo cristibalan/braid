@@ -1,15 +1,15 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
-module GistonCommandsInitHelper
+module BraidCommandsInitHelper
 end
 
-describe "Giston::Commands::Init" do
-  include GistonCommandsInitHelper
+describe "Braid::Commands::Init" do
+  include BraidCommandsInitHelper
 
   before(:each) do
     @config = mock("config")
     @svn = mock("svn")
-    @init = Giston::Commands::Init.new("config" => @config, "svn" => @svn)
+    @init = Braid::Commands::Init.new("config" => @config, "svn" => @svn)
     @init.stub!(:msg)
   end
 

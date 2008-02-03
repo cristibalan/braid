@@ -1,8 +1,8 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.dirname(__FILE__) + '/../spec_helper.rb'
 
-describe "Giston::Git" do
+describe "Braid::Git" do
   before(:each) do
-    @git = Giston::Git.new
+    @git = Braid::Git.new
 
     @git.stub!(:sys)
   end

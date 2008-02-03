@@ -1,6 +1,6 @@
-module Giston
+module Braid
   module Commands
-    class Update < Giston::Command
+    class Update < Braid::Command
       def run(mirror_name=nil, revision=nil)
         mirror_name ? update_one(mirror_name, revision) : update_all
       end
@@ -22,7 +22,7 @@ module Giston
           raise RequestedRevisionIsHigherThanRemoteRevision      if new_revision.to_i   >  remote_revision.to_i
           raise LocalRevisionIsHigherThanRequestedRevision       if local_revision.to_i >  new_revision.to_i
           raise MirrorAlreadyUpToDate                            if local_revision.to_i == new_revision.to_i
-          raise Giston::Git::LocalRepositoryHasUncommitedChanges if git.local_changes?(mirror["dir"])
+          raise Braid::Git::LocalRepositoryHasUncommitedChanges if git.local_changes?(mirror["dir"])
 
           diff = svn.diff_file(remote, local_revision, new_revision)
           local.patch(diff, mirror_name)

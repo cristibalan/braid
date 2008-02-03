@@ -1,10 +1,10 @@
-require 'giston/version'
+require 'braid/version'
 
 AUTHOR = 'FIXME full name'  # can also be an array of Authors
 EMAIL = "evil@che.lu"
 DESCRIPTION = "description of gem"
-GEM_NAME = 'giston' # what ppl will type to install your gem
-RUBYFORGE_PROJECT = 'giston' # The unix name for your project
+GEM_NAME = 'braid' # what ppl will type to install your gem
+RUBYFORGE_PROJECT = 'braid' # The unix name for your project
 HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
 DOWNLOAD_PATH = "http://rubyforge.org/projects/#{RUBYFORGE_PROJECT}"
 
@@ -31,8 +31,8 @@ end
 REV = nil 
 # UNCOMMENT IF REQUIRED: 
 # REV = `svn info`.each {|line| if line =~ /^Revision:/ then k,v = line.split(': '); break v.chomp; else next; end} rescue nil
-VERS = Giston::VERSION::STRING + (REV ? ".#{REV}" : "")
-RDOC_OPTS = ['--quiet', '--title', 'giston documentation',
+VERS = Braid::VERSION::STRING + (REV ? ".#{REV}" : "")
+RDOC_OPTS = ['--quiet', '--title', 'braid documentation',
     "--opname", "index.html",
     "--line-numbers", 
     "--main", "README",

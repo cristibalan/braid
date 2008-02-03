@@ -1,14 +1,14 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require File.dirname(__FILE__) + '/../../spec_helper.rb'
 
-module GistonCommandsUpdateHelper
+module BraidCommandsUpdateHelper
 end
 
-describe "Giston::Commands::Update with no parameters" do
-  include GistonCommandsUpdateHelper
+describe "Braid::Commands::Update with no parameters" do
+  include BraidCommandsUpdateHelper
 
   before(:each) do
     @config = mock("config")
-    @update = Giston::Commands::Update.new("config" => @config)
+    @update = Braid::Commands::Update.new("config" => @config)
     @update.stub!(:msg)
   end
 
@@ -22,15 +22,15 @@ describe "Giston::Commands::Update with no parameters" do
 
 end
 
-describe "Giston::Commands::Update with parameters" do
-  include GistonCommandsUpdateHelper
+describe "Braid::Commands::Update with parameters" do
+  include BraidCommandsUpdateHelper
 
   before(:each) do
     @config = mock("config")
     @svn = mock("svn")
     @git = mock("git")
     @local = mock("local")
-    @update = Giston::Commands::Update.new("config" => @config, "svn" => @svn, "git" => @git, "local" => @local)
+    @update = Braid::Commands::Update.new("config" => @config, "svn" => @svn, "git" => @git, "local" => @local)
     @update.stub!(:msg)
   end
 
@@ -38,28 +38,28 @@ describe "Giston::Commands::Update with parameters" do
     @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "13"})
     @svn.should_receive(:remote_revision).and_return("4")
 
-    lambda { @update.run("local/dir") }.should raise_error(Giston::Commands::LocalRevisionIsHigherThanRequestedRevision)
+    lambda { @update.run("local/dir") }.should raise_error(Braid::Commands::LocalRevisionIsHigherThanRequestedRevision)
   end
 
   it "should raise if the local revision is higher than the requested revision" do
     @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "13"})
     @svn.should_receive(:remote_revision).and_return("4")
 
-    lambda { @update.run("local/dir", "4") }.should raise_error(Giston::Commands::LocalRevisionIsHigherThanRequestedRevision)
+    lambda { @update.run("local/dir", "4") }.should raise_error(Braid::Commands::LocalRevisionIsHigherThanRequestedRevision)
   end
 
   it "should raise if the local revision is equal to the requested revision" do
     @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "13"})
     @svn.should_receive(:remote_revision).and_return("13")
 
-    lambda { @update.run("local/dir", "13") }.should raise_error(Giston::Commands::MirrorAlreadyUpToDate)
+    lambda { @update.run("local/dir", "13") }.should raise_error(Braid::Commands::MirrorAlreadyUpToDate)
   end
 
   it "should raise if the requested revision is higher than the remote revision" do
     @config.should_receive(:get).with("local/dir").and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "13"})
     @svn.should_receive(:remote_revision).and_return("13")
 
-    lambda { @update.run("local/dir", "40") }.should raise_error(Giston::Commands::RequestedRevisionIsHigherThanRemoteRevision)
+    lambda { @update.run("local/dir", "40") }.should raise_error(Braid::Commands::RequestedRevisionIsHigherThanRemoteRevision)
   end
 
   it "should raise if local git directory has changes" do
@@ -67,20 +67,20 @@ describe "Giston::Commands::Update with parameters" do
     @svn.should_receive(:remote_revision).and_return("13")
     @git.should_receive(:local_changes?).with("local/dir").and_return(true)
 
-    lambda { @update.run("local/dir", "13") }.should raise_error(Giston::Git::LocalRepositoryHasUncommitedChanges)
+    lambda { @update.run("local/dir", "13") }.should raise_error(Braid::Git::LocalRepositoryHasUncommitedChanges)
   end
 
 end
 
-describe "Giston::Commands::Update with favorable conditions" do
-  include GistonCommandsUpdateHelper
+describe "Braid::Commands::Update with favorable conditions" do
+  include BraidCommandsUpdateHelper
 
   before(:each) do
     @config = mock("config")
     @svn = mock("svn")
     @git = mock("git")
     @local = mock("local")
-    @update = Giston::Commands::Update.new("config" => @config, "svn" => @svn, "git" => @git, "local" => @local)
+    @update = Braid::Commands::Update.new("config" => @config, "svn" => @svn, "git" => @git, "local" => @local)
     @update.stub!(:msg)
 
     @config.stub!(:get).and_return({"dir" => "local/dir", "url" => "remote/path", "rev" => "4"})

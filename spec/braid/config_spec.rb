@@ -1,22 +1,22 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.dirname(__FILE__) + '/../spec_helper.rb'
 
-describe "A new Giston::Config" do
+describe "A new Braid::Config" do
   before(:each) do
     YAML.stub!(:load_file).and_return([])
-    @config = Giston::Config.new
+    @config = Braid::Config.new
   end
   
   it "should be empty" do
-    @config = Giston::Config.new
+    @config = Braid::Config.new
 
     @config.mirrors.should be_empty
   end
 end
 
-describe "Giston::Config" do
+describe "Braid::Config" do
   before(:each) do
     YAML.should_receive(:load_file).and_return([{"dir" => "local/dir", "url" => "remote/path", "rev" => "4"}])
-    @config = Giston::Config.new
+    @config = Braid::Config.new
   end
 
   it "should check for existance of mirror by dir" do
@@ -25,8 +25,8 @@ describe "Giston::Config" do
   end
 
   it "should raise when trying to add a duplicate mirror" do
-    lambda { @config.add({"dir" => "local/dir", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Giston::Config::MirrorNameAlreadyInUse)
-    lambda { @config.add({"dir" => "local/dir/", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Giston::Config::MirrorNameAlreadyInUse)
+    lambda { @config.add({"dir" => "local/dir", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Braid::Config::MirrorNameAlreadyInUse)
+    lambda { @config.add({"dir" => "local/dir/", "url" => "remote/path", "rev" => "4"}) }.should raise_error(Braid::Config::MirrorNameAlreadyInUse)
   end
 
   it "should add a new mirror if it doesn't exist" do
@@ -38,8 +38,8 @@ describe "Giston::Config" do
   end
 
   it "should raise when trying to remove a nonexistig mirror" do
-    lambda { @config.remove("local/newdir") }.should raise_error(Giston::Config::MirrorDoesNotExist)
-    lambda { @config.remove("local/newdir/") }.should raise_error(Giston::Config::MirrorDoesNotExist)
+    lambda { @config.remove("local/newdir") }.should raise_error(Braid::Config::MirrorDoesNotExist)
+    lambda { @config.remove("local/newdir/") }.should raise_error(Braid::Config::MirrorDoesNotExist)
   end
 
   it "should remove an existing mirror" do
@@ -82,7 +82,7 @@ describe "Giston::Config" do
   end
 
   it "should raise when trying to update a nonexisting mirror" do
-    lambda { @config.update("local/nonexistent", {"dir" => "local/nonexistent", "url" => "remote/path", "rev" => "13"}) }.should raise_error(Giston::Config::MirrorDoesNotExist)
+    lambda { @config.update("local/nonexistent", {"dir" => "local/nonexistent", "url" => "remote/path", "rev" => "13"}) }.should raise_error(Braid::Config::MirrorDoesNotExist)
   end
 
   it "should remove existing mirror and ad the new one when updating with valid parameters" do

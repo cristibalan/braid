@@ -1,8 +1,8 @@
 require 'yaml'
 
-module Giston
+module Braid
   class Config
-    DEFAULT_CONFIG_FILE = '.giston'
+    DEFAULT_CONFIG_FILE = '.braids'
     attr_accessor :mirrors
 
     def initialize(config_file = DEFAULT_CONFIG_FILE)

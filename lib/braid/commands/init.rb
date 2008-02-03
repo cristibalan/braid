@@ -1,6 +1,6 @@
-module Giston
+module Braid
   module Commands
-    class Init < Giston::Command
+    class Init < Braid::Command
 
       def run(remote, mirror=nil, revision=nil)
         mirror ||= extract_last_part(remote)

@@ -7,7 +7,7 @@ rescue
 end
 require 'main'
 
-require 'giston'
+require 'braid'
 
 Home = File.expand_path(ENV['HOME'] || '~')
 
@@ -15,9 +15,9 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # main kicks ass!
 Main {
   description <<-txt
-    giston is a simple tool to help track changes to svn repositories in git.
+    braid is a simple tool to help track changes to svn repositories in git.
 
-    run 'giston help commandname' for more info.
+    run 'braid help commandname' for more info.
   txt
 
   examples <<-txt
@@ -25,110 +25,110 @@ Main {
 
   mode(:init){
     description <<-txt
-      initialize a new giston mirror
+      initialize a new braid mirror
 
-      only adds metadata to the config file, you must manually run "giston fetch mirrorname"
+      only adds metadata to the config file, you must manually run "braid fetch mirrorname"
 
       mirror defaults to the last part of the remote path.
       if trunk is the last part, it is ignored and the previous part is used
     txt
 
     examples <<-txt
-      . giston init svn://remote/path
-      . giston init svn://remote/path local/dir
-      . giston init svn://remote/path local/dir -r 4
-      . giston init svn://remote/path local/dir --revision 13
+      . braid init svn://remote/path
+      . braid init svn://remote/path local/dir
+      . braid init svn://remote/path local/dir -r 4
+      . braid init svn://remote/path local/dir --revision 13
     txt
 
     mixin :argument_remote, :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:init, remote, mirror, revision)
+      Braid::Command.run(:init, remote, mirror, revision)
     }
   }
 
   mode(:fetch){
     description <<-txt
-      fetches files for a new giston mirror from remote svn remote
+      fetches files for a new braid mirror from remote svn remote
 
       only works if local directory does not exist.
-      if you actually want to update a mirror, see giston help update
+      if you actually want to update a mirror, see braid help update
     txt
 
     examples <<-txt
-      . giston fetch local/dir
+      . braid fetch local/dir
     txt
 
     mixin :argument_mirror
 
     run{
-      Giston::Command.run(:fetch, mirror)
+      Braid::Command.run(:fetch, mirror)
     }
   }
 
   mode(:mirror){
     description <<-txt
-      initialize and fetch files for a new giston mirror
+      initialize and fetch files for a new braid mirror
 
       mirror defaults to the last part of the remote path.
       if trunk is the last part, it is ignored and the previous part is used
     txt
 
     examples <<-txt
-      . giston mirror svn://remote/path
-      . giston mirror svn://remote/path local/dir
-      . giston mirror svn://remote/path local/dir -r 4
-      . giston mirror svn://remote/path local/dir --revision 13
+      . braid mirror svn://remote/path
+      . braid mirror svn://remote/path local/dir
+      . braid mirror svn://remote/path local/dir -r 4
+      . braid mirror svn://remote/path local/dir --revision 13
     txt
 
     mixin :argument_remote, :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:mirror, remote, mirror, revision)
+      Braid::Command.run(:mirror, remote, mirror, revision)
     }
   }
 
 
   mode(:update){
-    description 'update a giston mirror, or all mirrors if none specified'
+    description 'update a braid mirror, or all mirrors if none specified'
 
     examples <<-txt
-      . giston update
-      . giston update local/dir
-      . giston update local/dir -r 6000
-      . giston update local/dir --revision 6000
+      . braid update
+      . braid update local/dir
+      . braid update local/dir -r 6000
+      . braid update local/dir --revision 6000
     txt
 
     mixin :optional_mirror, :option_revision
 
     run{
-      Giston::Command.run(:update, mirror, revision)
+      Braid::Command.run(:update, mirror, revision)
     }
   }
 
   mode(:forget){
     description <<-txt
-      remove a mirror from giston metadata
+      remove a mirror from braid metadata
 
       only removes metadata, you must manually remove the local directory
     txt
 
     examples <<-txt
-      . giston forget local/dir
+      . braid forget local/dir
     txt
 
     mixin :argument_mirror
 
     run{
-      Giston::Command.run(:forget, mirror)
+      Braid::Command.run(:forget, mirror)
     }
   }
 
   mode(:version){
-    description 'show giston version'
+    description 'show braid version'
 
     run{
-      puts "giston #{Giston::VERSION::STRING}"
+      puts "braid #{Braid::VERSION::STRING}"
     }
   }
 

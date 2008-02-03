@@ -1,4 +1,4 @@
-module Giston
+module Braid
   class Local
 
     def patch(diff, dir)

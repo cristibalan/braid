@@ -1,14 +1,14 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.dirname(__FILE__) + '/../spec_helper.rb'
 require 'yaml'
 
-describe "Giston::Svn" do
+describe "Braid::Svn" do
   before(:each) do
-    fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/fixtures/')
+    fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/../fixtures/')
 
     @svn_info_fixture_path = File.join(fixtures_dir, 'svninfo')
     @diff_fixture_path     = File.join(fixtures_dir, 'some.diff')
 
-    @svn = Giston::Svn.new
+    @svn = Braid::Svn.new
     @info = YAML.load_file(@svn_info_fixture_path)
     @diff = File.read(@diff_fixture_path)
 
@@ -33,7 +33,7 @@ describe "Giston::Svn" do
   it "should produce diff in a temporary file" do
     @svn.stub!(:diff).and_return(@diff)
 
-    @svn.diff_file("svn://remote/path", 1, 2).should match /\/gistonsvndiff/
+    @svn.diff_file("svn://remote/path", 1, 2).should match(/\/braidsvndiff/)
   end
 
   it "should cat files from remote svn repository" do

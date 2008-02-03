@@ -1,8 +1,8 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.dirname(__FILE__) + '/../spec_helper.rb'
 
-describe "Giston::Local" do
+describe "Braid::Local" do
   before(:each) do
-    @local = Giston::Local.new
+    @local = Braid::Local.new
 
     @local.stub!(:sys)
   end

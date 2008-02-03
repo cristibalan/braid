@@ -1,11 +1,11 @@
-- fix giston update without a mirror name
+- fix braid update without a mirror name
 
 - handle cases when mirror directory is missing on disc
   Example:
-    giston mirror blah
+    braid mirror blah
     rm -rf blah
     git update blah # => borked
-    # it should exit and recommend using giston fetch to grab the mirror
+    # it should exit and recommend using braid fetch to grab the mirror
 
 - delete doesn't work for binary files
   idea:
@@ -19,10 +19,10 @@
 
 - handle cases when mirror directory is missing on disc
   Example:
-    giston mirror blah
+    braid mirror blah
     rm -rf blah
     git update blah # => borked
-    # it should exit and recommend using giston fetch to grab the mirror
+    # it should exit and recommend using braid fetch to grab the mirror
 
 - needs more progress info
 
@@ -31,9 +31,9 @@
     - most likely using Open4 to check the output of patch would catch this
     - ideally we should ignore missing files because most likely the git user removed them but they still receive updates in the remote svn
 
-- add giston outdated to check for remote updates to mirrors
+- add braid outdated to check for remote updates to mirrors
 
-- add giston lock/unlock so that mirrors can be skipepd during the global update
+- add braid lock/unlock so that mirrors can be skipepd during the global update
 
-- add mercurial, darcs, etc to giston and rename giston to something more "politically correct" like iston, ston, stoner, stonr, "any ston", anyston, aniston
+- add mercurial, darcs, etc to braid as sources and hosts
 

@@ -1,4 +1,4 @@
-module Giston
+module Braid
   class Git
 
     def local_changes?(dir)

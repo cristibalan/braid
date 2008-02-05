@@ -6,7 +6,7 @@ http://evil.che.lu/projects/braid
 
 = INSTALLING
 
-git clone git@github.com:evilchelu/braid.git
+git clone git://github.com/evilchelu/braid.git
 cd braid
 sudo ruby setup.rb
 

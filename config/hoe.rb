@@ -2,7 +2,7 @@ require 'braid/version'
 
 AUTHOR = 'FIXME full name'  # can also be an array of Authors
 EMAIL = "evil@che.lu"
-DESCRIPTION = "description of gem"
+DESCRIPTION = "Simple tool for managing vendor branches across different SCMs"
 GEM_NAME = 'braid' # what ppl will type to install your gem
 RUBYFORGE_PROJECT = 'braid' # The unix name for your project
 HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
@@ -59,7 +59,7 @@ hoe = Hoe.new(GEM_NAME, VERS) do |p|
   
   # == Optional
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\\n\\n")
-  #p.extra_deps = []     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
+  p.extra_deps = [ ['main', '>=2.8.0'] ]
   
   #p.spec_extras = {}    # A hash of extra values to set in the gemspec.
   

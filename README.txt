@@ -2,13 +2,21 @@
 
 Braid is a simple tool for managing vendor branches across different SCMs.
 
-http://evil.che.lu/projects/braid
+http://evil.che.lu/projects/braid.git
 
-= INSTALLING
+= INSTALLING FORM RUBYGEMS
+
+# not working yet. please install from git
+sudo gem install braid
+
+= INSTALLING FROM GIT
+
+# install deps
+sudo gem install main
 
 git clone git://github.com/evilchelu/braid.git
 cd braid
-sudo ruby setup.rb
+rake install_gem
 
 = USAGE
 

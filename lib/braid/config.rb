@@ -5,8 +5,46 @@ module Braid
   class Config
     attr_accessor :mirrors
     
-    def initialize
-      @mirrors = YAML::Store.new(".braids")
+    def initialize(config_file = ".braids")
+      @mirrors = YAML::Store.new(config_file)
+    end
+
+    def add(mirror, params)
+      mirror = remove_trailing_slash(mirror)
+      @mirrors.transaction do
+        raise Braid::Config::MirrorNameAlreadyInUse if @mirrors[mirror]
+        @mirrors[mirror] = params
+      end
+    end
+
+    def get(mirror)
+      mirror = remove_trailing_slash(mirror)
+      @mirrors.transaction do
+        @mirrors[mirror]
+      end
+    end
+
+    def remove(mirror)
+      mirror = remove_trailing_slash(mirror)
+      @mirrors.transaction do
+        @mirrors.delete(mirror)
+      end
+    end
+
+    def update(mirror, params)
+      mirror = remove_trailing_slash(mirror)
+      @mirrors.transaction do
+        raise Braid::Config::MirrorDoesNotExist unless @mirrors[mirror]
+        @mirrors[mirror] = @mirrors[mirror].merge(params)
+      end
+    end
+
+    def replace(mirror, params)
+      mirror = remove_trailing_slash(mirror)
+      @mirrors.transaction do
+        raise Braid::Config::MirrorDoesNotExist unless @mirrors[mirror]
+        @mirrors[mirror] = params
+      end
     end
 
     class << self
@@ -17,7 +55,7 @@ module Braid
         type   = options["type"]   || extract_type_from_path(remote)
         mirror = options["mirror"] || extract_mirror_from_path(remote)
 
-        [mirror, {"type" => type, "remote" => remote.to_s, "branch" => branch}]
+        [remove_trailing_slash(mirror), {"type" => type, "remote" => remove_trailing_slash(remote.to_s), "branch" => branch}]
       end
 
       private
@@ -36,63 +74,13 @@ module Braid
           last = File.basename(File.dirname(path)) if last == "trunk"
           last
         end
+        def remove_trailing_slash(path)
+          path.chomp("/") rescue path
+        end
     end
-
-  end
-end
-
-__END__
-module Braid
-  class Config
-    attr_accessor :mirrors
-
-    def initialize
-      @mirrors = YAML::Store.new(".braids")
-    end
-
-    def add(mirror)
-      raise MirrorNameAlreadyInUse if has_item?(mirror["dir"])
-      @mirrors << mirror
-      write
-    end
-
-    def remove(mirror_name)
-      raise MirrorDoesNotExist unless has_item?(mirror_name)
-      @mirrors.delete_if{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(mirror_name)}
-      write
-    end
-
-    def get(dir_or_mirror_hash)
-      case dir_or_mirror_hash
-        when String
-          dir = dir_or_mirror_hash
-        when Hash
-          dir = dir_or_mirror_hash["dir"]
-      end
-      has_item?(dir) #uh, using the sideeffect. lame
-    end
-
-    def get_from_remote(remote)
-      @mirrors.find{|mirror| cleanup_dir(mirror["url"]) == cleanup_dir(remote) && mirror["dir"] == extract_last_part(remote)}
-    end
-
-    def update(mirror_name, mirror)
-      raise MirrorDoesNotExist unless has_item?(mirror_name)
-      remove(mirror_name)
-      add(mirror)
-    end
-
     private
-
-      def cleanup_dir(dir)
-        dir.chomp("/")
-      end
-
-      # copy/paste from commands/init.rb
-      def extract_last_part(path)
-        last = File.basename(path)
-        last = File.basename(File.dirname(path)) if last == "trunk"
-        last
+      def remove_trailing_slash(path)
+        path.chomp("/") rescue path
       end
 
   end

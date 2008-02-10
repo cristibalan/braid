@@ -13,7 +13,7 @@ module Braid
       mirror = remove_trailing_slash(mirror)
       @mirrors.transaction do
         raise Braid::Config::MirrorNameAlreadyInUse if @mirrors[mirror]
-        @mirrors[mirror] = params.merge({"remote" => remove_trailing_slash(params["remote"])})
+        @mirrors[mirror] = params.merge("remote" => remove_trailing_slash(params["remote"]))
       end
     end
 
@@ -45,7 +45,7 @@ module Braid
       @mirrors.transaction do
         raise Braid::Config::MirrorDoesNotExist unless @mirrors[mirror]
         tmp = @mirrors[mirror].merge(params)
-        @mirrors[mirror] = tmp.merge({"remote" => remove_trailing_slash(tmp["remote"])})
+        @mirrors[mirror] = tmp.merge("remote" => remove_trailing_slash(tmp["remote"]))
       end
     end
 

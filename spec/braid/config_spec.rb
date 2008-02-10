@@ -7,49 +7,49 @@ describe Braid::Config, ".options_to_mirror" do
   end
 
   it "should default branch to master" do
-    name, params = @config.options_to_mirror({})
+    name, params = @config.options_to_mirror()
 
     params["branch"].should == "master"
   end
 
   it "should default type to svn, from protocol" do
-    name, params = @config.options_to_mirror({"remote" => "svn://path"})
+    name, params = @config.options_to_mirror("remote" => "svn://path")
 
     params["type"].should == "svn"
   end
 
   it "should default type to svn, if path ends in /trunk" do
-    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
 
     params["type"].should == "svn"
   end
 
   it "should default type to git, from protocol" do
-    name, params = @config.options_to_mirror({"remote" => "git://path"})
+    name, params = @config.options_to_mirror("remote" => "git://path")
 
     params["type"].should == "git"
   end
 
   it "should default type to git, if path ends in .git" do
-    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
 
     params["type"].should == "svn"
   end
 
   it "should default mirror to last path part" do
-    name, params = @config.options_to_mirror({"remote" => "http://path"})
+    name, params = @config.options_to_mirror("remote" => "http://path")
 
     name.should == "path"
   end
 
   it "should default mirror to previous to last path part, if last path part is /trunk" do
-    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
 
     name.should == "path"
   end
 
   it "should default mirror to last path part, ignoring trailing .git" do
-    name, params = @config.options_to_mirror({"remote" => "http://path.git"})
+    name, params = @config.options_to_mirror("remote" => "http://path.git")
 
     name.should == "path"
   end
@@ -66,7 +66,7 @@ describe Braid::Config, "when empty" do
   end
 
   it "should add a mirror and its params" do
-    @config.add "mirror", {"remote" => "path"}
+    @config.add "mirror", "remote" => "path"
 
     @config.get("mirror").should == {"remote" => "path"}
   end
@@ -77,7 +77,7 @@ describe Braid::Config, "with one mirror" do
   db = "tmp.yml"
   before(:each) do
     @config = Braid::Config.new(db)
-    @config.add "mirror", {"remote" => "path"}
+    @config.add "mirror", "remote" => "path"
   end
   after(:each) do
     FileUtils.rm db
@@ -93,7 +93,7 @@ describe Braid::Config, "with one mirror" do
 
 
   it "should raise when overwriting a mirror on add" do
-    lambda { @config.add "mirror", {"remote" => "other"}}.should raise_error
+    lambda { @config.add "mirror", "remote" => "other"}.should raise_error
   end
 
   it "should remove the mirror" do
@@ -103,13 +103,13 @@ describe Braid::Config, "with one mirror" do
   end
 
   it "should update the mirror with new params" do
-    @config.update("mirror", {"branch" => "other"})
+    @config.update("mirror", "branch" => "other")
 
     @config.get("mirror").should == {"remote" => "path", "branch" => "other"}
   end
 
   it "should replace the mirror with the new params" do
-    @config.replace("mirror", {"branch" => "other"})
+    @config.replace("mirror", "branch" => "other")
 
     @config.get("mirror").should == {"branch" => "other"}
   end

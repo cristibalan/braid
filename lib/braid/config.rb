@@ -13,7 +13,7 @@ module Braid
       mirror = remove_trailing_slash(mirror)
       @mirrors.transaction do
         raise Braid::Config::MirrorNameAlreadyInUse if @mirrors[mirror]
-        @mirrors[mirror] = params
+        @mirrors[mirror] = params.merge({"remote" => remove_trailing_slash(params["remote"])})
       end
     end
 
@@ -35,7 +35,8 @@ module Braid
       mirror = remove_trailing_slash(mirror)
       @mirrors.transaction do
         raise Braid::Config::MirrorDoesNotExist unless @mirrors[mirror]
-        @mirrors[mirror] = @mirrors[mirror].merge(params)
+        tmp = @mirrors[mirror].merge(params)
+        @mirrors[mirror] = tmp.merge({"remote" => remove_trailing_slash(tmp["remote"])})
       end
     end
 
@@ -43,6 +44,7 @@ module Braid
       mirror = remove_trailing_slash(mirror)
       @mirrors.transaction do
         raise Braid::Config::MirrorDoesNotExist unless @mirrors[mirror]
+        params["remote"] = remove_trailing_slash(params["remote"]) if params["remote"]
         @mirrors[mirror] = params
       end
     end
@@ -74,6 +76,7 @@ module Braid
           last = File.basename(File.dirname(path)) if last == "trunk"
           last
         end
+        # usage of this method is horrible and there are no specs :/
         def remove_trailing_slash(path)
           path.chomp("/") rescue path
         end

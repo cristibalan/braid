@@ -109,7 +109,6 @@ describe Braid::Config, "with one mirror" do
     @config.get("mirror").should == {"branch" => "other"}
   end
 
-
   it "should raise when trying to update non existent mirror" do
     lambda { @config.update "N/A", {}}.should raise_error
   end

@@ -1,5 +1,62 @@
 require File.dirname(__FILE__) + '/../spec_helper.rb'
 
+describe "Braid::Config.options_to_mirror" do
+
+  before do
+    @config = Braid::Config
+  end
+
+  it "should default branch to master" do
+    name, params = @config.options_to_mirror({})
+
+    params["branch"].should == "master"
+  end
+
+  it "should default type to svn, from protocol" do
+    name, params = @config.options_to_mirror({"remote" => "svn://path"})
+
+    params["type"].should == "svn"
+  end
+
+  it "should default type to svn, if path ends in /trunk" do
+    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+
+    params["type"].should == "svn"
+  end
+
+  it "should default type to git, from protocol" do
+    name, params = @config.options_to_mirror({"remote" => "git://path"})
+
+    params["type"].should == "git"
+  end
+
+  it "should default type to git, if path ends in .git" do
+    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+
+    params["type"].should == "svn"
+  end
+
+  it "should default mirror to last path part" do
+    name, params = @config.options_to_mirror({"remote" => "http://path"})
+
+    name.should == "path"
+  end
+
+  it "should default mirror to previous to last path part, if last path part is /trunk" do
+    name, params = @config.options_to_mirror({"remote" => "http://path/trunk"})
+
+    name.should == "path"
+  end
+
+  it "should default mirror to last path part, ignoring trailing .git" do
+    name, params = @config.options_to_mirror({"remote" => "http://path.git"})
+
+    name.should == "path"
+  end
+
+end
+
+__END__
 describe "A new Braid::Config" do
   before(:each) do
     YAML.stub!(:load_file).and_return([])

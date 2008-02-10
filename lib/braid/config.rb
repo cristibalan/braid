@@ -1,30 +1,53 @@
 require 'yaml'
+require 'yaml/store'
 
 module Braid
   class Config
-    DEFAULT_CONFIG_FILE = '.braids'
+    attr_accessor :mirrors
+    
+    def initialize
+      @mirrors = YAML::Store.new(".braids")
+    end
+
+    class << self
+      def options_to_mirror(options = {})
+        remote = options["remote"]
+        branch = options["branch"] || "master"
+
+        type   = options["type"]   || extract_type_from_path(remote)
+        mirror = options["mirror"] || extract_mirror_from_path(remote)
+
+        [mirror, {"type" => type, "remote" => remote.to_s, "branch" => branch}]
+      end
+
+      private
+        def extract_type_from_path(path)
+          return nil unless path
+          path_scheme = path.split(":").first
+          return path_scheme if %w[svn git].include? path_scheme
+
+          return "svn" if path[-6..-1] == "/trunk"
+          return "git" if path[-4..-1] == ".git"
+        end
+        def extract_mirror_from_path(path)
+          return nil unless path
+          last = File.basename(path)
+          return last[0..-5] if File.extname(last) == ".git"
+          last = File.basename(File.dirname(path)) if last == "trunk"
+          last
+        end
+    end
+
+  end
+end
+
+__END__
+module Braid
+  class Config
     attr_accessor :mirrors
 
-    def initialize(config_file = DEFAULT_CONFIG_FILE)
-      @config_file = config_file
-      read
-    end
-
-    def read
-      @mirrors = YAML::load_file(@config_file)
-    rescue
-      @mirrors = []
-    end
-
-    def write(config_file = nil)
-      config_file ||= @config_file
-      File.open(@config_file, 'w') do |out|
-        YAML.dump(@mirrors, out)
-      end 
-    end
-
-    def has_item?(mirror_name)
-      @mirrors.find{|mirror| cleanup_dir(mirror["dir"]) == cleanup_dir(mirror_name)}
+    def initialize
+      @mirrors = YAML::Store.new(".braids")
     end
 
     def add(mirror)

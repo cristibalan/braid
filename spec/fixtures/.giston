@@ -1,5 +1,0 @@
----
--
-  dir: local/mirror1
-  url: svn://remote/mirror1
-  rev: 1

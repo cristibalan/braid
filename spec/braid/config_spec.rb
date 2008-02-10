@@ -87,6 +87,11 @@ describe Braid::Config, "with one mirror" do
     @config.get("mirror").should == {"remote" => "path"}
   end
 
+  it "should get the mirror by remote" do
+    @config.get_by_remote("path").should == ["mirror", {"remote" => "path"}]
+  end
+
+
   it "should raise when overwriting a mirror on add" do
     lambda { @config.add "mirror", {"remote" => "other"}}.should raise_error
   end

@@ -24,6 +24,15 @@ module Braid
       end
     end
 
+    def get_by_remote(remote)
+      remote = remove_trailing_slash(remote)
+      mirror = nil
+      @mirrors.transaction do
+        mirror = @mirrors.roots.detect { |mirror| @mirrors[mirror]["remote"] == remote }
+      end
+      [mirror, get(mirror)]
+    end
+
     def remove(mirror)
       mirror = remove_trailing_slash(mirror)
       @mirrors.transaction do

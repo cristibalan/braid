@@ -24,3 +24,11 @@
 * add braid lock/unlock so that mirrors can be skipepd during the global update
 
 * add braid outdated to check for remote updates to mirrors
+
+* add braid switch to change the remote for a mirror
+  * for svn, an idea is here:
+    http://duncan.mac-vicar.com/blog/archives/282
+  * for git, some freaky merging i guess :)
+    welp!
+
+

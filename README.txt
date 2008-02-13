@@ -28,7 +28,7 @@ cd moo
 git config --global mirror.summary true
 git checkout -b localwork
 
-# add mirrors
+# adding mirrors
 braid add git://blah
 braid add svn://muh
 gitk braid/track

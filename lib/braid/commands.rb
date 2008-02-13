@@ -17,7 +17,7 @@ module Braid
       klass = Braid::Commands.const_get(command.to_s.capitalize)
       klass.new.run_in_track_branch(*args)
     rescue Braid::Exception => e
-      puts "braid: An exception has occured: #{e.message || e} (#{e})"
+      msg "An exception has occured: #{e.message || e} (#{e})"
     end
 
     def run_in_track_branch(*args)
@@ -27,11 +27,15 @@ module Braid
       work_head = get_work_head
 
       begin
+        msg "Checking out work branch '#{TRACK_BRANCH}'."
         exec! "git checkout #{TRACK_BRANCH}"
         run(*args)
-      rescue
+      rescue => e
+        puts "braid: Resetting #{TRACK_BRANCH} to #{work_head} due to error."
         exec! "git reset --hard #{work_head}"
+        raise e
       ensure
+        msg "Checking out branch '#{current}'."
         exec! "git checkout #{current}"
       end
     end
@@ -47,6 +51,7 @@ module Braid
         status, out, err = exec "git branch | grep -e '#{TRACK_BRANCH}'"
         track = out.strip!
         if status != 0
+          msg "Creating work branch '#{TRACK_BRANCH}'"
           status, out, err = exec! "git branch #{TRACK_BRANCH}"
         end
       end
@@ -90,8 +95,11 @@ module Braid
 
     private
 
-      def msg(str)
+      def self.msg(str)
         puts "braid: " + str
+      end
+      def msg(str)
+        self.class.msg(str)
       end
 
   end

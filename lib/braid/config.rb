@@ -42,6 +42,12 @@ module Braid
       end
     end
 
+    def get!(mirror)
+      params = get(mirror)
+      raise Braid::Config::MirrorDoesNotExist unless params
+      params
+    end
+
     def get_by_remote(remote)
       remote = remove_trailing_slash(remote)
       mirror = nil

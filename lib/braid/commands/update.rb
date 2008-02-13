@@ -15,6 +15,11 @@ module Braid
 
         def update_one(mirror)
           params = config.get(mirror)
+          unless params
+            msg "Mirror '#{mirror}' does not exist. Skipping."
+            return
+          end
+
           msg "Updating #{params["type"]} mirror '#{mirror}' from '#{params["remote"]}'."
 
           case params["type"]

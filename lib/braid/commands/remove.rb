@@ -3,8 +3,12 @@ module Braid
     class Remove < Braid::Command
       def run(mirror)
         params = config.get(mirror)
+        unless params
+          msg "Mirror '#{mirror}' does not exist."
+          return
+        end
 
-        msg "Removign #{params["type"]} mirror from '#{mirror}'."
+        msg "Removing #{params["type"]} mirror from '#{mirror}'."
         config.remove(mirror)
 
         remove_dir = <<-CMDS

@@ -5,6 +5,8 @@ module Braid
       def run(remote, options = {})
         mirror, params = config.add_from_options(remote, options)
 
+        msg "Adding #{params["type"]} mirror from '#{params["remote"]}' into '#{mirror}' using local branch '#{params["branch"]}'."
+
         local_branch = get_local_branch_name(mirror, params)
         config.update(mirror, {"local_branch" => local_branch})
 
@@ -21,6 +23,7 @@ module Braid
         else
           raise
         end
+        msg "Setting up remote branch and fetching data."
         exec_all! setup_remote
 
         merge = <<-CMDS
@@ -29,6 +32,7 @@ module Braid
           git add .braids
           git commit -m "Merge #{local_branch} into #{mirror}/"
         CMDS
+        msg "Merging code into '#{mirror}'."
         exec_all! merge
 
       end

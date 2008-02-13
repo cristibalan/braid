@@ -4,6 +4,7 @@ module Braid
       def run(mirror)
         params = config.get(mirror)
 
+        msg "Removign #{params["type"]} mirror from '#{mirror}'."
         config.remove(mirror)
 
         remove_dir = <<-CMDS

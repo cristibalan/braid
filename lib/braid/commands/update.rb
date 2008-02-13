@@ -7,6 +7,7 @@ module Braid
 
       private
         def update_all
+          msg "Updating all mirrors."
           config.mirrors.each do |mirror|
             update_one(mirror)
           end
@@ -14,6 +15,7 @@ module Braid
 
         def update_one(mirror)
           params = config.get(mirror)
+          msg "Updating #{params["type"]} mirror '#{mirror}' from '#{params["remote"]}'."
 
           case params["type"]
           when "svn"

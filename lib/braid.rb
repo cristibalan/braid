@@ -3,10 +3,8 @@ require "braid/version"
 require "braid/exceptions"
 
 require "braid/config"
+#require "braid/cli"
 require "braid/commands"
-require "braid/svn"
-require "braid/git"
-require "braid/local"
 
 module Braid
 end

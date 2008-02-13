@@ -7,49 +7,49 @@ describe Braid::Config, ".options_to_mirror" do
   end
 
   it "should default branch to master" do
-    name, params = @config.options_to_mirror()
+    name, params = @config.options_to_mirror("svn://path")
 
     params["branch"].should == "master"
   end
 
   it "should default type to svn, from protocol" do
-    name, params = @config.options_to_mirror("remote" => "svn://path")
+    name, params = @config.options_to_mirror("svn://path")
 
     params["type"].should == "svn"
   end
 
   it "should default type to svn, if path ends in /trunk" do
-    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
+    name, params = @config.options_to_mirror("http://path/trunk")
 
     params["type"].should == "svn"
   end
 
   it "should default type to git, from protocol" do
-    name, params = @config.options_to_mirror("remote" => "git://path")
+    name, params = @config.options_to_mirror("git://path")
 
     params["type"].should == "git"
   end
 
   it "should default type to git, if path ends in .git" do
-    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
+    name, params = @config.options_to_mirror("http://path/trunk")
 
     params["type"].should == "svn"
   end
 
   it "should default mirror to last path part" do
-    name, params = @config.options_to_mirror("remote" => "http://path")
+    name, params = @config.options_to_mirror("http://path")
 
     name.should == "path"
   end
 
   it "should default mirror to previous to last path part, if last path part is /trunk" do
-    name, params = @config.options_to_mirror("remote" => "http://path/trunk")
+    name, params = @config.options_to_mirror("http://path/trunk")
 
     name.should == "path"
   end
 
   it "should default mirror to last path part, ignoring trailing .git" do
-    name, params = @config.options_to_mirror("remote" => "http://path.git")
+    name, params = @config.options_to_mirror("http://path.git")
 
     name.should == "path"
   end

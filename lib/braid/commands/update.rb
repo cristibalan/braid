@@ -1,39 +1,35 @@
 module Braid
   module Commands
     class Update < Braid::Command
-      def run(mirror_name=nil, revision=nil)
-        mirror_name ? update_one(mirror_name, revision) : update_all
+      def run(mirror)
+        mirror ? update_one(mirror) : update_all
       end
 
       private
         def update_all
           config.mirrors.each do |mirror|
-            update_one(mirror["dir"])
+            update_one(mirror)
           end
         end
 
-        def update_one(mirror_name, new_revision=nil)
-          mirror = config.get(mirror_name)
-          local_revision = mirror["rev"]
-          remote_revision = svn.remote_revision(mirror["url"])
-          new_revision ||= remote_revision
-          remote = mirror["url"]
+        def update_one(mirror)
+          params = config.get(mirror)
 
-          raise RequestedRevisionIsHigherThanRemoteRevision      if new_revision.to_i   >  remote_revision.to_i
-          raise LocalRevisionIsHigherThanRequestedRevision       if local_revision.to_i >  new_revision.to_i
-          raise MirrorAlreadyUpToDate                            if local_revision.to_i == new_revision.to_i
-          raise Braid::Git::LocalRepositoryHasUncommitedChanges if git.local_changes?(mirror["dir"])
-
-          diff = svn.diff_file(remote, local_revision, new_revision)
-          local.patch(diff, mirror_name)
-
-          binaries = local.extract_binaries_from_diff(diff)
-          binaries.each do |binary|
-            svn.cat(remote, binary, new_revision, mirror_name)
+          case params["type"]
+          when "svn"
+            update_remote = <<-CMDS
+              git svn fetch #{params["local_branch"]}
+              git merge -s subtree #{params["local_branch"]}
+            CMDS
+          when "git"
+            update_remote = <<-CMDS
+              git fetch #{params["local_branch"]}
+              git merge -s subtree #{params["local_branch"]} 
+            CMDS
+          else
+            raise
           end
-
-          mirror["rev"] = new_revision
-          config.update(mirror_name, mirror)
+          exec_all! update_remote
         end
 
     end

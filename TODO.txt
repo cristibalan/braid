@@ -1,3 +1,32 @@
+= TODO
+
+* allow updating to older revisions
+  * implementation idea:
+    git update --revision XX or git update --commit HASH
+      # svn
+      git svn find-rev rXX # #{SHA1}
+      # git
+      # use git log to find a commit
+
+      # updating
+      # i'd rather not want to use read-tree because this would mess with all the automatic merges and stuff
+      # it'll make goin back in the future harder too
+      # another idea i have is to do something like rebase
+      #   - stash away the change to the mirror
+      #   - remake the merge form the lower revision
+      #   - reapply the stashed changes
+
+      git read-tree --prefix=#{local_branch}.tmp -u #{SHA1}
+      cp -r #{local_branch}.tmp/* #{local_branch}/
+      rm #{local_branch}.tmp
+      git reset --mixed
+
+* add braid lock/unlock so that mirrors can be skipepd during the global update
+
+* add braid outdated to check for remote updates to mirrors
+
+= OLD TODOS, outdated or no longer needed. keeping them around for a while for reference
+
 - fix braid update without a mirror name
 
 - handle cases when mirror directory is missing on disc
@@ -30,10 +59,6 @@
   idea:
     - most likely using Open4 to check the output of patch would catch this
     - ideally we should ignore missing files because most likely the git user removed them but they still receive updates in the remote svn
-
-- add braid outdated to check for remote updates to mirrors
-
-- add braid lock/unlock so that mirrors can be skipepd during the global update
 
 - add mercurial, darcs, etc to braid as sources and hosts
 

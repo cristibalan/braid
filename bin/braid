@@ -14,113 +14,104 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # mostly blantantly stolen from ara's punch script
 # main kicks ass!
 Main {
+=begin
+braid add
+
+braid update
+
+braid remove
+=end
+
   description <<-txt
-    braid is a simple tool to help track changes to svn repositories in git.
+    braid is a simple tool to help track git or svn repositories inside a git repository.
 
     run 'braid help commandname' for more info.
+    
+    operations will be ran in the braid/track branch from which you can then cherry pick
   txt
 
   examples <<-txt
   txt
 
-  mode(:init){
+  mode(:add){
     description <<-txt
-      initialize a new braid mirror
+      add a new mirror to be tracked:
 
-      only adds metadata to the config file, you must manually run "braid fetch mirrorname"
+        * adds metadata about the mirror to .braids
+        * adds the git or git svn remotes to .git
+        * fetches and merges remote code into given directory (mirror)
 
-      mirror defaults to the last part of the remote path.
-      if trunk is the last part, it is ignored and the previous part is used
+      mirror_type defaults:
+
+        * svn://path          # => svn
+        * git://path          # => git
+        * http://path/trunk   # => svn
+        * http://path.git     # => git
+
+      mirror_name defaults:
+
+        * remote/path         # => path
+        * remote/path/trunk   # => path
+        * remote/path.git     # => path
     txt
 
     examples <<-txt
-      . braid init svn://remote/path
-      . braid init svn://remote/path local/dir
-      . braid init svn://remote/path local/dir -r 4
-      . braid init svn://remote/path local/dir --revision 13
+      . braid add svn://remote/path
+      . braid add svn://remote/path local/dir
+      . braid add git://remote/path local/dir
+      . braid add http://remote/path.git local/dir
+      . braid add http://remote/path --type git local/dir
+      . braid add svn://remote/path --branch notmaster
     txt
 
-    mixin :argument_remote, :optional_mirror, :option_revision
+    mixin :argument_remote, :option_type, :optional_mirror, :option_branch
 
     run{
-      Braid::Command.run(:init, remote, mirror, revision)
+      Braid::Command.run(:add, remote, {"type" => type, "mirror" => mirror, "branch" => branch})
     }
   }
-
-  mode(:fetch){
-    description <<-txt
-      fetches files for a new braid mirror from remote svn remote
-
-      only works if local directory does not exist.
-      if you actually want to update a mirror, see braid help update
-    txt
-
-    examples <<-txt
-      . braid fetch local/dir
-    txt
-
-    mixin :argument_mirror
-
-    run{
-      Braid::Command.run(:fetch, mirror)
-    }
-  }
-
-  mode(:mirror){
-    description <<-txt
-      initialize and fetch files for a new braid mirror
-
-      mirror defaults to the last part of the remote path.
-      if trunk is the last part, it is ignored and the previous part is used
-    txt
-
-    examples <<-txt
-      . braid mirror svn://remote/path
-      . braid mirror svn://remote/path local/dir
-      . braid mirror svn://remote/path local/dir -r 4
-      . braid mirror svn://remote/path local/dir --revision 13
-    txt
-
-    mixin :argument_remote, :optional_mirror, :option_revision
-
-    run{
-      Braid::Command.run(:mirror, remote, mirror, revision)
-    }
-  }
-
 
   mode(:update){
-    description 'update a braid mirror, or all mirrors if none specified'
+    description <<-txt
+      update a braid mirror:
+
+        * get new changes from remote
+
+      defaults to updating all mirrors if none is specified
+      
+      if you want nicer commit messages from the automatic merges, do this:
+        git config --global mirror.summary true
+    txt
 
     examples <<-txt
       . braid update
       . braid update local/dir
-      . braid update local/dir -r 6000
-      . braid update local/dir --revision 6000
     txt
 
-    mixin :optional_mirror, :option_revision
+    mixin :optional_mirror
 
     run{
-      Braid::Command.run(:update, mirror, revision)
+      Braid::Command.run(:update, mirror)
     }
   }
 
-  mode(:forget){
+  mode(:remove){
     description <<-txt
-      remove a mirror from braid metadata
+      remove a mirror
 
-      only removes metadata, you must manually remove the local directory
+        * removes metadata from .braids
+        * removes the local directory and commits the removal
+        * does NOT remove the git and git svn remotes in case you still need them around
     txt
 
     examples <<-txt
-      . braid forget local/dir
+      . braid remove local/dir
     txt
 
     mixin :argument_mirror
 
     run{
-      Braid::Command.run(:forget, mirror)
+      Braid::Command.run(:remove, mirror)
     }
   }
 
@@ -151,11 +142,20 @@ Main {
     }
   end
 
-  mixin :option_revision do
-    option(:revision, :r){
+  mixin :option_type do
+    option(:type, :t){
       optional
       argument :required
-      desc 'remote svn revision'
+      desc 'mirror type'
+      attr
+    }
+  end
+
+  mixin :option_branch do
+    option(:branch, :b){
+      optional
+      argument :required
+      desc 'remote branch name'
       attr
     }
   end

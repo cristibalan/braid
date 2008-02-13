@@ -14,20 +14,14 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # mostly blantantly stolen from ara's punch script
 # main kicks ass!
 Main {
-=begin
-braid add
-
-braid update
-
-braid remove
-=end
 
   description <<-txt
     braid is a simple tool to help track git or svn repositories inside a git repository.
 
     run 'braid help commandname' for more info.
     
-    operations will be ran in the braid/track branch from which you can then cherry pick
+    all operations will be executed in the braid/track branch
+    you can then merge it back or cherry pick changes
   txt
 
   examples <<-txt

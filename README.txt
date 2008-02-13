@@ -6,7 +6,7 @@ http://evil.che.lu/projects/braid
 
 = INSTALLING FORM RUBYGEMS
 
-# not working yet. please install from git
+# gem not published yet. please install from git
 sudo gem install braid
 
 = INSTALLING FROM GIT
@@ -20,7 +20,38 @@ rake install_gem
 
 = USAGE
 
-Braid stores it's metadata in a file called ".braids" located in the currend directory where braid is run. Run "braid" to see the full usage instructions.
+# create a git repo
+git init moo
+cd moo
+
+# ideally you will also do these, but they are just good practices
+git config --global mirror.summary true
+git checkout -b localwork
+
+# add mirrors
+braid add git://blah
+braid add svn://muh
+gitk braid/track
+git merge braid/track
+
+# updating mirrors
+braid update muh
+braid update
+git merge braid/track
+
+# removing mirrors
+braid remove blah
+braid remove muh
+git merge braid/track
+
+= MORE USAGE
+
+Braid stores it's metadata in a file called ".braids" located in the current directory where braid is run.
+
+For full usage docs run:
+
+braid help
+braid help COMMANDNAME
 
 = ISSUES
 

@@ -53,6 +53,12 @@ For full usage docs run:
 braid help
 braid help COMMANDNAME
 
+= POSSIBLE PROBLEMS
+
+In a multiuser setup people won't have all the remote branches setup. But nothing is really lost, yet.
+
+Theoretically if you add the same remotes on other checkout and set the branches correctly things could be made to just work(TM).
+
 = ISSUES
 
 Braid barely works and you'll definitely encounter bugs. Help is appreciated :).

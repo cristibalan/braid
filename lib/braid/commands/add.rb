@@ -14,7 +14,7 @@ module Braid
         when "svn"
           setup_remote = <<-CMDS
             git svn init -R #{local_branch} --id=#{local_branch} #{params["remote"]}
-            git svn fetch #{local_branch}
+            git svn fetch -r HEAD #{local_branch}
           CMDS
         when "git"
           setup_remote = <<-CMDS

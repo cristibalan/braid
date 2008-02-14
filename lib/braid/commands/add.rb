@@ -8,7 +8,7 @@ module Braid
         local_branch = get_local_branch_name(mirror, params)
         config.update(mirror, {"local_branch" => local_branch})
 
-        msg "Adding #{params["type"]} mirror from '#{params["remote"]}' into '#{mirror}' using local branch '#{params["branch"]}'."
+        msg "Adding #{params["type"]} mirror from '#{params["remote"]}'#{", branch #{params["branch"]}" if params["type"] == "git"} into '#{mirror}' using local branch '#{local_branch}'."
 
         case params["type"]
         when "svn"

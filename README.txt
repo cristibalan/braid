@@ -4,6 +4,8 @@ Braid is a simple tool for managing vendor branches across different SCMs.
 
 http://evil.che.lu/projects/braid
 
+You'll need a rather recent version of git, most likely something after 1.5.4.
+
 = INSTALLING FORM RUBYGEMS
 
 # gem not published yet. please install from git

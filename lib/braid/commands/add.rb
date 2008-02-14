@@ -5,10 +5,10 @@ module Braid
       def run(remote, options = {})
         mirror, params = config.add_from_options(remote, options)
 
-        msg "Adding #{params["type"]} mirror from '#{params["remote"]}' into '#{mirror}' using local branch '#{params["branch"]}'."
-
         local_branch = get_local_branch_name(mirror, params)
         config.update(mirror, {"local_branch" => local_branch})
+
+        msg "Adding #{params["type"]} mirror from '#{params["remote"]}' into '#{mirror}' using local branch '#{params["branch"]}'."
 
         case params["type"]
         when "svn"
@@ -41,6 +41,7 @@ module Braid
         def get_local_branch_name(mirror, params)
           res = "braid/#{params["type"]}/#{mirror}"
           res << "/#{params["branch"]}" if params["type"] == "git"
+          res.gsub!("_", '-') # stupid git svn changes all _ to ., weird
           res
         end
 

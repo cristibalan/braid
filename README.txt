@@ -13,6 +13,7 @@ sudo gem install braid
 
 # install deps
 sudo gem install main
+sudo gem install open4
 
 git clone git://github.com/evilchelu/braid.git
 cd braid

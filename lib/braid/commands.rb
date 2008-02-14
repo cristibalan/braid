@@ -88,7 +88,7 @@ module Braid
       def exec_all!(cmds)
         cmds.each_line do |cmd|
           status, out, err = exec(cmd)
-          return [status, out, err] unless status
+          raise Braid::Commands::ShellExecutionError, err unless status == 0
         end
         true
       end

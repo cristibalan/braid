@@ -31,8 +31,11 @@ module Braid
         exec! "git checkout #{TRACK_BRANCH}"
         run(*args)
       rescue => e
-        msg "Resetting #{TRACK_BRANCH} to #{work_head} due to error."
-        exec! "git reset --hard #{work_head}"
+        msg "Error occured: #{e}"
+        if get_current_branch == TRACK_BRANCH
+          msg "Resetting #{TRACK_BRANCH} to #{work_head}."
+          exec! "git reset --hard #{work_head}"
+        end
         raise e
       ensure
         msg "Checking out branch '#{current}'."

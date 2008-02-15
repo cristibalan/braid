@@ -31,7 +31,7 @@ module Braid
         exec! "git checkout #{TRACK_BRANCH}"
         run(*args)
       rescue => e
-        puts "braid: Resetting #{TRACK_BRANCH} to #{work_head} due to error."
+        msg "Resetting #{TRACK_BRANCH} to #{work_head} due to error."
         exec! "git reset --hard #{work_head}"
         raise e
       ensure
@@ -72,6 +72,8 @@ module Braid
         out = ""
         err = ""
         cmd.strip!
+
+        ENV['LANG'] = 'C' unless ENV['LANG'] == 'C'
         status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
           out = stdout.read.strip
           err = stderr.read.strip

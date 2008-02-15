@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Braid
   module Commands
     class Add < Braid::Command
@@ -8,13 +10,16 @@ module Braid
         local_branch = get_local_branch_name(mirror, params)
         config.update(mirror, {"local_branch" => local_branch})
 
-        msg "Adding #{params["type"]} mirror from '#{params["remote"]}'#{", branch #{params["branch"]}" if params["type"] == "git"} into '#{mirror}' using local branch '#{local_branch}'."
+        msg "Adding #{params["type"]} mirror from '#{params["remote"]}'#{", branch '#{params["branch"]}'" if params["type"] == "git"} into '#{mirror}' using local branch '#{local_branch}'."
 
         case params["type"]
         when "svn"
+          head_revision = svn_remote_revision(params["remote"])
+          msg "Got remote svn revision: #{head_revision}."
+
           setup_remote = <<-CMDS
             git svn init -R #{local_branch} --id=#{local_branch} #{params["remote"]}
-            git svn fetch -r HEAD #{local_branch}
+            git svn fetch -r #{head_revision} #{local_branch}
           CMDS
         when "git"
           setup_remote = <<-CMDS
@@ -43,6 +48,11 @@ module Braid
           res << "/#{params["branch"]}" if params["type"] == "git"
           res.gsub!("_", '-') # stupid git svn changes all _ to ., weird
           res
+        end
+
+        def svn_remote_revision(path)
+          status, out, err = exec!("svn info #{path}")
+          YAML.load(out)["Last Changed Rev"]
         end
 
     end

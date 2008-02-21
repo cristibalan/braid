@@ -35,7 +35,7 @@ module Braid
           git merge -s ours --no-commit #{local_branch}
           git read-tree --prefix=#{mirror}/ -u #{local_branch}
           git add .braids
-          git commit -m "Merge #{local_branch} into #{mirror}/"
+          git commit -m "Merge #{local_branch} into #{mirror}/" --no-verify
         CMDS
         msg "Merging code into '#{mirror}'."
         exec_all! merge

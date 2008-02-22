@@ -6,6 +6,10 @@ http://evil.che.lu/projects/braid
 
 You'll need a rather recent version of git, most likely something after 1.5.4.
 
+If you're on OS X, git from macports is at version 1.5.3.7 and braid won't work with that.
+There a patch in the macports trac to allow you to get git-core 1.5.4.2, here (thanks jakehow):
+http://trac.macosforge.org/projects/macports/ticket/13956
+
 = INSTALLING FORM RUBYGEMS
 
 # gem not published yet. please install from git

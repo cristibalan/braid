@@ -22,7 +22,7 @@ module Braid
     end
 
     def mirrors
-      @db.transaction do
+      @db.transaction(true) do
         @db.roots
       end
     end
@@ -37,7 +37,7 @@ module Braid
 
     def get(mirror)
       mirror = remove_trailing_slash(mirror)
-      @db.transaction do
+      @db.transaction(true) do
         @db[mirror]
       end
     end
@@ -51,7 +51,7 @@ module Braid
     def get_by_remote(remote)
       remote = remove_trailing_slash(remote)
       mirror = nil
-      @db.transaction do
+      @db.transaction(true) do
         mirror = @db.roots.detect { |mirror| @db[mirror]["remote"] == remote }
       end
       [mirror, get(mirror)]

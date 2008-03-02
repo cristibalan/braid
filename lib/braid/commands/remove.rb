@@ -12,7 +12,7 @@ module Braid
         config.remove(mirror)
 
         remove_dir = <<-CMDS
-          git rm #{mirror}
+          git rm -r #{mirror}
           git add .braids
           git commit -m "Remove #{params["local_branch"]} from #{mirror}/" --no-verify
         CMDS

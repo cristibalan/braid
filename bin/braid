@@ -58,10 +58,10 @@ Main {
       . braid add svn://remote/path --branch notmaster
     txt
 
-    mixin :argument_remote, :option_type, :optional_mirror, :option_branch
+    mixin :argument_remote, :option_type, :optional_mirror, :option_branch, :option_rails_plugin
 
     run{
-      Braid::Command.run(:add, remote, {"type" => type, "mirror" => mirror, "branch" => branch})
+      Braid::Command.run(:add, remote, {"type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin})
     }
   }
 
@@ -150,6 +150,14 @@ Main {
       optional
       argument :required
       desc 'remote branch name'
+      attr
+    }
+  end
+
+  mixin :option_rails_plugin do
+    option(:rails_plugin, :p){
+      optional
+      desc 'added mirror is a rails plugin'
       attr
     }
   end

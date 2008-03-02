@@ -17,6 +17,7 @@ module Braid
       raise Braid::Config::BranchIsRequired unless params["branch"]
       raise Braid::Config::MirrorNameIsRequired unless mirror
 
+      params.delete("rails_plugin")
       add(mirror, params)
       [mirror, get(mirror)]
     end
@@ -89,6 +90,10 @@ module Braid
 
         type   = options["type"]   || extract_type_from_path(remote)
         mirror = options["mirror"] || extract_mirror_from_path(remote)
+
+        if options["rails_plugin"]
+          mirror = "vendor/plugins/#{mirror}"
+        end
 
         [remove_trailing_slash(mirror), {"type" => type, "remote" => remote, "branch" => branch}]
       end

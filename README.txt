@@ -32,7 +32,7 @@ git init moo
 cd moo
 
 # ideally you will also do these, but they are just good practices
-git config --global mirror.summary true
+git config --global merge.summary true
 git checkout -b localwork
 
 # adding mirrors

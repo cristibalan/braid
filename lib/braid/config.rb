@@ -14,10 +14,11 @@ module Braid
 
       raise Braid::Config::RemoteIsRequired unless params["remote"]
       raise Braid::Config::MirrorTypeIsRequired unless params["type"]
-      raise Braid::Config::BranchIsRequired unless params["branch"]
+      raise Braid::Config::BranchIsRequired unless params["type"] == "svn" || params["branch"]
       raise Braid::Config::MirrorNameIsRequired unless mirror
 
       params.delete("rails_plugin")
+      params.delete("branch") if params["type"] == "svn"
       add(mirror, params)
       [mirror, get(mirror)]
     end

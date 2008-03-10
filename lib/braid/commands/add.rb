@@ -51,8 +51,10 @@ module Braid
         end
 
         def svn_remote_revision(path)
-          status, out, err = exec!("svn info #{path}")
-          YAML.load(out)["Last Changed Rev"]
+          # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
+          # also, git svn has no clue on how to get the actual HEAD # on it's own
+          status, out, err = exec!("svn log -q --limit 1 #{path}")
+          out.split(/\n/).find {|x| x.match /^r\d+/}.split(" ")[0][1..-1]
         end
 
     end

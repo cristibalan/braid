@@ -1,5 +1,7 @@
 = TODO
 
+* add braid diff to show what custom changes have been made to mirrors
+
 * add braid setup to set up remotes and merges on other clones of your repo
   * consider requiring the braid/track branch to be pushed for this to work
 

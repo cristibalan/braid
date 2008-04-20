@@ -10,6 +10,7 @@ module Braid
   end
 
   class Config
+    class UnknownMirrorType < Braid::Exception; end
     class MirrorNameAlreadyInUse < Braid::Exception; end
     class MirrorDoesNotExist < Braid::Exception; end
     class CannotGuessMirrorType < Braid::Exception; end
@@ -28,5 +29,6 @@ module Braid
   class Git
     class LocalRepositoryHasUncommitedChanges < Braid::Exception; end
     class RepositoryError < Braid::Exception; end
+    class UnknownRevision < Braid::Exception; end
   end
 end

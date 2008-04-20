@@ -6,7 +6,7 @@ module Braid
 
     TRACK_BRANCH = "braid/track"
 
-    attr_accessor :config, :cli
+    attr_accessor :config
 
     def initialize(options = {})
       @config = options["config"] || Braid::Config.new
@@ -16,8 +16,9 @@ module Braid
     def self.run(command, *args)
       klass = Braid::Commands.const_get(command.to_s.capitalize)
       klass.new.run_in_track_branch(*args)
-    rescue Braid::Exception => e
-      msg "An exception has occured: #{e.message || e} (#{e})"
+    rescue => e
+      # FIXME
+      msg "Error occured at: #{e.backtrace.first}."
     end
 
     def run_in_track_branch(*args)
@@ -60,13 +61,23 @@ module Braid
       end
 
       def get_work_head
+        get_revision_hash(TRACK_BRANCH)
+      end
+
+      def get_revision_hash(treeish)
+        retried = false # FIXME surely there must be a better way?
         begin
-          status, out, err = exec! "git log #{TRACK_BRANCH} --pretty=oneline | head -1"
+          status, out, err = exec! "git log #{treeish} --pretty=oneline | head -1"
         rescue Braid::Commands::ShellExecutionError => e
-          if e.message.match("unknown revision")
-            create_work_branch
-            retry
+          unless retried
+            if e.message.match("unknown revision")
+              create_work_branch
+              retried = true
+              retry
+            end
           end
+
+          raise Braid::Git::UnknownRevision, treeish
         end
         out.split(" ").first
       end
@@ -92,10 +103,32 @@ module Braid
 
       def exec_all!(cmds)
         cmds.each_line do |cmd|
-          status, out, err = exec(cmd)
-          raise Braid::Commands::ShellExecutionError, err unless status == 0
+          exec!(cmd)
         end
         true
+      end
+
+      # TODO following helpers need cleaning
+
+      def svn_remote_head_revision(path)
+        # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
+        # also, git svn has no clue on how to get the actual HEAD revision number on it's own
+        status, out, err = exec!("svn log -q --limit 1 #{path}")
+        out.split(/\n/).find {|x| x.match /^r\d+/}.split(" ")[0][1..-1]
+      end
+
+      def clean_revision(type, revision)
+        if revision
+          # ensures nice formatting and whatnot
+          type == "svn" ? revision.to_i : get_revision_hash(revision)
+        end
+      end
+
+      def display_revision(type, revision)
+        # assumes "cleaned" identifier
+        if revision
+          type == "svn" ? "r#{revision}" : revision.to_s[0..6]
+        end
       end
 
     private

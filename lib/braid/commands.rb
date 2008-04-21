@@ -11,7 +11,7 @@ module Braid
 
     def self.run(command, *args)
       klass = Braid::Commands.const_get(command.to_s.capitalize)
-      klass.new.run_in_track_branch(*args)
+      klass.new.run(*args)
     rescue => e
       # FIXME
     end
@@ -20,36 +20,36 @@ module Braid
       puts str
     end
 
-    def run_in_track_branch(*args)
-      # make sure there is a git repository
-      begin
-        old_branch = get_current_branch
-      rescue => e
-        msg "Error occured: #{e}"
-        raise e
-      end
-
-      create_work_branch
-      work_head = get_work_head
-
-      begin
-        invoke(:git_checkout, TRACK_BRANCH)
-        run(*args)
-      rescue => e
-        msg "Error occured: #{e}"
-        if get_current_branch == TRACK_BRANCH
-          msg "Resetting '#{TRACK_BRANCH}' to #{work_head}."
-          exec!("git reset --hard #{work_head}")
-        end
-        raise e
-      ensure
-        invoke(:git_checkout, old_branch)
-      end
-    end
-
     private
       def msg(str)
         self.class.msg(str)
+      end
+
+      def in_track_branch
+        # make sure there is a git repository
+        begin
+          old_branch = get_current_branch
+        rescue => e
+          msg "Error occured: #{e}"
+          raise e
+        end
+
+        create_work_branch
+        work_head = get_work_head
+
+        begin
+          invoke(:git_checkout, TRACK_BRANCH)
+          yield
+        rescue => e
+          msg "Error occured: #{e}"
+          if get_current_branch == TRACK_BRANCH
+            msg "Resetting '#{TRACK_BRANCH}' to #{work_head}."
+            exec!("git reset --hard #{work_head}")
+          end
+          raise e
+        ensure
+          invoke(:git_checkout, old_branch)
+        end
       end
   end
 end

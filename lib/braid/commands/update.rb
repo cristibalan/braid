@@ -2,10 +2,12 @@ module Braid
   module Commands
     class Update < Command
       def run(mirror, options = {})
-        mirror ? update_one(mirror, options) : update_all
+        in_track_branch do
+          mirror ? update_one(mirror, options) : update_all
+        end
       end
 
-      private
+      protected
         def update_all
           msg "Updating all mirrors."
           config.mirrors.each do |mirror|
@@ -19,7 +21,6 @@ module Braid
             msg "Mirror '#{mirror}/' does not exist. Skipping."
             return
           end
-
           local_branch = params["local_branch"]
 
           msg "Updating #{params["type"]} mirror '#{mirror}/'."

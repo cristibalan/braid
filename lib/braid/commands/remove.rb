@@ -8,15 +8,17 @@ module Braid
           return
         end
 
-        msg "Removing #{params["type"]} mirror from '#{mirror}/'."
+        in_track_branch do
+          msg "Removing #{params["type"]} mirror from '#{mirror}/'."
 
-        exec!("git rm -r #{mirror}")
+          exec!("git rm -r #{mirror}")
 
-        config.remove(mirror)
-        add_config_file
+          config.remove(mirror)
+          add_config_file
 
-        commit_message = "Remove '#{params["local_branch"]}' from '#{mirror}/'."
-        invoke(:git_commit, commit_message)
+          commit_message = "Remove '#{params["local_branch"]}' from '#{mirror}/'."
+          invoke(:git_commit, commit_message)
+        end
       end
     end
   end

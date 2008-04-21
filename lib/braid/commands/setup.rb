@@ -5,7 +5,7 @@ module Braid
         mirror ? setup_one(mirror) : setup_all
       end
 
-      private
+      protected
         def setup_all
           msg "Setting up all mirrors."
           config.mirrors.each do |mirror|
@@ -29,7 +29,6 @@ module Braid
           create_remote(params)
         end
 
-      protected
         def create_remote(params)
           local_branch = params["local_branch"]
 

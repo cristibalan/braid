@@ -4,41 +4,41 @@ module Braid
   module Commands
     class Add < Command
       def run(remote, options = {})
-        mirror, params = config.add_from_options(remote, options)
+        in_track_branch do
+          mirror, params = config.add_from_options(remote, options)
+          local_branch = get_local_branch_name(mirror, params)
 
-        local_branch = get_local_branch_name(mirror, params)
-        config.update(mirror, { "local_branch" => local_branch })
-        params["local_branch"] = local_branch # TODO check
+          config.update(mirror, { "local_branch" => local_branch })
+          params["local_branch"] = local_branch # TODO check
 
-        add_message = "Adding #{params["type"]} mirror of '#{params["remote"]}'" + (params["type"] == "git" ? ", branch '#{params["branch"]}'" : "") + "."
-        msg add_message
+          msg "Adding #{params["type"]} mirror of '#{params["remote"]}'" + (params["type"] == "git" ? ", branch '#{params["branch"]}'" : "") + "."
 
-        # these commands are explained in the subtree merge guide
-        # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
-        
-        msg "Setting up remote branch '#{local_branch}' and fetching data."
-        setup_remote(mirror)
-        fetch_remote(params["type"], local_branch)
+          # these commands are explained in the subtree merge guide
+          # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
 
-        validate_revision_option(params, options)
-        commit = determine_target_commit(params, options)
+          msg "Setting up remote branch '#{local_branch}' and fetching data."
+          setup_remote(mirror)
+          fetch_remote(params["type"], local_branch)
 
-        msg "Merging code into '#{mirror}/'."
+          validate_revision_option(params, options)
+          commit = determine_target_commit(params, options)
 
-        exec!("git merge -s ours --no-commit #{commit}")
-        exec!("git read-tree --prefix=#{mirror}/ -u #{commit}")
+          msg "Merging code into '#{mirror}/'."
 
-        config.update(mirror, { "revision" => options["revision"] })
-        add_config_file
+          exec!("git merge -s ours --no-commit #{commit}")
+          exec!("git read-tree --prefix=#{mirror}/ -u #{commit}")
 
-        commit_message = "Merge '#{params["remote"]}' into '#{mirror}/'."
-        invoke(:git_commit, commit_message)
+          config.update(mirror, { "revision" => options["revision"] })
+          add_config_file
+
+          commit_message = "Merge '#{params["remote"]}' into '#{mirror}/'."
+          invoke(:git_commit, commit_message)
+        end
       end
 
       protected
         def setup_remote(mirror)
-          # no track branch magic needed
-          Braid::Commands::Setup.new.run(mirror)
+          Braid::Command.run(:setup, mirror)
         end
 
       private

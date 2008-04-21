@@ -104,6 +104,22 @@ Main {
     }
   }
 
+  mode(:setup) {
+    description <<-TXT
+      Set up git and git-svn remotes.
+    TXT
+
+    examples <<-TXT
+      . braid setup local/dir
+    TXT
+
+    mixin :optional_mirror
+
+    run {
+      Braid::Command.run(:setup, mirror)
+    }
+  }
+
   mode(:version) {
     description 'show braid version'
 

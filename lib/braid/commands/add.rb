@@ -16,7 +16,8 @@ module Braid
         # these commands are explained in the subtree merge guide
         # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
         
-        setup_remote(params)
+        msg "Setting up remote branch '#{local_branch}' and fetching data."
+        setup_remote(mirror)
         fetch_remote(params["type"], local_branch)
 
         validate_revision_option(params, options)
@@ -35,16 +36,9 @@ module Braid
       end
 
       protected
-        def setup_remote(params)
-          local_branch = params["local_branch"]
-          msg "Setting up remote branch '#{local_branch}' and fetching data."
-
-          case params["type"]
-          when "git"
-            invoke(:git_remote_add, local_branch, params["remote"], params["branch"])
-          when "svn"
-            exec!("git svn init -R #{local_branch} --id=#{local_branch} #{params["remote"]}")
-          end
+        def setup_remote(mirror)
+          # no track branch magic needed
+          Braid::Commands::Setup.new.run(mirror)
         end
 
       private

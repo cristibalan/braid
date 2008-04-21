@@ -57,3 +57,4 @@ end
 require 'braid/commands/add'
 require 'braid/commands/remove'
 require 'braid/commands/update'
+require 'braid/commands/setup'

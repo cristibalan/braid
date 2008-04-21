@@ -111,9 +111,9 @@ module Braid
         self.class.send(:remove_trailing_slash, path)
       end
 
-      # bluh.
       def self.remove_trailing_slash(path)
-        path.chomp("/") rescue path
+        # bluh.
+        path.sub(/\/$/, '')
       end
 
       def self.extract_type_from_path(path)

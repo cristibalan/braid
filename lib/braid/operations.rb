@@ -1,6 +1,6 @@
 begin
   require 'rubygems'
-rescue
+rescue LoadError
 end
 require 'open4'
 
@@ -55,6 +55,11 @@ module Braid
 
       def git_svn_fetch(remote)
         exec!("git svn fetch #{remote}")
+        true
+      end
+
+      def git_svn_init(remote, path)
+        exec!("git svn init -R #{remote} --id=#{remote} #{path}")
         true
       end
     end
@@ -175,12 +180,15 @@ module Braid
           invoke(:git_svn_fetch, remote)
         end
       end
+
+      # TODO clean up and maybe return more information
+      def find_remote(remote)
+        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{remote}"\]/ }
+      end
     end
 
     extend Git
     extend Svn
-    include Mirror
-    include Helpers
 
     def self.invoke(*args)
       send(*args)

@@ -1,9 +1,8 @@
 begin
-  require 'spec'
-rescue LoadError
   require 'rubygems'
-  require 'spec'
+rescue LoadError
 end
+require 'spec'
 
 dir = File.dirname(__FILE__)
 lib_path = File.expand_path("#{dir}/../lib")

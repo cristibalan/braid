@@ -14,130 +14,125 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # mostly blantantly stolen from ara's punch script
 # main kicks ass!
 Main {
-
-  description <<-txt
+  description <<-TXT
     braid is a simple tool to help track git or svn repositories inside a git repository.
 
-    run 'braid help commandname' for more info.
+    Run 'braid help commandname' for more details.
     
-    all operations will be executed in the braid/track branch
-    you can then merge it back or cherry pick changes
-  txt
+    All operations will be executed in the braid/track branch.
+    You can then merge back or cherry-pick changes.
+  TXT
 
-  examples <<-txt
-  txt
-
-  mode(:add){
-    description <<-txt
-      add a new mirror to be tracked:
+  mode(:add) {
+    description <<-TXT
+      Add a new mirror to be tracked.
 
         * adds metadata about the mirror to .braids
-        * adds the git or git svn remotes to .git
-        * fetches and merges remote code into given directory (mirror)
+        * adds the git or git svn remotes to .git/config
+        * fetches and merges remote code into given directory
 
-      mirror_type defaults:
+      --type defaults:
 
         * svn://path          # => svn
         * git://path          # => git
         * http://path/trunk   # => svn
         * http://path.git     # => git
 
-      mirror_name defaults:
+      Name defaults:
 
         * remote/path         # => path
         * remote/path/trunk   # => path
         * remote/path.git     # => path
-    txt
+    TXT
 
-    examples <<-txt
+    examples <<-TXT
       . braid add svn://remote/path
       . braid add svn://remote/path local/dir
       . braid add git://remote/path local/dir
       . braid add http://remote/path.git local/dir
       . braid add http://remote/path --type git local/dir
       . braid add svn://remote/path --branch notmaster
-    txt
+    TXT
 
     mixin :argument_remote, :option_type, :optional_mirror, :option_branch, :option_rails_plugin, :option_revision
 
-    run{
-      Braid::Command.run(:add, remote, {"type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision})
+    run {
+      Braid::Command.run(:add, remote, { "type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision })
     }
   }
 
-  mode(:update){
-    description <<-txt
-      update a braid mirror:
+  mode(:update) {
+    description <<-TXT
+      Update a braid mirror.
 
         * get new changes from remote
+        * always creates a merge commit
+        * updates metadata in .braids when revisions are changed
 
-      defaults to updating all mirrors if none is specified
-      
-      if you want nicer commit messages from the automatic merges, do this:
-        git config --global mirror.summary true
-    txt
+      Defaults to updating all unlocked mirrors if none is specified.
+    TXT
 
-    examples <<-txt
+    examples <<-TXT
       . braid update
       . braid update local/dir
-    txt
+    TXT
 
-    mixin :optional_mirror
+    mixin :optional_mirror, :option_revision, :option_head
 
-    run{
-      Braid::Command.run(:update, mirror)
+    run {
+      Braid::Command.run(:update, mirror, { "revision" => revision, "head" => head })
     }
   }
 
-  mode(:remove){
-    description <<-txt
-      remove a mirror
+  mode(:remove) {
+    description <<-TXT
+      Remove a mirror.
 
         * removes metadata from .braids
         * removes the local directory and commits the removal
         * does NOT remove the git and git svn remotes in case you still need them around
-    txt
+    TXT
 
-    examples <<-txt
+    examples <<-TXT
       . braid remove local/dir
-    txt
+    TXT
 
     mixin :argument_mirror
 
-    run{
+    run {
       Braid::Command.run(:remove, mirror)
     }
   }
 
-  mode(:version){
+  mode(:version) {
     description 'show braid version'
 
-    run{
+    run {
       puts "braid #{Braid::VERSION::STRING}"
     }
   }
 
   mixin :argument_mirror do
-    argument(:mirror){
+    argument(:mirror) {
       attr
     }
   end
 
   mixin :optional_mirror do
-    argument(:mirror){
+    argument(:mirror) {
       optional
       attr
     }
   end
 
   mixin :argument_remote do
-    argument(:remote){
+    argument(:remote) {
       attr
     }
   end
 
   mixin :option_type do
-    option(:type, :t){
+    option(:type, :t) {
       optional
       argument :required
       desc 'mirror type'
@@ -146,7 +141,7 @@ Main {
   end
 
   mixin :option_branch do
-    option(:branch, :b){
+    option(:branch, :b) {
       optional
       argument :required
       desc 'remote branch name'
@@ -155,15 +150,15 @@ Main {
   end
 
   mixin :option_rails_plugin do
-    option(:rails_plugin, :p){
+    option(:rails_plugin, :p) {
       optional
-      desc 'added mirror is a rails plugin'
+      desc 'added mirror is a Rails plugin'
       attr
     }
   end
 
   mixin :option_revision do
-    option(:revision, :r){
+    option(:revision, :r) {
       optional
       argument :required
       desc 'revision to track'
@@ -171,5 +166,13 @@ Main {
     }
   end
 
-  run{ help! }
+  mixin :option_head do
+    option(:head) {
+      optional
+      desc 'mirror head'
+      attr
+    }
+  end
+
+  run { help! }
 }

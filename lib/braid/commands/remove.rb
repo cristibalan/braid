@@ -1,6 +1,6 @@
 module Braid
   module Commands
-    class Remove < Braid::Command
+    class Remove < Command
       def run(mirror)
         params = config.get(mirror)
         unless params
@@ -9,14 +9,14 @@ module Braid
         end
 
         msg "Removing #{params["type"]} mirror from '#{mirror}/'."
-        config.remove(mirror)
 
-        remove_dir = <<-CMDS
-          git rm -r #{mirror}
-          git add .braids
-          git commit -m "Remove '#{params["local_branch"]}' from '#{mirror}/'." --no-verify
-        CMDS
-        exec_all! remove_dir
+        exec!("git rm -r #{mirror}")
+
+        config.remove(mirror)
+        add_config_file
+
+        commit_message = "Remove '#{params["local_branch"]}' from '#{mirror}/'."
+        invoke(:git_commit, commit_message)
       end
     end
   end

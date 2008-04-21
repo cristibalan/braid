@@ -21,14 +21,7 @@ module Braid
     class MirrorNameIsRequired < Braid::Exception; end
   end
 
-  class Svn
-    class TargetDirectoryAlreadyExists < Braid::Exception; end
-    class RepositoryNotFound < Braid::Exception; end
-  end
-
   class Git
-    class LocalRepositoryHasUncommitedChanges < Braid::Exception; end
-    class RepositoryError < Braid::Exception; end
     class UnknownRevision < Braid::Exception; end
   end
 end

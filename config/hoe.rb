@@ -28,9 +28,7 @@ Run 'rubyforge setup' to prepare your env for access to Rubyforge
 end
 
 
-REV = nil 
-# UNCOMMENT IF REQUIRED: 
-# REV = `svn info`.each {|line| if line =~ /^Revision:/ then k,v = line.split(': '); break v.chomp; else next; end} rescue nil
+REV = 1
 VERS = Braid::VERSION::STRING + (REV ? ".#{REV}" : "")
 RDOC_OPTS = ['--quiet', '--title', 'braid documentation',
     "--opname", "index.html",

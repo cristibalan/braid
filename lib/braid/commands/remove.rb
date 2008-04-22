@@ -16,7 +16,7 @@ module Braid
           config.remove(mirror)
           add_config_file
 
-          commit_message = "Remove '#{params["local_branch"]}' from '#{mirror}/'."
+          commit_message = "Remove mirror '#{mirror}/'."
           invoke(:git_commit, commit_message)
         end
       end

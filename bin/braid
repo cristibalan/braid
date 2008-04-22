@@ -120,8 +120,24 @@ Main {
     }
   }
 
+  mode(:diff) {
+    description <<-TXT
+      Show diff between #{Braid::TRACK_BRANCH} and HEAD.
+    TXT
+
+    examples <<-TXT
+      . braid diff local/dir
+    TXT
+
+    mixin :argument_mirror
+
+    run {
+      Braid::Command.run(:diff, mirror)
+    }
+  }
+
   mode(:version) {
-    description 'show braid version'
+    description 'Show braid version.'
 
     run {
       puts "braid #{Braid::VERSION::STRING}"

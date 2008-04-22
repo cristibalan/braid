@@ -24,4 +24,8 @@ module Braid
   class Git
     class UnknownRevision < Braid::Exception; end
   end
+
+  class Svn
+    class UnknownRevision < Braid::Exception; end
+  end
 end

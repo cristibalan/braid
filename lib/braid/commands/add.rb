@@ -25,13 +25,16 @@ module Braid
 
           msg "Merging code into '#{mirror}/'."
 
-          invoke(:git_merge_ours, commit)
+          unless params["squash"]
+            invoke(:git_merge_ours, commit)
+          end
           invoke(:git_read_tree, commit, mirror)
 
           config.update(mirror, { "revision" => options["revision"] })
           add_config_file
 
-          commit_message = "Merge '#{params["remote"]}' into '#{mirror}/'."
+          revision_message = options["revision"] ? " at #{display_revision(params["type"], options["revision"])}" : ""
+          commit_message = "Import '#{mirror}/' from '#{params["remote"]}'#{revision_message}."
           invoke(:git_commit, commit_message)
         end
       end

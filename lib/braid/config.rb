@@ -103,7 +103,9 @@ module Braid
         mirror = "vendor/plugins/#{mirror}"
       end
 
-      [remove_trailing_slash(mirror), { "type" => type, "remote" => remote, "branch" => branch }]
+      squash = !!options["squash"]
+
+      [remove_trailing_slash(mirror), { "type" => type, "remote" => remote, "branch" => branch, "squash" => squash }]
     end
 
     private

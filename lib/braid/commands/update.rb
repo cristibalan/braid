@@ -23,10 +23,8 @@ module Braid
           end
           local_branch = params["local_branch"]
 
-          msg "Updating #{params["type"]} mirror '#{mirror}/'."
-
           if check_for_lock(params, options)
-            msg "Mirror '#{mirror}/' is locked to #{params["revision"]}. Skipping."
+            msg "Mirror '#{mirror}/' is locked to #{display_revision(params["type"], params["revision"])}. Skipping."
             return
           end
 
@@ -49,12 +47,20 @@ module Braid
             return
           end
 
-          invoke(:git_merge_subtree, commit)
+          msg "Updating #{params["type"]} mirror '#{mirror}/'."
+
+          if params["squash"]
+            invoke(:git_rm_r, mirror)
+            invoke(:git_read_tree, commit, mirror)
+          else
+            invoke(:git_merge_subtree, commit)
+          end
 
           update_revision(mirror, options["revision"])
           add_config_file
 
-          commit_message = "Update '#{mirror}/' from '#{params["remote"]}'."
+          revision_message = " at " + (options["revision"] ? display_revision(params["type"], options["revision"]) : "HEAD")
+          commit_message = "Update '#{mirror}/' from '#{params["remote"]}'#{revision_message}."
           invoke(:git_commit, commit_message)
         end
 

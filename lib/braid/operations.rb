@@ -8,8 +8,15 @@ module Braid
   module Operations
     module Git
       def git_commit(message)
-        exec!("git commit -m #{message.inspect} --no-verify")
-        true
+        status, out, err = exec("git commit -m #{message.inspect} --no-verify")
+
+        if status == 0
+          true
+        elsif out.match("nothing to commit")
+          false
+        else
+          raise Braid::Commands::ShellExecutionError, err
+        end
       end
 
       def git_fetch(remote)
@@ -84,7 +91,9 @@ module Braid
       # FIXME move
       def svn_git_commit_hash(remote, revision)
         status, out, err = exec!("git svn log --show-commit --oneline -r #{revision} #{remote}")
-        invoke(:git_rev_parse, out.split(" | ")[1])
+        part = out.split(" | ")[1]
+        raise Braid::Svn::UnknownRevision, "unknown revision: #{revision}" unless part
+        invoke(:git_rev_parse, part)
       end
 
       def git_svn_fetch(remote)
@@ -120,10 +129,10 @@ module Braid
       end
 
       def validate_svn_revision(old_revision, new_revision, path)
-        # TODO add checks for unlocked mirrors
         return unless new_revision = clean_svn_revision(new_revision)
         old_revision = clean_svn_revision(old_revision)
 
+        # TODO add checks for unlocked mirrors
         if old_revision
           if new_revision < old_revision
             raise Braid::Commands::LocalRevisionIsHigherThanRequestedRevision
@@ -139,6 +148,7 @@ module Braid
         true
       end
 
+      # Make sure the revision is valid, then clean it.
       def validate_revision_option(params, options)
         if options["revision"]
           case params["type"]
@@ -165,6 +175,10 @@ module Braid
         else
           invoke(:git_rev_parse, local_branch)
         end
+      end
+
+      def display_revision(type, revision)
+        type == "svn" ? "r#{revision}" : "'#{revision[0, 7]}'"
       end
     end
 

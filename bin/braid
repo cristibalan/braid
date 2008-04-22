@@ -54,10 +54,10 @@ Main {
       . braid add svn://remote/path --branch notmaster
     TXT
 
-    mixin :argument_remote, :option_type, :optional_mirror, :option_branch, :option_rails_plugin, :option_revision
+    mixin :argument_remote, :option_type, :optional_mirror, :option_branch, :option_rails_plugin, :option_revision, :option_squash
 
     run {
-      Braid::Command.run(:add, remote, { "type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision })
+      Braid::Command.run(:add, remote, { "type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "squash" => squash })
     }
   }
 
@@ -202,6 +202,14 @@ Main {
     option(:head) {
       optional
       desc 'mirror head'
+      attr
+    }
+  }
+
+  mixin(:option_squash) {
+    option(:squash) {
+      optional
+      desc 'squash tree' # FIXME
       attr
     }
   }

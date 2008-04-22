@@ -11,7 +11,7 @@ module Braid
         in_track_branch do
           msg "Removing #{params["type"]} mirror from '#{mirror}/'."
 
-          exec!("git rm -r #{mirror}")
+          invoke(:git_rm_r, mirror)
 
           config.remove(mirror)
           add_config_file

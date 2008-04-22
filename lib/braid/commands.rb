@@ -44,7 +44,7 @@ module Braid
           msg "Error occured: #{e}"
           if get_current_branch == TRACK_BRANCH
             msg "Resetting '#{TRACK_BRANCH}' to #{work_head}."
-            exec!("git reset --hard #{work_head}")
+            invoke(:git_reset_hard, work_head)
           end
           raise e
         ensure

@@ -16,8 +16,8 @@ module Braid
           # these commands are explained in the subtree merge guide
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
 
-          msg "Setting up remote branch '#{local_branch}' and fetching data."
           setup_remote(mirror)
+          msg "Fetching data from '#{local_branch}'."
           fetch_remote(params["type"], local_branch)
 
           validate_revision_option(params, options)
@@ -25,8 +25,8 @@ module Braid
 
           msg "Merging code into '#{mirror}/'."
 
-          exec!("git merge -s ours --no-commit #{commit}")
-          exec!("git read-tree --prefix=#{mirror}/ -u #{commit}")
+          invoke(:git_merge_ours, commit)
+          invoke(:git_read_tree, commit, mirror)
 
           config.update(mirror, { "revision" => options["revision"] })
           add_config_file

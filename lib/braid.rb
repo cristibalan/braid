@@ -2,7 +2,7 @@ $:.unshift File.dirname(__FILE__)
 
 begin
   require 'rubygems'
-rescue
+rescue LoadError
 end
 
 module Braid

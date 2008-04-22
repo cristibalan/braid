@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
 
 begin
   require 'rubygems'
-rescue
+rescue LoadError
 end
 require 'main'
 
@@ -18,7 +18,7 @@ Main {
     braid is a simple tool to help track git or svn repositories inside a git repository.
 
     Run 'braid help commandname' for more details.
-    
+
     All operations will be executed in the braid/track branch.
     You can then merge back or cherry-pick changes.
   TXT
@@ -144,67 +144,67 @@ Main {
     }
   }
 
-  mixin :argument_mirror do
+  mixin(:argument_mirror) {
     argument(:mirror) {
       attr
     }
-  end
+  }
 
-  mixin :optional_mirror do
+  mixin(:optional_mirror) {
     argument(:mirror) {
       optional
       attr
     }
-  end
+  }
 
-  mixin :argument_remote do
+  mixin(:argument_remote) {
     argument(:remote) {
       attr
     }
-  end
+  }
 
-  mixin :option_type do
+  mixin(:option_type) {
     option(:type, :t) {
       optional
       argument :required
       desc 'mirror type'
       attr
     }
-  end
+  }
 
-  mixin :option_branch do
+  mixin(:option_branch) {
     option(:branch, :b) {
       optional
       argument :required
       desc 'remote branch name'
       attr
     }
-  end
+  }
 
-  mixin :option_rails_plugin do
+  mixin(:option_rails_plugin) {
     option(:rails_plugin, :p) {
       optional
       desc 'added mirror is a Rails plugin'
       attr
     }
-  end
+  }
 
-  mixin :option_revision do
+  mixin(:option_revision) {
     option(:revision, :r) {
       optional
       argument :required
       desc 'revision to track'
       attr
     }
-  end
+  }
 
-  mixin :option_head do
+  mixin(:option_head) {
     option(:head) {
       optional
       desc 'mirror head'
       attr
     }
-  end
+  }
 
   run { help! }
 }

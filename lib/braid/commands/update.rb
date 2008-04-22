@@ -43,17 +43,13 @@ module Braid
             fetch_remote(params["type"], local_branch)
 
             check_merge_status(commit)
-          rescue Braid::Commands::MirrorAlreadyUpToDate => error
+          rescue Braid::Commands::MirrorAlreadyUpToDate
             msg "Mirror '#{mirror}/' is already up to date. Skipping."
             update_revision(mirror, options["revision"])
             return
           end
 
-          # TODO is --no-ff needed?
-          status, out, err = exec!("git merge -s subtree --no-commit --no-ff #{commit}")
-
-          # hm, this should be caught by check_merge_status
-          return if out.match("Already up-to-date.")
+          invoke(:git_merge_subtree, commit)
 
           update_revision(mirror, options["revision"])
           add_config_file

@@ -20,7 +20,9 @@ module Braid
       end
 
       def git_fetch(remote)
-        exec!("git fetch -n #{remote}")
+        # open4 messes with the pipes of index-pack
+        system("git fetch -n #{remote} &> /dev/null")
+        raise Braid::Commands::ShellExecutionError unless $? == 0
         true
       end
 

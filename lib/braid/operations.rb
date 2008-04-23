@@ -20,7 +20,7 @@ module Braid
       end
 
       def git_fetch(remote)
-        exec!("git fetch #{remote}")
+        exec!("git fetch -n #{remote}")
         true
       end
 
@@ -46,7 +46,7 @@ module Braid
 
       # Implies tracking.
       def git_remote_add(remote, path, branch)
-        exec!("git remote add -f -t #{branch} -m #{branch} #{remote} #{path}")
+        exec!("git remote add -t #{branch} -m #{branch} #{remote} #{path}")
         true
       end
 

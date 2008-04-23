@@ -21,20 +21,20 @@ module Braid
           fetch_remote(params["type"], local_branch)
 
           validate_revision_option(params, options)
-          commit = determine_target_commit(params, options)
+          target = determine_target_commit(params, options)
 
           msg "Merging code into '#{mirror}/'."
 
           unless params["squash"]
-            invoke(:git_merge_ours, commit)
+            invoke(:git_merge_ours, target)
           end
-          invoke(:git_read_tree, commit, mirror)
+          invoke(:git_read_tree, target, mirror)
 
           config.update(mirror, { "revision" => options["revision"] })
           add_config_file
 
           revision_message = options["revision"] ? " at #{display_revision(params["type"], options["revision"])}" : ""
-          commit_message = "Import '#{mirror}/' from '#{params["remote"]}'#{revision_message}."
+          commit_message = "Add mirror '#{mirror}/'#{revision_message}."
           invoke(:git_commit, commit_message)
         end
       end

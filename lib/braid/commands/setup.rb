@@ -30,13 +30,11 @@ module Braid
         end
 
         def create_remote(params)
-          local_branch = params["local_branch"]
-
           case params["type"]
           when "git"
-            invoke(:git_remote_add, local_branch, params["remote"], params["branch"])
+            invoke(:git_remote_add, params["local_branch"], params["remote"], params["branch"])
           when "svn"
-            invoke(:git_svn_init, local_branch, params["remote"])
+            invoke(:git_svn_init, params["local_branch"], params["remote"])
           end
         end
     end

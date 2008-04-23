@@ -36,11 +36,11 @@ module Braid
 
           begin
             validate_revision_option(params, options)
-            commit = determine_target_commit(params, options)
+            target = determine_target_commit(params, options)
 
             fetch_remote(params["type"], local_branch)
 
-            check_merge_status(commit)
+            check_merge_status(target)
           rescue Braid::Commands::MirrorAlreadyUpToDate
             msg "Mirror '#{mirror}/' is already up to date. Skipping."
             update_revision(mirror, options["revision"])
@@ -51,16 +51,16 @@ module Braid
 
           if params["squash"]
             invoke(:git_rm_r, mirror)
-            invoke(:git_read_tree, commit, mirror)
+            invoke(:git_read_tree, target, mirror)
           else
-            invoke(:git_merge_subtree, commit)
+            invoke(:git_merge_subtree, target)
           end
 
           update_revision(mirror, options["revision"])
           add_config_file
 
-          revision_message = " at " + (options["revision"] ? display_revision(params["type"], options["revision"]) : "HEAD")
-          commit_message = "Update '#{mirror}/' from '#{params["remote"]}'#{revision_message}."
+          revision_message = " to " + (options["revision"] ? display_revision(params["type"], options["revision"]) : "HEAD")
+          commit_message = "Update mirror '#{mirror}/'#{revision_message}."
           invoke(:git_commit, commit_message)
         end
 

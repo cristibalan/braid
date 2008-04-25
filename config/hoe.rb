@@ -1,6 +1,6 @@
 require 'braid/version'
 
-AUTHOR = 'FIXME full name'  # can also be an array of Authors
+AUTHOR = ["Cristi Balan", "Norbert Crombach"]
 EMAIL = "evil@che.lu"
 DESCRIPTION = "Braid is a simple tool to help track git and svn vendor branches in a git repository"
 GEM_NAME = 'braid' # what ppl will type to install your gem

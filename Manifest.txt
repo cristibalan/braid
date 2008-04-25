@@ -18,6 +18,7 @@ lib/braid/config.rb
 lib/braid/exceptions.rb
 lib/braid/operations.rb
 lib/braid/version.rb
+braid.gemspec
 script/destroy
 script/generate
 setup.rb

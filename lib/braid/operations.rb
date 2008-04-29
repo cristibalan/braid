@@ -1,9 +1,3 @@
-begin
-  require 'rubygems'
-rescue LoadError
-end
-require 'open4'
-
 module Braid
   module Operations
     module Git
@@ -166,16 +160,14 @@ module Braid
       end
 
       def determine_target_commit(params, options)
-        local_branch = params["local_branch"]
-
         if options["revision"]
           if params["type"] == "svn"
-            invoke(:svn_git_commit_hash, local_branch, options["revision"])
+            invoke(:svn_git_commit_hash, params["local_branch"], options["revision"])
           else
             invoke(:git_rev_parse, options["revision"])
           end
         else
-          invoke(:git_rev_parse, local_branch)
+          invoke(:git_rev_parse, params["local_branch"])
         end
       end
 
@@ -223,7 +215,7 @@ module Braid
       end
 
       def fetch_remote(type, remote)
-        msg "Fetching data from '#{local_branch}'."
+        msg "Fetching data from '#{remote}'."
         case type
         when "git"
           invoke(:git_fetch, remote)

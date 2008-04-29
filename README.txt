@@ -5,7 +5,8 @@ In purpose, it's similar to piston, but it's especially built on top of git
 commands. This allows better integration with git and easier management of
 merges.
 
-The braid homepage is:http://evil.che.lu/projects/braid.
+The braid homepage is at
+"http://evil.che.lu/projects/braid":http://evil.che.lu/projects/braid/
 
 Braid is "hosted on github":http://github.com/evilchelu/braid.
 

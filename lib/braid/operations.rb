@@ -93,7 +93,8 @@ module Braid
       end
 
       def git_svn_fetch(remote)
-        exec!("git svn fetch #{remote}")
+        # open4 messes with the pipes of index-pack
+        system("git svn fetch #{remote} &> /dev/null")
         true
       end
 

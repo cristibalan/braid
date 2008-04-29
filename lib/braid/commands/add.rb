@@ -1,10 +1,8 @@
-require 'yaml'
-
 module Braid
   module Commands
     class Add < Command
       def run(remote, options = {})
-        in_track_branch do
+        in_work_branch do
           mirror, params = config.add_from_options(remote, options)
           local_branch = get_local_branch_name(mirror, params)
 
@@ -17,7 +15,6 @@ module Braid
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
 
           setup_remote(mirror)
-          msg "Fetching data from '#{local_branch}'."
           fetch_remote(params["type"], local_branch)
 
           validate_revision_option(params, options)

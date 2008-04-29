@@ -3,12 +3,6 @@ module Braid
     include Operations::Mirror
     include Operations::Helpers
 
-    attr_accessor :config
-
-    def initialize(options = {})
-      @config = options["config"] || Braid::Config.new
-    end
-
     def self.run(command, *args)
       klass = Braid::Commands.const_get(command.to_s.capitalize)
       klass.new.run(*args)
@@ -20,17 +14,21 @@ module Braid
       puts str
     end
 
+    def config
+      @config ||= Braid::Config.new
+    end
+
     private
       def msg(str)
         self.class.msg(str)
       end
 
-      def in_track_branch
+      def in_work_branch
         # make sure there is a git repository
         begin
           old_branch = get_current_branch
         rescue => e
-          msg "Error occured: #{e}"
+          msg "Error occured: #{e.message}"
           raise e
         end
 
@@ -38,12 +36,12 @@ module Braid
         work_head = get_work_head
 
         begin
-          invoke(:git_checkout, TRACK_BRANCH)
+          invoke(:git_checkout, WORK_BRANCH)
           yield
         rescue => e
-          msg "Error occured: #{e}"
-          if get_current_branch == TRACK_BRANCH
-            msg "Resetting '#{TRACK_BRANCH}' to #{work_head}."
+          msg "Error occured: #{e.message}"
+          if get_current_branch == WORK_BRANCH
+            msg "Resetting '#{WORK_BRANCH}' to '#{work_head}'."
             invoke(:git_reset_hard, work_head)
           end
           raise e

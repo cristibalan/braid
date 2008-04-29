@@ -2,13 +2,13 @@ module Braid
   module Commands
     class Remove < Command
       def run(mirror)
-        params = config.get(mirror)
-        unless params
-          msg "Mirror '#{mirror}/' does not exist."
-          return
-        end
+        in_work_branch do
+          params = config.get(mirror)
+          unless params
+            msg "Mirror '#{mirror}/' does not exist."
+            return
+          end
 
-        in_track_branch do
           msg "Removing #{params["type"]} mirror from '#{mirror}/'."
 
           invoke(:git_rm_r, mirror)

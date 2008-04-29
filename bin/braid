@@ -122,7 +122,7 @@ Main {
 
   mode(:diff) {
     description <<-TXT
-      Show diff between #{Braid::TRACK_BRANCH} and HEAD.
+      Show diff between '#{Braid::WORK_BRANCH}' and HEAD.
     TXT
 
     examples <<-TXT

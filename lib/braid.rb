@@ -7,7 +7,7 @@ end
 
 module Braid
   MIRROR_TYPES = %w[git svn]
-  TRACK_BRANCH = "braid/track"
+  WORK_BRANCH = "braid/track"
   CONFIG_FILE = ".braids"
 end
 

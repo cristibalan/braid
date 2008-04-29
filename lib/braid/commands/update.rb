@@ -2,7 +2,7 @@ module Braid
   module Commands
     class Update < Command
       def run(mirror, options = {})
-        in_track_branch do
+        in_work_branch do
           mirror ? update_one(mirror, options) : update_all
         end
       end
@@ -35,10 +35,10 @@ module Braid
           end
 
           begin
+            fetch_remote(params["type"], local_branch)
+
             validate_revision_option(params, options)
             target = determine_target_commit(params, options)
-
-            fetch_remote(params["type"], local_branch)
 
             check_merge_status(target)
           rescue Braid::Commands::MirrorAlreadyUpToDate

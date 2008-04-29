@@ -2,7 +2,9 @@ module Braid
   module Commands
     class Setup < Command
       def run(mirror)
-        mirror ? setup_one(mirror) : setup_all
+        in_track_branch do
+          mirror ? setup_one(mirror) : setup_all
+        end
       end
 
       protected
@@ -26,10 +28,6 @@ module Braid
           end
 
           msg "Setting up remote for '#{mirror}/'."
-          create_remote(params)
-        end
-
-        def create_remote(params)
           case params["type"]
           when "git"
             invoke(:git_remote_add, params["local_branch"], params["remote"], params["branch"])

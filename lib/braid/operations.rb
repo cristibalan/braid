@@ -192,18 +192,18 @@ module Braid
 
       def create_work_branch
         # check if branch exists
-        status, out, err = exec("git branch | grep '#{TRACK_BRANCH}'")
+        status, out, err = exec("git branch | grep '#{WORK_BRANCH}'")
         if status != 0
           # then create it
-          msg "Creating work branch '#{TRACK_BRANCH}'."
-          exec!("git branch #{TRACK_BRANCH}")
+          msg "Creating work branch '#{WORK_BRANCH}'."
+          exec!("git branch #{WORK_BRANCH}")
         end
 
         true
       end
 
       def get_work_head
-        find_git_revision(TRACK_BRANCH)
+        find_git_revision(WORK_BRANCH)
       end
 
       def add_config_file
@@ -223,6 +223,7 @@ module Braid
       end
 
       def fetch_remote(type, remote)
+        msg "Fetching data from '#{local_branch}'."
         case type
         when "git"
           invoke(:git_fetch, remote)

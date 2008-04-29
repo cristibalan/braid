@@ -1,11 +1,11 @@
 require 'braid/version'
 
-AUTHOR = 'FIXME full name'  # can also be an array of Authors
+AUTHOR = ["Cristi Balan", "Norbert Crombach"]
 EMAIL = "evil@che.lu"
-DESCRIPTION = "Simple tool for managing vendor branches across different SCMs"
+DESCRIPTION = "Braid is a simple tool to help track git and svn vendor branches in a git repository"
 GEM_NAME = 'braid' # what ppl will type to install your gem
 RUBYFORGE_PROJECT = 'braid' # The unix name for your project
-HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
+HOMEPATH = "http://evil.che.lu/projects/braid"
 DOWNLOAD_PATH = "http://rubyforge.org/projects/#{RUBYFORGE_PROJECT}"
 
 @config_file = "~/.rubyforge/user-config.yml"
@@ -28,7 +28,7 @@ Run 'rubyforge setup' to prepare your env for access to Rubyforge
 end
 
 
-REV = 1
+REV = nil
 VERS = Braid::VERSION::STRING + (REV ? ".#{REV}" : "")
 RDOC_OPTS = ['--quiet', '--title', 'braid documentation',
     "--opname", "index.html",

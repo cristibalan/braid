@@ -8,7 +8,7 @@ bin/braid
 config/hoe.rb
 config/requirements.rb
 lib/braid.rb
-lib/braid/commands.rb
+lib/braid/command.rb
 lib/braid/commands/add.rb
 lib/braid/commands/diff.rb
 lib/braid/commands/remove.rb

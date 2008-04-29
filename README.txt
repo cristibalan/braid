@@ -1,74 +1,49 @@
-= README
+Braid is a simple tool to help track git and svn vendor branches in a git
+repository.
 
-Braid is a simple tool for managing vendor branches across different SCMs.
+In purpose, it's similar to piston, but it's especially built on top of git
+commands. This allows better integration with git and easier management of
+merges.
 
-http://evil.che.lu/projects/braid
+The braid homepage is:http://evil.che.lu/projects/braid.
 
-You'll need a rather recent version of git, most likely something after 1.5.4.
+Braid is "hosted on github":http://github.com/evilchelu/braid.
 
-If you're on OS X, git from macports is at version 1.5.3.7 and braid won't work with that.
-There a patch in the macports trac to allow you to get git-core 1.5.4.2, here (thanks jakehow):
-http://trac.macosforge.org/projects/macports/ticket/13956
+*NOTE:* You will need at least git 1.5.4.5+ to run braid. You'll also need the
+open4 and main gems.
 
-= INSTALLING FORM RUBYGEMS
+h3. Install with rubygems
 
-# gem not published yet. please install from git
-sudo gem install braid
+  gem sources -a http://gems.github.com/  # only need to do this once
+  gem install evilchelu-braid
 
-= INSTALLING FROM GIT
+h3. Get it from the git repository
 
-# install deps
-sudo gem install main
-sudo gem install open4
+Get a clone of the git repository using:
 
-git clone git://github.com/evilchelu/braid.git
-cd braid
-rake install_gem
+  git clone git://github.com/evilchelu/braid.git
+  cd braid
+  rake install_gem
+  braid --help # see usage
 
-= USAGE
+h3. Usage
 
-# create a git repo
-git init moo
-cd moo
+  braid help
+  braid help COMMANDNAME
 
-# ideally you will also do these, but they are just good practices
-git config --global merge.summary true
-git checkout -b localwork
+For more usage examples, documentation, feature requests and bug reporting,
+check out the "braid wiki":http://github.com/evilchelu/braid/wikis.
 
-# adding mirrors
-braid add git://blah
-braid add svn://muh
-gitk braid/track
-git merge braid/track
+h3. Contributing
 
-# updating mirrors
-braid update muh
-braid update
-git merge braid/track
+If you want to send a patch in, please fork the project on github, commit your
+changes and send a pull request.
 
-# removing mirrors
-braid remove blah
-braid remove muh
-git merge braid/track
+h3. Mad props
 
-= MORE USAGE
+Braid used to be quite lame before "Norbert Crombach":http://primetheory.org/
+("github":http://github.com/norbert) resuscitated it by contribuing a bunch of
+code.
 
-Braid stores it's metadata in a file called ".braids" located in the current directory where braid is run.
-
-For full usage docs run:
-
-braid help
-braid help COMMANDNAME
-
-= POSSIBLE PROBLEMS
-
-In a multiuser setup people won't have all the remote branches setup. But nothing is really lost, yet.
-
-Theoretically if you add the same remotes on other checkout and set the branches correctly things could be made to just work(TM).
-
-= ISSUES
-
-Braid barely works and you'll definitely encounter bugs. Help is appreciated :).
-
-For now, known issues and feature requests are stored in the TODO.txt file in the root of the braid checkout.
+He rocks! Go buy him a beer. 
 

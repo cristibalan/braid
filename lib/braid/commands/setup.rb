@@ -2,9 +2,7 @@ module Braid
   module Commands
     class Setup < Command
       def run(mirror)
-        in_work_branch do
-          mirror ? setup_one(mirror) : setup_all
-        end
+        mirror ? setup_one(mirror) : setup_all
       end
 
       protected

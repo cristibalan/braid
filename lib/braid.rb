@@ -13,6 +13,7 @@ module Braid
   MIRROR_TYPES = %w[git svn]
   WORK_BRANCH = "braid/track"
   CONFIG_FILE = ".braids"
+  REQUIRED_GIT_VERSION = "1.6.4.5"
 end
 
 require 'braid/version'

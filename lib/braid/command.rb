@@ -7,11 +7,13 @@ module Braid
       include Operations::Helpers
 
       def run(command, *args)
-        raise Braid::Git::VersionTooLow unless verify_git_version("1.5.4.5")
-        raise Braid::Git::LocalChangesPresent unless verify_git_version("1.5.4.5")
+        raise Braid::Git::VersionTooLow unless verify_git_version(REQUIRED_GIT_VERSION)
 
         klass = Braid::Commands.const_get(command.to_s.capitalize)
         klass.new.run(*args)
+      rescue Braid::Git::VersionTooLow => e
+        msg "This version of braid requires at least git #{REQUIRED_GIT_VERSION}. You have #{extract_git_version}."
+        msg "Exiting."
       rescue => e
         # FIXME
       end

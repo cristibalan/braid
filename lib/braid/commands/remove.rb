@@ -2,6 +2,8 @@ module Braid
   module Commands
     class Remove < Command
       def run(mirror)
+        raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
+
         in_work_branch do
           params = config.get(mirror)
           unless params

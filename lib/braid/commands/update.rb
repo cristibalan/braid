@@ -2,6 +2,8 @@ module Braid
   module Commands
     class Update < Command
       def run(mirror, options = {})
+        raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
+
         in_work_branch do
           mirror ? update_one(mirror, options) : update_all
         end

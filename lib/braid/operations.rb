@@ -73,6 +73,11 @@ module Braid
         exec!("git rm -r #{path}")
         true
       end
+
+      def local_changes?
+        status, out, err = exec("git status")
+        out.split("\n").grep(/nothing to commit \(working directory clean\)/).empty?
+      end
     end
 
     module Svn

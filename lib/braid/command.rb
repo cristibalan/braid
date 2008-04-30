@@ -5,15 +5,22 @@ module Braid
 
     class << self
       include Operations::Helpers
+      include Operations::Git
 
       def run(command, *args)
         raise Braid::Git::VersionTooLow unless verify_git_version(REQUIRED_GIT_VERSION)
+        raise Braid::Git::LocalChangesPresent if local_changes?
 
         klass = Braid::Commands.const_get(command.to_s.capitalize)
         klass.new.run(*args)
+
+      rescue Braid::Git::LocalChangesPresent => e
+        msg "Local changes are present. You have to commit or stash them before running braid commands."
+
       rescue Braid::Git::VersionTooLow => e
         msg "This version of braid requires at least git #{REQUIRED_GIT_VERSION}. You have #{extract_git_version}."
         msg "Exiting."
+
       rescue => e
         # FIXME
       end

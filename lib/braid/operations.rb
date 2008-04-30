@@ -111,6 +111,32 @@ module Braid
         end
       end
 
+      def extract_git_version
+        status, out, err = exec!("git --version")
+        return out.sub(/^git version/, "").strip
+      end
+
+      def verify_git_version(required)
+        required_version = required.split(".")
+        actual_version   = extract_git_version.split(".")
+        actual_version.each_with_index do |actual_piece, idx|
+          required_piece = required_version[idx]
+
+          return true unless required_piece
+
+          case (actual_piece <=> required_piece)
+            when -1
+              return false
+            when 1
+              return true
+            when 0
+              next
+          end
+        end
+
+        return actual_version.length >= required_version.length
+      end
+
       def find_git_revision(commit)
         invoke(:git_rev_parse, commit)
       rescue Braid::Commands::ShellExecutionError

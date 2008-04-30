@@ -23,6 +23,7 @@ module Braid
 
   class Git
     class UnknownRevision < Braid::Exception; end
+    class VersionTooLow < Braid::Exception; end
   end
 
   class Svn

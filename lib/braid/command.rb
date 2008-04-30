@@ -3,15 +3,22 @@ module Braid
     include Operations::Mirror
     include Operations::Helpers
 
-    def self.run(command, *args)
-      klass = Braid::Commands.const_get(command.to_s.capitalize)
-      klass.new.run(*args)
-    rescue => e
-      # FIXME
-    end
+    class << self
+      include Operations::Helpers
 
-    def self.msg(str)
-      puts str
+      def run(command, *args)
+        raise Braid::Git::VersionTooLow unless verify_git_version("1.5.4.5")
+        raise Braid::Git::LocalChangesPresent unless verify_git_version("1.5.4.5")
+
+        klass = Braid::Commands.const_get(command.to_s.capitalize)
+        klass.new.run(*args)
+      rescue => e
+        # FIXME
+      end
+
+      def msg(str)
+        puts str
+      end
     end
 
     def config

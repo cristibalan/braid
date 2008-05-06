@@ -6,7 +6,7 @@ module Braid
 
         if status == 0
           true
-        elsif out.match("nothing to commit")
+        elsif out.match(/nothing.* to commit/)
           false
         else
           raise Braid::Commands::ShellExecutionError, err

@@ -8,7 +8,8 @@ module Braid
       include Operations::Git
 
       def run(command, *args)
-        raise Braid::Git::VersionTooLow unless verify_git_version(REQUIRED_GIT_VERSION)
+        raise Braid::Git::GitVersionTooLow    unless verify_version("git",     REQUIRED_GIT_VERSION)
+        raise Braid::Git::GitSvnVersionTooLow unless verify_version("git svn", REQUIRED_GIT_SVN_VERSION)
 
         klass = Braid::Commands.const_get(command.to_s.capitalize)
         klass.new.run(*args)
@@ -17,8 +18,12 @@ module Braid
         msg "Local changes are present. You have to commit or stash them before running braid commands."
         msg "Exiting."
 
-      rescue Braid::Git::VersionTooLow => e
-        msg "This version of braid requires at least git #{REQUIRED_GIT_VERSION}. You have #{extract_git_version}."
+      rescue Braid::Git::GitVersionTooLow => e
+        msg "This version of braid requires at least git #{REQUIRED_GIT_VERSION}. You have #{extract_version("git")}."
+        msg "Exiting."
+
+      rescue Braid::Git::GitSvnVersionTooLow => e
+        msg "This version of braid requires at least git svn #{REQUIRED_GIT_SVN_VERSION}. You have #{extract_version("git svn")}."
         msg "Exiting."
 
       rescue => e

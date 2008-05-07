@@ -116,14 +116,14 @@ module Braid
         end
       end
 
-      def extract_git_version
-        status, out, err = exec!("git --version")
-        return out.sub(/^git version/, "").strip
+      def extract_version(cmd)
+        status, out, err = exec!("#{cmd} --version")
+        return out.sub(/^.* version/, "").strip
       end
 
-      def verify_git_version(required)
+      def verify_version(cmd, required)
         required_version = required.split(".")
-        actual_version   = extract_git_version.split(".")
+        actual_version   = extract_version(cmd).split(".")
         actual_version.each_with_index do |actual_piece, idx|
           required_piece = required_version[idx]
 

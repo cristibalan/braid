@@ -27,7 +27,7 @@ module Braid
         msg "Exiting."
 
       rescue => e
-        # FIXME
+        puts "braid error: " + e.message
       end
 
       def msg(str)

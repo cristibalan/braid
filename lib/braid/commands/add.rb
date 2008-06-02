@@ -4,7 +4,7 @@ module Braid
       def run(remote, options = {})
         raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
 
-        in_work_branch do
+        with_reset_on_error do
           mirror, params = config.add_from_options(remote, options)
           local_branch = get_local_branch_name(mirror, params)
 

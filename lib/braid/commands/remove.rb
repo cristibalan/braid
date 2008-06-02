@@ -4,7 +4,7 @@ module Braid
       def run(mirror)
         raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
 
-        in_work_branch do
+        with_reset_on_error do
           params = config.get(mirror)
           unless params
             msg "Mirror '#{mirror}/' does not exist."

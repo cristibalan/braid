@@ -78,6 +78,18 @@ module Braid
         status, out, err = exec("git status")
         out.split("\n").grep(/nothing to commit \(working directory clean\)/).empty?
       end
+
+      def get_tree_hash(path)
+        status, out, err = exec!("git ls-tree HEAD -d #{path}")
+        out.split[2]
+      end
+
+      def read_diff_tree(src_tree, dst_tree, mirror = nil)
+        cmd = "git diff-tree -p --binary #{src_tree} #{dst_tree}"
+        cmd << " --src-prefix=a/#{mirror}/ --dst-prefix=b/#{mirror}/"
+        status, out, err = exec!(cmd)
+        out
+      end
     end
 
     module Svn
@@ -214,20 +226,9 @@ module Braid
         out[2..-1]
       end
 
-      def create_work_branch
-        # check if branch exists
-        status, out, err = exec("git branch | grep '#{WORK_BRANCH}'")
-        if status != 0
-          # then create it
-          msg "Creating work branch '#{WORK_BRANCH}'."
-          exec!("git branch #{WORK_BRANCH}")
-        end
-
-        true
-      end
-
       def get_work_head
-        find_git_revision(WORK_BRANCH)
+        # FIXME
+        find_git_revision("HEAD")
       end
 
       def add_config_file

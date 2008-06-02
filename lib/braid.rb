@@ -11,7 +11,6 @@ require 'yaml/store'
 
 module Braid
   MIRROR_TYPES = %w[git svn]
-  WORK_BRANCH = "braid/track"
   CONFIG_FILE = ".braids"
   REQUIRED_GIT_VERSION = "1.5.4.5"
   REQUIRED_GIT_SVN_VERSION = "1.5.4.5"

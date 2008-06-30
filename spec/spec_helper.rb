@@ -1,11 +1,23 @@
+require 'test/unit'
+
 begin
   require 'rubygems'
+  require 'spec'
+  require 'mocha'
+rescue LoadError
+  puts <<-EOS
+To run the specs you must install the rspec and mocha gems:
+  . gem install rspec
+  . gem install mocha
+  EOS
+  exit(1)
+end
+
+begin
+  require 'ruby-debug'
 rescue LoadError
 end
-require 'spec'
 
-dir = File.dirname(__FILE__)
-lib_path = File.expand_path("#{dir}/../lib")
-$LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
+Spec::Runner.configuration.mock_with :mocha
 
-require 'braid'
+require File.dirname(__FILE__) + '/../lib/braid'

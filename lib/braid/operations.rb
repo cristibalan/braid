@@ -1,143 +1,27 @@
+require 'open4'
+
 module Braid
   module Operations
-    module Git
-      def git_commit(message)
-        status, out, err = exec("git commit -m #{message.inspect} --no-verify")
-
-        if status == 0
-          true
-        elsif out.match(/nothing.* to commit/)
-          false
-        else
-          raise Braid::Commands::ShellExecutionError, err
-        end
-      end
-
-      def git_fetch(remote)
-        # open4 messes with the pipes of index-pack
-        system("git fetch -n #{remote} &> /dev/null")
-        raise Braid::Commands::ShellExecutionError unless $? == 0
-        true
-      end
-
-      def git_checkout(treeish)
-        # TODO debug
-        msg "Checking out '#{treeish}'."
-        exec!("git checkout #{treeish}")
-        true
-      end
-
-      # Returns the base commit or nil.
-      def git_merge_base(target, source)
-        status, out, err = exec!("git merge-base #{target} #{source}")
-        out.strip
-      rescue Braid::Commands::ShellExecutionError
-        nil
-      end
-
-      def git_rev_parse(commit)
-        status, out, err = exec!("git rev-parse #{commit}")
-        out.strip
-      end
-
-      # Implies tracking.
-      def git_remote_add(remote, path, branch)
-        exec!("git remote add -t #{branch} -m #{branch} #{remote} #{path}")
-        true
-      end
-
-      def git_reset_hard(target)
-        exec!("git reset --hard #{target}")
-        true
-      end
-
-      # Implies no commit.
-      def git_merge_ours(commit)
-        exec!("git merge -s ours --no-commit #{commit}")
-        true
-      end
-
-      # Implies no commit.
-      def git_merge_subtree(commit)
-        # TODO which options are needed?
-        exec!("git merge -s subtree --no-commit --no-ff #{commit}")
-        true
-      end
-
-      def git_read_tree(treeish, prefix)
-        exec!("git read-tree --prefix=#{prefix}/ -u #{treeish}")
-        true
-      end
-
-      def git_rm_r(path)
-        exec!("git rm -r #{path}")
-        true
-      end
-
-      def local_changes?
-        status, out, err = exec("git status")
-        out.split("\n").grep(/nothing to commit \(working directory clean\)/).empty?
-      end
-
-      def get_tree_hash(path)
-        status, out, err = exec!("git ls-tree HEAD -d #{path}")
-        out.split[2]
-      end
-
-      def read_diff_tree(src_tree, dst_tree, mirror = nil)
-        cmd = "git diff-tree -p --binary #{src_tree} #{dst_tree}"
-        cmd << " --src-prefix=a/#{mirror}/ --dst-prefix=b/#{mirror}/"
-        status, out, err = exec!(cmd)
-        out
-      end
+    class ShellExecutionError < BraidError
+    end
+    class VersionError < BraidError
     end
 
-    module Svn
-      # FIXME move
-      def svn_remote_head_revision(path)
-        # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
-        # git svn has no clue on how to get the actual HEAD revision number on it's own
-        status, out, err = exec!("svn log -q --limit 1 #{path}")
-        out.split(/\n/).find { |x| x.match /^r\d+/ }.split(" | ")[0][1..-1].to_i
+    # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
+    #
+    # It is expected that subclasses override the command method, define a COMMAND constant and have a VersionTooLow exception.
+    class CommandProxy
+      def version
+        status, out, err = exec!("#{self.class::COMMAND} --version")
+        out.sub(/^.* version/, "").strip
       end
 
-      # FIXME move
-      def svn_git_commit_hash(remote, revision)
-        status, out, err = exec!("git svn log --show-commit --oneline -r #{revision} #{remote}")
-        part = out.split(" | ")[1]
-        raise Braid::Svn::UnknownRevision, "unknown revision: #{revision}" unless part
-        invoke(:git_rev_parse, part)
-      end
+      def require_version(required)
+        required = required.split(".")
+        actual = version.split(".")
 
-      def git_svn_fetch(remote)
-        # open4 messes with the pipes of index-pack
-        system("git svn fetch #{remote} &> /dev/null")
-        true
-      end
-
-      def git_svn_init(remote, path)
-        exec!("git svn init -R #{remote} --id=#{remote} #{path}")
-        true
-      end
-    end
-
-    module Helpers
-      [:invoke, :exec, :exec!].each do |method|
-        define_method(method) do |*args|
-          Braid::Operations.send(method, *args)
-        end
-      end
-
-      def extract_version(cmd)
-        status, out, err = exec!("#{cmd} --version")
-        return out.sub(/^.* version/, "").strip
-      end
-
-      def verify_version(cmd, required)
-        required_version = required.split(".")
-        actual_version   = extract_version(cmd).split(".")
-        actual_version.each_with_index do |actual_piece, idx|
-          required_piece = required_version[idx]
+        actual.each_with_index do |actual_piece, idx|
+          required_piece = required[idx]
 
           return true unless required_piece
 
@@ -151,148 +35,239 @@ module Braid
           end
         end
 
-        return actual_version.length >= required_version.length
+        return actual.length >= required.length
       end
 
-      def find_git_revision(commit)
-        invoke(:git_rev_parse, commit)
-      rescue Braid::Commands::ShellExecutionError
-        raise Braid::Git::UnknownRevision, "unknown revision: #{commit}"
+      def require_version!(required)
+        require_version(required) || raise(self.class::VersionTooLow, version)
       end
 
-      def clean_svn_revision(revision)
-        if revision
-          revision.to_i
-        else
-          nil
-        end
-      end
-
-      def validate_svn_revision(old_revision, new_revision, path)
-        return unless new_revision = clean_svn_revision(new_revision)
-        old_revision = clean_svn_revision(old_revision)
-
-        # TODO add checks for unlocked mirrors
-        if old_revision
-          if new_revision < old_revision
-            raise Braid::Commands::LocalRevisionIsHigherThanRequestedRevision
-          elsif new_revision == old_revision
-            raise Braid::Commands::MirrorAlreadyUpToDate
-          end
+      private
+        def command(name)
+          # stub
+          name
         end
 
-        if path && invoke(:svn_remote_head_revision, path) < new_revision
-          raise Braid::Commands::RequestedRevisionIsHigherThanRemoteRevision
+        def invoke(arg, *args)
+          exec!("#{command(arg)} #{args.join(' ')}".strip)
         end
 
-        true
-      end
-
-      # Make sure the revision is valid, then clean it.
-      def validate_revision_option(params, options)
-        if options["revision"]
-          case params["type"]
-          when "git"
-            options["revision"] = find_git_revision(options["revision"])
-          when "svn"
-            validate_svn_revision(params["revision"], options["revision"], params["remote"])
-            options["revision"] = clean_svn_revision(options["revision"])
-          end
+        def method_missing(name, *args)
+          invoke(name, *args)
+          true
         end
 
-        true
-      end
+        def exec(cmd)
+          cmd.strip!
 
-      def determine_target_commit(params, options)
-        if options["revision"]
-          if params["type"] == "svn"
-            invoke(:svn_git_commit_hash, params["local_branch"], options["revision"])
-          else
-            invoke(:git_rev_parse, options["revision"])
-          end
-        else
-          invoke(:git_rev_parse, params["local_branch"])
+          previous_lang = ENV['LANG']
+          ENV['LANG'] = 'C'
+
+          out, err = nil
+          status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
+            out = stdout.read.strip
+            err = stderr.read.strip
+          end.exitstatus
+          [status, out, err]
+
+        ensure
+          ENV['LANG'] = previous_lang
         end
-      end
 
-      def display_revision(type, revision)
-        type == "svn" ? "r#{revision}" : "'#{revision[0, 7]}'"
-      end
+        def exec!(cmd)
+          status, out, err = exec(cmd)
+          raise ShellExecutionError, err unless status == 0
+          [status, out, err]
+        end
     end
 
-    module Mirror
-      def get_current_branch
+    class Git < CommandProxy
+      COMMAND = "git"
+
+      class UnknownRevision < BraidError
+      end
+      class LocalChangesPresent < BraidError
+      end
+      class VersionTooLow < VersionError
+      end
+
+      def commit(message)
+        status, out, err = invoke(:commit, "-m #{message.inspect} --no-verify")
+
+        if status == 0
+          true
+        elsif out.match(/nothing.* to commit/)
+          false
+        else
+          raise ShellExecutionError, err
+        end
+      end
+
+      def fetch(remote)
+        # open4 messes with the pipes of index-pack
+        system("git fetch -n #{remote} &> /dev/null")
+        raise ShellExecutionError unless $? == 0
+        true
+      end
+
+      def checkout(treeish)
+        # TODO debug
+        msg "Checking out '#{treeish}'."
+        invoke(:checkout, treeish)
+        true
+      end
+
+      # Returns the base commit or nil.
+      def merge_base(target, source)
+        status, out, err = invoke(:merge_base, target, source)
+        out.strip
+      rescue ShellExecutionError
+        nil
+      end
+
+      def rev_parse(opt)
+        status, out, err = invoke(:rev_parse, opt)
+        out.strip
+      rescue ShellExecutionError
+        raise UnknownRevision, opt
+      end
+
+      # Implies tracking.
+      def remote_add(remote, path, branch)
+        invoke(:remote, "add", "-t #{branch} -m #{branch}", remote, path)
+        true
+      end
+
+      # Checks git and svn remotes.
+      def remote_exists?(remote)
+        # TODO clean up and maybe return more information
+        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{remote}"\]/ }
+      end
+
+      def reset_hard(target)
+        invoke(:reset, "--hard", target)
+        true
+      end
+
+      # Implies no commit.
+      def merge_ours(opt)
+        invoke(:merge, "-s ours --no-commit", opt)
+        true
+      end
+
+      # Implies no commit.
+      def merge_subtree(opt)
+        # TODO which options are needed?
+        invoke(:merge, "-s subtree --no-commit --no-ff", opt)
+        true
+      end
+
+      def read_tree(treeish, prefix)
+        invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
+        true
+      end
+
+      def rm_r(path)
+        invoke(:rm, "-r", path)
+        true
+      end
+
+      def tree_hash(path, treeish = "HEAD")
+        status, out, err = invoke(:ls_tree, treeish, "-d", path)
+        out.split[2]
+      end
+
+      def diff_tree(src_tree, dst_tree, mirror = nil)
+        cmd = "git diff-tree -p --binary #{src_tree} #{dst_tree}"
+        cmd << " --src-prefix=a/#{mirror}/ --dst-prefix=b/#{mirror}/"
+        status, out, err = exec!(cmd)
+        out
+      end
+
+      def status_clean?
+        status, out, err = exec("git status")
+        !out.split("\n").grep(/nothing to commit \(working directory clean\)/).empty?
+      end
+
+      def ensure_clean!
+        status_clean? || raise(LocalChangesPresent)
+      end
+
+      def head
+        rev_parse("HEAD")
+      end
+
+      def branch
         status, out, err = exec!("git branch | grep '*'")
         out[2..-1]
       end
 
-      def get_work_head
-        # FIXME
-        find_git_revision("HEAD")
+      private
+        def command(name)
+          "#{COMMAND} #{name.to_s.gsub('_', '-')}"
+        end
+    end
+
+    class GitSvn < CommandProxy
+      COMMAND = "git-svn"
+
+      class UnknownRevision < BraidError
+      end
+      class VersionTooLow < VersionError
       end
 
-      def add_config_file
-        exec!("git add #{CONFIG_FILE}")
+      def commit_hash(remote, revision)
+        status, out, err = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
+        part = out.split(" | ")[1]
+        raise UnknownRevision, "unknown revision: #{revision}" unless part
+        Git.new.rev_parse(part) # FIXME ugly ugly ugly
+      end
+
+      def fetch(remote)
+        # open4 messes with the pipes of index-pack
+        system("git-svn fetch #{remote} &> /dev/null")
         true
       end
 
-      def check_merge_status(commit)
-        commit = find_git_revision(commit)
-        # tip from spearce in #git:
-        # `test z$(git merge-base A B) = z$(git rev-parse --verify A)`
-        if invoke(:git_merge_base, commit, "HEAD") == commit
-          raise Braid::Commands::MirrorAlreadyUpToDate
-        end
-
+      def init(remote, path)
+        invoke(:init, "-R", remote, "--id=#{remote}", path)
         true
       end
 
-      def fetch_remote(type, remote)
-        msg "Fetching data from '#{remote}'."
-        case type
-        when "git"
-          invoke(:git_fetch, remote)
-        when "svn"
-          invoke(:git_svn_fetch, remote)
+      private
+        def command(name)
+          "#{COMMAND} #{name}"
         end
+    end
+
+    class Svn < CommandProxy
+      COMMAND = "svn"
+
+      def clean_revision(revision)
+        revision.to_i if revision
       end
 
-      def find_remote(remote)
-        # TODO clean up and maybe return more information
-        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{remote}"\]/ }
+      def head_revision(path)
+        # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
+        # git svn has no clue on how to get the actual HEAD revision number on it's own
+        status, out, err = exec!("svn log -q --limit 1 #{path}")
+        out.split(/\n/).find { |x| x.match /^r\d+/ }.split(" | ")[0][1..-1].to_i
       end
     end
 
-    extend Git
-    extend Svn
+    module VersionControl
+      private
+        def git
+          Git.new
+        end
 
-    def self.invoke(*args)
-      send(*args)
+        def git_svn
+          GitSvn.new
+        end
+
+        def svn
+          Svn.new
+        end
     end
-
-    def self.exec(cmd)
-      #puts cmd
-      out = ""
-      err = ""
-      cmd.strip!
-
-      ENV['LANG'] = 'C' unless ENV['LANG'] == 'C'
-      status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
-        out = stdout.read.strip
-        err = stderr.read.strip
-      end
-      [status.exitstatus, out, err]
-    end
-
-    def self.exec!(cmd)
-      status, out, err = exec(cmd)
-      raise Braid::Commands::ShellExecutionError, err unless status == 0
-      return status, out, err
-    end
-
-    private
-      def self.msg(str)
-        Braid::Command.msg(str)
-      end
   end
 end

@@ -1,13 +1,6 @@
-begin
-  require 'rubygems'
-  require 'spec'
-rescue LoadError
-  puts <<-EOS
-  To run the specs you must install the rspec gem:
-    . gem install rspec
-  EOS
-  exit(0)
-end
+require 'rubygems'
+require 'spec'
+require 'spec/rake/spectask'
 
 # all this just to change the default task
 Rake::TaskManager.class_eval do
@@ -19,8 +12,6 @@ end
 def remove_task(task_name)
   Rake.application.remove_task(task_name)
 end
-
-require 'spec/rake/spectask'
 
 desc "Run the specs."
 Spec::Rake::SpecTask.new do |t|

@@ -1,25 +1,21 @@
 module Braid
   module Commands
     class Remove < Command
-      def run(mirror)
-        raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
+      def run(path)
+        mirror = config.get!(path)
+
+        bail_on_local_changes!
 
         with_reset_on_error do
-          params = config.get(mirror)
-          unless params
-            msg "Mirror '#{mirror}/' does not exist."
-            return
-          end
+          msg "Removing mirror from '#{mirror.path}/'."
 
-          msg "Removing #{params["type"]} mirror from '#{mirror}/'."
-
-          invoke(:git_rm_r, mirror)
+          git.rm_r(mirror.path)
 
           config.remove(mirror)
           add_config_file
 
-          commit_message = "Remove mirror '#{mirror}/'."
-          invoke(:git_commit, commit_message)
+          commit_message = "Remove mirror '#{mirror.path}/'"
+          git.commit(commit_message)
         end
       end
     end

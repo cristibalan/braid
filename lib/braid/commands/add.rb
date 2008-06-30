@@ -1,54 +1,43 @@
 module Braid
   module Commands
     class Add < Command
-      def run(remote, options = {})
-        raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
+      def run(url, options = {})
+        bail_on_local_changes!
 
         with_reset_on_error do
-          mirror, params = config.add_from_options(remote, options)
-          local_branch = get_local_branch_name(mirror, params)
+          mirror = config.add_from_options(url, options)
 
-          config.update(mirror, { "local_branch" => local_branch })
-          params["local_branch"] = local_branch # TODO check
-
-          msg "Adding #{params["type"]} mirror of '#{params["remote"]}'" + (params["type"] == "git" ? ", branch '#{params["branch"]}'" : "") + "."
+          branch_message = (mirror.type == "svn" || mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
+          msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}."
 
           # these commands are explained in the subtree merge guide
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
 
           setup_remote(mirror)
-          fetch_remote(params["type"], local_branch)
+          mirror.fetch
 
-          validate_revision_option(params, options)
-          target = determine_target_commit(params, options)
+          new_revision = validate_new_revision(mirror, options["revision"])
+          target_hash = determine_target_commit(mirror, new_revision)
 
-          msg "Merging code into '#{mirror}/'."
-
-          unless params["squash"]
-            invoke(:git_merge_ours, target)
+          unless mirror.squashed?
+            git.merge_ours(target_hash)
           end
-          invoke(:git_read_tree, target, mirror)
+          git.read_tree(target_hash, mirror.path)
 
-          config.update(mirror, { "revision" => options["revision"] })
+          mirror.revision = new_revision
+          config.update(mirror)
+
           add_config_file
 
-          revision_message = options["revision"] ? " at #{display_revision(params["type"], options["revision"])}" : ""
-          commit_message = "Add mirror '#{mirror}/'#{revision_message}."
-          invoke(:git_commit, commit_message)
+          revision_message = options["revision"] ? " at #{display_revision(mirror)}" : ""
+          commit_message = "Add mirror '#{mirror.path}/'#{revision_message}"
+          git.commit(commit_message)
         end
       end
 
-      protected
-        def setup_remote(mirror)
-          Braid::Command.run(:setup, mirror)
-        end
-
       private
-        def get_local_branch_name(mirror, params)
-          res = "braid/#{params["type"]}/#{mirror}"
-          res << "/#{params["branch"]}" if params["type"] == "git"
-          res.gsub!("_", '-') # stupid git svn changes all _ to ., weird
-          res
+        def setup_remote(mirror)
+          Command.run(:setup, mirror.path)
         end
     end
   end

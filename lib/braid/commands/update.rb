@@ -1,78 +1,70 @@
 module Braid
   module Commands
     class Update < Command
-      def run(mirror, options = {})
-        raise Braid::Git::LocalChangesPresent if invoke(:local_changes?)
+      def run(path, options = {})
+        bail_on_local_changes!
 
         with_reset_on_error do
-          mirror ? update_one(mirror, options) : update_all
+          path ? update_one(path, options) : update_all
         end
       end
 
       protected
         def update_all
           msg "Updating all mirrors."
-          config.mirrors.each do |mirror|
-            update_one(mirror)
+          config.mirrors.each do |path|
+            update_one(path)
           end
         end
 
-        def update_one(mirror, options = {})
-          params = config.get(mirror)
-          unless params
-            msg "Mirror '#{mirror}/' does not exist. Skipping."
-            return
-          end
-          local_branch = params["local_branch"]
-
-          if check_for_lock(params, options)
-            msg "Mirror '#{mirror}/' is locked to #{display_revision(params["type"], params["revision"])}. Skipping."
+        def update_one(path, options = {})
+          mirror = config.get(path)
+          unless mirror
+            msg "Mirror '#{path}' does not exist. Skipping."
             return
           end
 
           # unlock
-          if params["revision"] && options["head"]
-            msg "Unlocking mirror '#{mirror}/'."
-            options["revision"] = nil 
+          if mirror.locked?
+            if options["head"]
+              msg "Unlocking mirror '#{mirror.path}/'."
+              mirror.lock = nil
+            else
+              msg "Mirror '#{mirror.path}/' is locked to #{display_revision(mirror, mirror.lock)}. Skipping."
+              return
+            end
           end
 
-          begin
-            fetch_remote(params["type"], local_branch)
+          mirror.fetch
 
-            validate_revision_option(params, options)
-            target = determine_target_commit(params, options)
+          new_revision = validate_new_revision(mirror, options["revision"])
+          target_hash = determine_target_commit(mirror, new_revision)
 
-            check_merge_status(target)
-          rescue Braid::Commands::MirrorAlreadyUpToDate
-            msg "Mirror '#{mirror}/' is already up to date. Skipping."
-            update_revision(mirror, options["revision"])
+          if mirror.merged?(target_hash)
+            msg "Mirror '#{mirror.path}/' is already up to date. Skipping."
             return
           end
 
-          msg "Updating #{params["type"]} mirror '#{mirror}/'."
-
-          if params["squash"]
-            invoke(:git_rm_r, mirror)
-            invoke(:git_read_tree, target, mirror)
+          msg "Updating mirror '#{mirror.path}/'."
+          if mirror.squashed?
+            if mirror.local_changes?
+              msg "Mirror '#{mirror.path}/' has local changes. Aborting."
+              return
+            end
+            git.rm_r(mirror.path)
+            git.read_tree(target_hash, mirror.path)
           else
-            invoke(:git_merge_subtree, target)
+            git.merge_subtree(target_hash)
           end
 
-          update_revision(mirror, options["revision"])
+          mirror.revision = new_revision
+
+          config.update(mirror)
           add_config_file
 
-          revision_message = " to " + (options["revision"] ? display_revision(params["type"], options["revision"]) : "HEAD")
-          commit_message = "Update mirror '#{mirror}/'#{revision_message}."
-          invoke(:git_commit, commit_message)
-        end
-
-      private
-        def check_for_lock(params, options)
-          params["revision"] && !options["revision"] && !options["head"]
-        end
-
-        def update_revision(mirror, revision)
-          config.update(mirror, { "revision" => revision })
+          revision_message = " to " + (options["revision"] ? display_revision(mirror) : "HEAD")
+          commit_message = "Update mirror '#{mirror.path}/'#{revision_message}"
+          git.commit(commit_message)
         end
     end
   end

@@ -54,10 +54,10 @@ Main {
       . braid add svn://remote/path --branch notmaster
     TXT
 
-    mixin :argument_remote, :option_type, :optional_mirror, :option_branch, :option_rails_plugin, :option_revision, :option_full
+    mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full
 
     run {
-      Braid::Command.run(:add, remote, { "type" => type, "mirror" => mirror, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full })
+      Braid::Command.run(:add, url, { "type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full })
     }
   }
 
@@ -77,10 +77,10 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_mirror, :option_revision, :option_head
+    mixin :optional_path, :option_revision, :option_head
 
     run {
-      Braid::Command.run(:update, mirror, { "revision" => revision, "head" => head })
+      Braid::Command.run(:update, path, { "revision" => revision, "head" => head })
     }
   }
 
@@ -97,10 +97,10 @@ Main {
       . braid remove local/dir
     TXT
 
-    mixin :argument_mirror
+    mixin :argument_path
 
     run {
-      Braid::Command.run(:remove, mirror)
+      Braid::Command.run(:remove, path)
     }
   }
 
@@ -113,10 +113,10 @@ Main {
       . braid setup local/dir
     TXT
 
-    mixin :optional_mirror
+    mixin :optional_path
 
     run {
-      Braid::Command.run(:setup, mirror)
+      Braid::Command.run(:setup, path)
     }
   }
 
@@ -129,10 +129,10 @@ Main {
       . braid diff local/dir
     TXT
 
-    mixin :argument_mirror
+    mixin :argument_path
 
     run {
-      Braid::Command.run(:diff, mirror)
+      Braid::Command.run(:diff, path)
     }
   }
 
@@ -144,21 +144,21 @@ Main {
     }
   }
 
-  mixin(:argument_mirror) {
-    argument(:mirror) {
+  mixin(:argument_path) {
+    argument(:path) {
       attr
     }
   }
 
-  mixin(:optional_mirror) {
-    argument(:mirror) {
+  mixin(:optional_path) {
+    argument(:path) {
       optional
       attr
     }
   }
 
-  mixin(:argument_remote) {
-    argument(:remote) {
+  mixin(:argument_url) {
+    argument(:url) {
       attr
     }
   }

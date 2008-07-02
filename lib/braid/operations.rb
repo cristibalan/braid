@@ -177,9 +177,9 @@ module Braid
         out.split[2]
       end
 
-      def diff_tree(src_tree, dst_tree, mirror = nil)
+      def diff_tree(src_tree, dst_tree, prefix = nil)
         cmd = "git diff-tree -p --binary #{src_tree} #{dst_tree}"
-        cmd << " --src-prefix=a/#{mirror}/ --dst-prefix=b/#{mirror}/"
+        cmd << " --src-prefix=a/#{prefix}/ --dst-prefix=b/#{prefix}/" if prefix
         status, out, err = exec!(cmd)
         out
       end

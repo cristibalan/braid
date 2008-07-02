@@ -76,11 +76,6 @@ module Braid
       unless squashed?
         git.merge_base(commit, "HEAD") == commit
       else
-        unless type == "svn"
-          base_revision = revision
-        else
-          base_revision = git_svn.commit_hash(remote, revision)
-        end
         git.merge_base(commit, base_revision) == commit
       end
     end
@@ -90,16 +85,15 @@ module Braid
     end
 
     def diff
-      remote_hash = git.rev_parse(remote)
+      remote_hash = git.rev_parse(base_revision)
       local_hash = git.tree_hash(path)
-      git.diff_tree(remote_hash, local_hash)
+      git.diff_tree(remote_hash, local_hash, path)
     end
 
     def fetch
-      case type
-      when "git"
+      unless type == "svn"
         git.fetch(remote)
-      when "svn"
+      else
         git_svn.fetch(remote)
       end
     end
@@ -115,6 +109,14 @@ module Braid
           end
         else
           super
+        end
+      end
+
+      def base_revision
+        unless type == "svn"
+          revision
+        else
+          git_svn.commit_hash(remote, revision)
         end
       end
 

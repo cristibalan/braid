@@ -18,11 +18,7 @@ module Braid
         end
 
         def update_one(path, options = {})
-          mirror = config.get(path)
-          unless mirror
-            msg "Mirror '#{path}' does not exist. Skipping."
-            return
-          end
+          mirror = config.get!(path)
 
           # unlock
           if mirror.locked?

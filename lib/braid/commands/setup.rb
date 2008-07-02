@@ -14,11 +14,7 @@ module Braid
         end
 
         def setup_one(path)
-          mirror = config.get(path)
-          unless mirror
-            msg "Mirror '#{mirror.path}/' does not exist. Skipping."
-            return
-          end
+          mirror = config.get!(path)
 
           if git.remote_exists?(mirror.remote)
             msg "Mirror '#{mirror.path}/' already has a remote. Skipping."

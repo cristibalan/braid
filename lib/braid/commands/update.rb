@@ -25,7 +25,7 @@ module Braid
             if options["head"]
               msg "Unlocking mirror '#{mirror.path}/'."
               mirror.lock = nil
-            else
+            elsif !options["revision"]
               msg "Mirror '#{mirror.path}/' is locked to #{display_revision(mirror, mirror.lock)}. Skipping."
               return
             end
@@ -54,7 +54,7 @@ module Braid
           end
 
           mirror.revision = new_revision
-
+          mirror.lock = new_revision if options["revision"]
           config.update(mirror)
           add_config_file
 

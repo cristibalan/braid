@@ -8,7 +8,8 @@ module Braid
           mirror = config.add_from_options(url, options)
 
           branch_message = (mirror.type == "svn" || mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
-          msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}."
+          revision_message = options["revision"] ? " at #{display_revision(mirror)}" : ""
+          msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
 
           # these commands are explained in the subtree merge guide
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
@@ -25,11 +26,10 @@ module Braid
           git.read_tree(target_hash, mirror.path)
 
           mirror.revision = new_revision
+          mirror.lock = new_revision if options["revision"]
           config.update(mirror)
-
           add_config_file
 
-          revision_message = options["revision"] ? " at #{display_revision(mirror)}" : ""
           commit_message = "Add mirror '#{mirror.path}/'#{revision_message}"
           git.commit(commit_message)
         end

@@ -47,7 +47,7 @@ module Braid
         branch = nil
       end
 
-      attributes = { "url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed, "revision" => nil, "lock" => options["revision"] }
+      attributes = { "url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed, "revision" => nil, "lock" => nil }
       self.new(path, attributes)
     end
 

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/test_helper'
 
 describe "Braid::Operations::Git#remote_exists?" do
   include Braid::Operations::VersionControl
@@ -8,15 +8,15 @@ describe "Braid::Operations::Git#remote_exists?" do
   end
 
   it "should return true for existing git remotes" do
-    git.remote_exists?("braid/git/one").should be_true
+    git.remote_exists?("braid/git/one").should == true
   end
 
   it "should return true for existing svn remotes" do
-    git.remote_exists?("braid/git/two").should be_true
+    git.remote_exists?("braid/git/two").should == true
   end
 
   it "should return false for nonexistent remotes" do
-    git.remote_exists?("N/A").should be_false
+    git.remote_exists?("N/A").should == false
   end
 end
 
@@ -32,7 +32,7 @@ describe "Braid::Operations::Git#rev_parse" do
   it "should raise a revision error when the hash is not found" do
     ambiguous_revision = 'b' * 7
     Braid::Operations::Git.any_instance.expects(:exec).returns([1, ambiguous_revision, "fatal: ..."])
-    lambda { git.rev_parse(ambiguous_revision) }.should raise_error(Braid::Operations::Git::UnknownRevision)
+    lambda { git.rev_parse(ambiguous_revision) }.should.raise(Braid::Operations::Git::UnknownRevision)
   end
 end
 
@@ -64,14 +64,14 @@ describe "Braid::Operations::Git#require_version" do
   it "should return true for higher revisions" do
     PASS_VERSIONS.each do |version|
       set_version(version)
-      git.require_version(REQUIRED_VERSION).should be_true
+      git.require_version(REQUIRED_VERSION).should == true
     end
   end
 
   it "should return false for lower revisions" do
     FAIL_VERSIONS.each do |version|
       set_version(version)
-      git.require_version(REQUIRED_VERSION).should be_false
+      git.require_version(REQUIRED_VERSION).should == false
     end
   end
 end

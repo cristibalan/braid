@@ -1,5 +1,8 @@
-#require 'config/requirements'
-#require 'config/hoe' # setup Hoe + all gem configuration
+desc "Run all specs by default"
+task :default => :test
 
-#Dir['tasks/**/*.rake'].each { |rake| load rake }
-load 'tasks/rspec.rake'
+task :test do
+  Dir[File.dirname(__FILE__) + '/test/**/*_spec.rb'].each do |file|
+    load file
+  end
+end

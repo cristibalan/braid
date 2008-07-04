@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/test_helper'
+
+def new_from_options(url, options = {})
+  @mirror = Braid::Mirror.new_from_options(url, options)
+end
 
 describe "Braid::Mirror.new_from_options" do
-  def new_from_options(url, options = {})
-    @mirror = Braid::Mirror.new_from_options(url, options)
-  end
-
   it "should default branch to master" do
     new_from_options("git://path")
     @mirror.branch.should == "master"
@@ -31,7 +31,7 @@ describe "Braid::Mirror.new_from_options" do
   end
 
   it "should raise if no type can be guessed" do
-    lambda { new_from_options("http://path") }.should raise_error(Braid::Mirror::CannotGuessType)
+    lambda { new_from_options("http://path") }.should.raise(Braid::Mirror::CannotGuessType)
   end
 
   it "should default mirror to previous to last path part, if last path part is /trunk" do
@@ -53,11 +53,11 @@ describe "Braid::Mirror#local_changes?" do
 
   it "should return true when the diff is not empty" do
     Braid::Operations::Git.any_instance.expects(:diff_tree).returns("diff --git a/path b/path\n")
-    @mirror.local_changes?.should be_true
+    @mirror.local_changes?.should == true
   end
 
   it "should return false when the diff is empty" do
     Braid::Operations::Git.any_instance.expects(:diff_tree).returns("")
-    @mirror.local_changes?.should be_false
+    @mirror.local_changes?.should == false
   end
 end

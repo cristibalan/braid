@@ -3,7 +3,7 @@ module Braid
     class Diff < Command
       def run(path)
         mirror = config.get!(path)
-        $stdout.write mirror.diff
+        puts mirror.diff
       end
     end
   end

@@ -202,6 +202,16 @@ module Braid
         out[2..-1]
       end
 
+      def apply(diff)
+        # always uses index
+        status = Open4.popen4("git apply --index -") do |pid, stdin, stdout, stderr|
+          stdin.puts(diff)
+          stdin.close
+        end.exitstatus
+        raise ShellExecutionError unless status == 0
+        true
+      end
+
       private
         def command(name)
           "#{COMMAND} #{name.to_s.gsub('_', '-')}"

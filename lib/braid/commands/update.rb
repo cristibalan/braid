@@ -43,12 +43,10 @@ module Braid
 
           msg "Updating mirror '#{mirror.path}/'."
           if mirror.squashed?
-            if mirror.local_changes?
-              msg "Mirror '#{mirror.path}/' has local changes. Aborting."
-              return
-            end
+            diff = mirror.diff
             git.rm_r(mirror.path)
             git.read_tree(target_hash, mirror.path)
+            git.apply(diff) unless diff.empty?
           else
             git.merge_subtree(target_hash)
           end

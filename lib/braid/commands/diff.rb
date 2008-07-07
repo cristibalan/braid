@@ -3,7 +3,8 @@ module Braid
     class Diff < Command
       def run(path)
         mirror = config.get!(path)
-        puts mirror.diff
+        diff = mirror.diff
+        puts diff unless diff.empty?
       end
     end
   end

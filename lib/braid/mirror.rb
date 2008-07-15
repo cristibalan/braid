@@ -13,7 +13,7 @@ module Braid
         "cannot guess type: #{super}"
       end
     end
-    class PathIsRequired < BraidError
+    class PathRequired < BraidError
       def message
         "path is required"
       end
@@ -40,7 +40,7 @@ module Braid
       end
 
       unless path = options["path"] || extract_path_from_url(url)
-        raise PathIsRequired
+        raise PathRequired
       end
 
       if options["rails_plugin"]
@@ -55,15 +55,6 @@ module Braid
       self.new(path, attributes)
     end
 
-    def locked?
-      # the question mark just looks nicer
-      !!lock
-    end
-
-    def squashed?
-      !!squashed
-    end
-
     def ==(comparison)
       path == comparison.path && attributes == comparison.attributes
     end
@@ -71,6 +62,14 @@ module Braid
     def type
       # override Object#type
       attributes["type"]
+    end
+
+    def locked?
+      !!lock
+    end
+
+    def squashed?
+      !!squashed
     end
 
     def merged?(commit)
@@ -84,14 +83,10 @@ module Braid
       end
     end
 
-    def local_changes?
-      !diff.empty?
-    end
-
     def diff
-      remote_hash = git.rev_parse(base_revision)
+      remote_hash = git.rev_parse("#{base_revision}:")
       local_hash = git.tree_hash(path)
-      git.diff_tree(remote_hash, local_hash, path)
+      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash, path) : ""
     end
 
     def fetch
@@ -116,10 +111,36 @@ module Braid
       end
 
       def base_revision
-        revision && unless type == "svn"
-          git.rev_parse(revision)
+        if revision
+          unless type == "svn"
+            git.rev_parse(revision)
+          else
+            git_svn.commit_hash(remote, revision)
+          end
         else
-          git_svn.commit_hash(remote, revision)
+          inferred_revision
+        end
+      end
+
+      def inferred_revision
+        time = list_revisions("-E --grep='^(Add|Update) mirror'", "-1", "HEAD", "-- #{path}").first[0]
+        revs = list_revisions("--reverse", remote)
+        hash = nil
+        revs.each_with_index do |rev, idx|
+          if !revs[idx + 1] || revs[idx + 1][0] > time
+            hash = revs[idx][1]
+            break
+          end
+        end
+        hash
+      end
+
+      def list_revisions(*args)
+        out = git.rev_list("--timestamp", *args)
+        out.split("\n").map do |line|
+          parts = line.split(' ', 2)
+          parts[0] = parts[0].to_i
+          parts
         end
       end
 

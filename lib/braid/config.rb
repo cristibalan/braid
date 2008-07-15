@@ -31,13 +31,6 @@ module Braid
       end
     end
 
-    def add(mirror)
-      @db.transaction do
-        raise PathAlreadyInUse, mirror.path if @db[mirror.path]
-        @db[mirror.path] = clean_attributes(mirror.attributes)
-      end
-    end
-
     def get(path)
       @db.transaction(true) do
         if attributes = @db[path.to_s.sub(/\/$/, '')]
@@ -52,6 +45,13 @@ module Braid
       mirror
     end
 
+    def add(mirror)
+      @db.transaction do
+        raise PathAlreadyInUse, mirror.path if @db[mirror.path]
+        write_mirror(mirror)
+      end
+    end
+
     def remove(mirror)
       @db.transaction do
         @db.delete(mirror.path)
@@ -61,14 +61,41 @@ module Braid
     def update(mirror)
       @db.transaction do
         raise MirrorDoesNotExist, mirror.path unless @db[mirror.path]
-        @db.delete(mirror)
-        @db[mirror.path] = clean_attributes(mirror.attributes)
+        @db.delete(mirror.path)
+        write_mirror(mirror)
+      end
+    end
+
+    def valid?
+      @db.transaction(true) do
+        !@db.roots.any? do |path|
+          @db[path]["url"].nil?
+        end
+      end
+    end
+
+    def migrate!
+      @db.transaction do
+        @db.roots.each do |path|
+          attributes = @db[path]
+          if attributes["local_branch"]
+            attributes["url"] = attributes.delete("remote")
+            attributes["remote"] = attributes.delete("local_branch")
+            attributes["squashed"] = attributes.delete("squash")
+            attributes["lock"] = attributes["revision"] # so far this has always been true
+          end
+          @db[path] = clean_attributes(attributes)
+        end
       end
     end
 
     private
+      def write_mirror(mirror)
+        @db[mirror.path] = clean_attributes(mirror.attributes)
+      end
+
       def clean_attributes(hash)
-        (hash = hash.dup).each { |k,v| hash.delete(k) if v.nil? }
+        hash.reject { |k,v| v.nil? }
       end
   end
 end

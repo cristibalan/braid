@@ -110,8 +110,8 @@ module Braid
     end
 
     class Git < Proxy
-      def commit(message)
-        status, out, err = exec("git commit -m #{message.inspect} --no-verify")
+      def commit(message, *args)
+        status, out, err = exec("git commit -m #{message.inspect} --no-verify #{args.join(' ')}")
 
         if status == 0
           true
@@ -219,10 +219,9 @@ module Braid
         out[2..-1]
       end
 
-      def apply(diff)
+      def apply(diff, *args)
         err = nil
-        # always uses index
-        status = Open4.popen4("git apply --index -") do |pid, stdin, stdout, stderr|
+        status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
           stdin.puts(diff)
           stdin.close
 
@@ -242,7 +241,7 @@ module Braid
       def self.command; "git-svn"; end
 
       def commit_hash(remote, revision)
-        status, out, err = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
+        out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
         part = out.to_s.split(" | ")[1]
         raise UnknownRevision, "r#{revision}" unless part
         Git.instance.rev_parse(part) # FIXME ugly ugly ugly

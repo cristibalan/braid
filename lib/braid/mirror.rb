@@ -14,7 +14,7 @@ module Braid
 
     attr_reader :path, :attributes
 
-    def initialize(path, attributes)
+    def initialize(path, attributes = {})
       @path = path.sub(/\/$/, '')
       @attributes = attributes
     end
@@ -47,7 +47,7 @@ module Braid
         branch = nil
       end
 
-      attributes = { "url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed, "revision" => nil, "lock" => nil }
+      attributes = { "url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed }
       self.new(path, attributes)
     end
 
@@ -73,10 +73,10 @@ module Braid
       # tip from spearce in #git:
       # `test z$(git merge-base A B) = z$(git rev-parse --verify A)`
       commit = git.rev_parse(commit)
-      unless squashed?
-        git.merge_base(commit, "HEAD") == commit
+      if squashed?
+        !!base_revision && git.merge_base(commit, base_revision) == commit
       else
-        git.merge_base(commit, base_revision) == commit
+        git.merge_base(commit, "HEAD") == commit
       end
     end
 
@@ -113,8 +113,8 @@ module Braid
       end
 
       def base_revision
-        unless type == "svn"
-          revision
+        revision && unless type == "svn"
+          git.rev_parse(revision)
         else
           git_svn.commit_hash(remote, revision)
         end

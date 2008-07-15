@@ -47,7 +47,7 @@ end
 
 describe "Braid::Mirror#local_changes?" do
   before(:each) do
-    @mirror = Braid::Mirror.new_from_options("git://path")
+    @mirror = new_from_options("git://path")
     Braid::Operations::Git.any_instance.expects(:rev_parse)
   end
 
@@ -59,5 +59,19 @@ describe "Braid::Mirror#local_changes?" do
   it "should return false when the diff is empty" do
     Braid::Operations::Git.any_instance.expects(:diff_tree).returns("")
     @mirror.local_changes?.should == false
+  end
+end
+
+describe "Braid::Mirror#base_revision" do
+  it "should be nil when no revision is set" do
+    @mirror = Braid::Mirror.new("path")
+    @mirror.revision.should.be.nil
+    @mirror.send(:base_revision).should.be.nil
+  end
+
+  it "should be the parsed hash for git mirrors" do
+    Braid::Operations::Git.any_instance.expects(:rev_parse).returns('a' * 40)
+    @mirror = Braid::Mirror.new("path", "revision" => ('a' * 7))
+    @mirror.send(:base_revision).should == 'a' * 40
   end
 end

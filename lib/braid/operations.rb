@@ -49,12 +49,11 @@ module Braid
         end
 
         def invoke(arg, *args)
-          exec!("#{command(arg)} #{args.join(' ')}".strip)
+          exec!("#{command(arg)} #{args.join(' ')}".strip)[1] # return stdout
         end
 
         def method_missing(name, *args)
           invoke(name, *args)
-          true
         end
 
         def exec(cmd)
@@ -92,7 +91,7 @@ module Braid
       end
 
       def commit(message)
-        status, out, err = invoke(:commit, "-m #{message.inspect} --no-verify")
+        status, out, err = exec("git commit -m #{message.inspect} --no-verify")
 
         if status == 0
           true
@@ -119,15 +118,13 @@ module Braid
 
       # Returns the base commit or nil.
       def merge_base(target, source)
-        status, out, err = invoke(:merge_base, target, source)
-        out.strip
+        invoke(:merge_base, target, source)
       rescue ShellExecutionError
         nil
       end
 
       def rev_parse(opt)
-        status, out, err = invoke(:rev_parse, opt)
-        out.strip
+        invoke(:rev_parse, opt)
       rescue ShellExecutionError
         raise UnknownRevision, opt
       end
@@ -173,7 +170,7 @@ module Braid
       end
 
       def tree_hash(path, treeish = "HEAD")
-        status, out, err = invoke(:ls_tree, treeish, "-d", path)
+        out = invoke(:ls_tree, treeish, "-d", path)
         out.split[2]
       end
 

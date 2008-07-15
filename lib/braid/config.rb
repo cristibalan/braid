@@ -8,8 +8,6 @@ module Braid
     class MirrorDoesNotExist < BraidError
     end
 
-    attr_reader :db
-
     def initialize(config_file = CONFIG_FILE)
       @db = YAML::Store.new(config_file)
     end
@@ -30,7 +28,7 @@ module Braid
     def add(mirror)
       @db.transaction do
         raise PathAlreadyInUse if @db[mirror.path]
-        @db[mirror.path] = mirror.attributes
+        @db[mirror.path] = clean_attributes(mirror.attributes)
       end
     end
 
@@ -58,8 +56,13 @@ module Braid
       @db.transaction do
         raise MirrorDoesNotExist unless @db[mirror.path]
         @db.delete(mirror)
-        @db[mirror.path] = mirror.attributes
+        @db[mirror.path] = clean_attributes(mirror.attributes)
       end
     end
+
+    private
+      def clean_attributes(hash)
+        (hash = hash.dup).each { |k,v| hash.delete(k) if v.nil? }
+      end
   end
 end

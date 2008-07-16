@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'open4'
 
 module Braid

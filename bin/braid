@@ -1,13 +1,10 @@
 #!/usr/bin/env ruby
+
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
-
-begin
-  require 'rubygems'
-rescue LoadError
-end
-require 'main'
-
 require 'braid'
+
+require 'rubygems'
+require 'main'
 
 Home = File.expand_path(ENV['HOME'] || '~')
 

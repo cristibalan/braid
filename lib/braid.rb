@@ -1,11 +1,8 @@
 $:.unshift File.dirname(__FILE__)
 
-begin
-  require 'rubygems'
-rescue LoadError
-end
-
 module Braid
+  VERSION = "0.4.9"
+
   CONFIG_FILE = ".braids"
   REQUIRED_GIT_VERSION = "1.5.4.5"
 
@@ -13,7 +10,6 @@ module Braid
   end
 end
 
-require 'braid/version'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'

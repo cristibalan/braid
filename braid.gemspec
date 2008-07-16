@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.files = ["README.rdoc", "LICENSE", "Rakefile", "braid.gemspec", "bin/braid", "lib/braid.rb", "lib/braid/command.rb", "lib/braid/commands/add.rb", "lib/braid/commands/diff.rb", "lib/braid/commands/remove.rb", "lib/braid/commands/setup.rb", "lib/braid/commands/update.rb", "lib/braid/config.rb", "lib/braid/mirror.rb", "lib/braid/operations.rb", "test/braid_spec.rb", "test/config_spec.rb", "test/mirror_spec.rb", "test/operations_spec.rb", "test/test_helper.rb"]
   s.has_rdoc = true
   s.homepage = %q{http://evil.che.lu/projects/braid}
-  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "braid", "--main", "README.txt"]
+  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "braid", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{braid}
   s.rubygems_version = %q{1.1.0}

@@ -5,21 +5,22 @@ http://evil.che.lu/projects/braid/
 
 == Requirements
 
-You will need git version 1.5.4.5 or higher to run this version.
+You will need git 1.5.4.5 or higher to run this version.
 
 == Installation
 
   git clone git://github.com/evilchelu/braid.git
   cd braid
-  ...
+  gem build braid.gemspec
+  sudo gem install braid-x.y.z.gem
 
 == Usage
 
   braid help
   braid help COMMANDNAME
 
-For more usage examples and documentation check the {project wiki}[http://github.com/evilchelu/braid/wikis].
-Also see the {bug tracker}[evilchelu.lighthouseapp.com/projects/10600-braid] for current issues.
+For more usage examples and documentation check the project wiki at http://github.com/evilchelu/braid/wikis.
+Also see the bug tracker at http://evilchelu.lighthouseapp.com/projects/10600-braid for current issues and future plans.
 
 == Contributing
 

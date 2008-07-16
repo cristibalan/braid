@@ -1,0 +1,26 @@
+= braid
+A simple tool for tracking vendor branches in git.
+
+http://evil.che.lu/projects/braid/
+
+== Requirements
+
+You will need git version 1.5.4.5 or higher to run this version.
+
+== Installation
+
+  git clone git://github.com/evilchelu/braid.git
+  cd braid
+  ...
+
+== Usage
+
+  braid help
+  braid help COMMANDNAME
+
+For more usage examples and documentation check the {project wiki}[http://github.com/evilchelu/braid/wikis].
+Also see the {bug tracker}[evilchelu.lighthouseapp.com/projects/10600-braid] for current issues.
+
+== Contributing
+
+If you want to send a patch please fork the project on GitHub and send a pull request.

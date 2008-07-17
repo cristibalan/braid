@@ -34,7 +34,7 @@ module Braid
 
     def get(path)
       @db.transaction(true) do
-        if attributes = @db[path]
+        if attributes = @db[path.to_s.sub(/\/$/, '')]
           Mirror.new(path, attributes)
         end
       end

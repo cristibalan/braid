@@ -5,12 +5,33 @@ require 'open4'
 module Braid
   module Operations
     class ShellExecutionError < BraidError
+      def initialize(err = nil)
+        @err = err
+      end
+
+      def message
+        @err.to_s.split("\n").first
+      end
     end
     class VersionTooLow < BraidError
+      def initialize(command, version)
+        @command = command
+        @version = version.to_s.split("\n").first
+      end
+
+      def message
+        "#{@command} version too low: #{@version}"
+      end
     end
     class UnknownRevision < BraidError
+      def message
+        "unknown revision: #{super}"
+      end
     end
     class LocalChangesPresent < BraidError
+      def message
+        "local changes are present"
+      end
     end
 
     # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
@@ -47,7 +68,7 @@ module Braid
       end
 
       def require_version!(required)
-        require_version(required) || raise(VersionTooLow, version)
+        require_version(required) || raise(VersionTooLow.new(self.class.command, version))
       end
 
       private
@@ -104,7 +125,7 @@ module Braid
       def fetch(remote)
         # open4 messes with the pipes of index-pack
         system("git fetch -n #{remote} &> /dev/null")
-        raise ShellExecutionError unless $? == 0
+        raise ShellExecutionError, "could not fetch" unless $? == 0
         true
       end
 
@@ -199,12 +220,15 @@ module Braid
       end
 
       def apply(diff)
+        err = nil
         # always uses index
         status = Open4.popen4("git apply --index -") do |pid, stdin, stdout, stderr|
           stdin.puts(diff)
           stdin.close
+
+          err = stderr.read
         end.exitstatus
-        raise ShellExecutionError unless status == 0
+        raise ShellExecutionError, err unless status == 0
         true
       end
 
@@ -227,6 +251,7 @@ module Braid
       def fetch(remote)
         # open4 messes with the pipes of index-pack
         system("git-svn fetch #{remote} &> /dev/null")
+        raise ShellExecutionError, "could not fetch" unless $? == 0
         true
       end
 

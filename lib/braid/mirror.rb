@@ -4,10 +4,19 @@ module Braid
     ATTRIBUTES = %w(url remote type branch squashed revision lock)
 
     class UnknownType < BraidError
+      def message
+        "unknown type: #{super}"
+      end
     end
     class CannotGuessType < BraidError
+      def message
+        "cannot guess type: #{super}"
+      end
     end
     class PathIsRequired < BraidError
+      def message
+        "path is required"
+      end
     end
 
     include Operations::VersionControl
@@ -25,7 +34,7 @@ module Braid
       branch = options["branch"] || "master"
 
       if type = options["type"] || extract_type_from_url(url)
-        raise UnknownType unless TYPES.include?(type)
+        raise UnknownType, type unless TYPES.include?(type)
       else
         raise CannotGuessType, url
       end
@@ -95,15 +104,14 @@ module Braid
 
     private
       def method_missing(name, *args)
-        name = name.to_s
-        if ATTRIBUTES.find { |attribute| name =~ /^(#{attribute})(=)?$/ }
+        if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }
           unless $2
             attributes[$1]
           else
             attributes[$1] = args[0]
           end
         else
-          super
+          raise NameError, "unknown attribute `#{name}'"
         end
       end
 

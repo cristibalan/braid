@@ -1,10 +1,6 @@
 module Braid
   class Command
-    class LocalRevisionIsHigherThanRequestedRevision < BraidError
-    end
-    class RequestedRevisionIsHigherThanRemoteRevision < BraidError
-    end
-    class MirrorAlreadyAtRequestedRevision < BraidError
+    class InvalidRevision < BraidError
     end
 
     extend Operations::VersionControl
@@ -16,12 +12,13 @@ module Braid
       klass = Commands.const_get(command.to_s.capitalize)
       klass.new.run(*args)
 
-    rescue Operations::VersionTooLow => error
-      msg "Error: git version too low: #{error.message}"
-      exit(1)
-
-    rescue Operations::LocalChangesPresent => error
-      msg "Error: local changes are present, commit or stash them before running #{command}"
+    rescue BraidError => error
+      case error
+      when Operations::ShellExecutionError
+        msg "Shell error: #{error.message}"
+      else
+        msg "Error: #{error.message}"
+      end
       exit(1)
     end
 
@@ -84,16 +81,16 @@ module Braid
         old_revision = mirror.revision
 
         if new_revision == old_revision
-          raise MirrorAlreadyAtRequestedRevision
+          raise InvalidRevision, "mirror is already at requested revision"
         end
 
         if mirror.type == "svn"
           if old_revision && new_revision < old_revision
-            raise LocalRevisionIsHigherThanRequestedRevision
+            raise InvalidRevision, "local revision is higher than request revision"
           end
 
           if svn.head_revision(mirror.url) < new_revision
-            raise RequestedRevisionIsHigherThanRemoteRevision
+            raise InvalidRevision, "requested revision is higher than remote revision"
           end
         end
 

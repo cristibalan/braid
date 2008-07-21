@@ -4,8 +4,14 @@ require 'yaml/store'
 module Braid
   class Config
     class PathAlreadyInUse < BraidError
+      def message
+        "path already in use: #{super}"
+      end
     end
     class MirrorDoesNotExist < BraidError
+      def message
+        "mirror does not exist: #{super}"
+      end
     end
 
     def initialize(config_file = CONFIG_FILE)
@@ -27,7 +33,7 @@ module Braid
 
     def add(mirror)
       @db.transaction do
-        raise PathAlreadyInUse if @db[mirror.path]
+        raise PathAlreadyInUse, mirror.path if @db[mirror.path]
         @db[mirror.path] = clean_attributes(mirror.attributes)
       end
     end
@@ -42,7 +48,7 @@ module Braid
 
     def get!(path)
       mirror = get(path)
-      raise MirrorDoesNotExist unless mirror
+      raise MirrorDoesNotExist, path unless mirror
       mirror
     end
 
@@ -54,7 +60,7 @@ module Braid
 
     def update(mirror)
       @db.transaction do
-        raise MirrorDoesNotExist unless @db[mirror.path]
+        raise MirrorDoesNotExist, mirror.path unless @db[mirror.path]
         @db.delete(mirror)
         @db[mirror.path] = clean_attributes(mirror.attributes)
       end

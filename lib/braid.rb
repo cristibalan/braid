@@ -7,6 +7,10 @@ module Braid
   REQUIRED_GIT_VERSION = "1.5.4.5"
 
   class BraidError < StandardError
+    def message
+      value = super
+      value if value != self.class.name
+    end
   end
 end
 

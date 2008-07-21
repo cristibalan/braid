@@ -203,7 +203,7 @@ module Braid
 
       def status_clean?
         status, out, err = exec("git status")
-        !out.split("\n").grep(/nothing to commit \(working directory clean\)/).empty?
+        !out.split("\n").grep(/nothing to commit/).empty?
       end
 
       def ensure_clean!

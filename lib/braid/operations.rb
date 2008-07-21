@@ -1,3 +1,4 @@
+require 'singleton'
 require 'rubygems'
 require 'open4'
 
@@ -5,15 +6,21 @@ module Braid
   module Operations
     class ShellExecutionError < BraidError
     end
-    class VersionError < BraidError
+    class VersionTooLow < BraidError
+    end
+    class UnknownRevision < BraidError
+    end
+    class LocalChangesPresent < BraidError
     end
 
     # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
-    #
-    # It is expected that subclasses override the command method, define a COMMAND constant and have a VersionTooLow exception.
-    class CommandProxy
+    class Proxy
+      include Singleton
+
+      def self.command; name.split('::').last.downcase; end # hax!
+
       def version
-        status, out, err = exec!("#{self.class::COMMAND} --version")
+        status, out, err = exec!("#{self.class.command} --version")
         out.sub(/^.* version/, "").strip
       end
 
@@ -40,7 +47,7 @@ module Braid
       end
 
       def require_version!(required)
-        require_version(required) || raise(self.class::VersionTooLow, version)
+        require_version(required) || raise(VersionTooLow, version)
       end
 
       private
@@ -81,16 +88,7 @@ module Braid
         end
     end
 
-    class Git < CommandProxy
-      COMMAND = "git"
-
-      class UnknownRevision < BraidError
-      end
-      class LocalChangesPresent < BraidError
-      end
-      class VersionTooLow < VersionError
-      end
-
+    class Git < Proxy
       def commit(message)
         status, out, err = exec("git commit -m #{message.inspect} --no-verify")
 
@@ -212,23 +210,18 @@ module Braid
 
       private
         def command(name)
-          "#{COMMAND} #{name.to_s.gsub('_', '-')}"
+          "#{self.class.command} #{name.to_s.gsub('_', '-')}"
         end
     end
 
-    class GitSvn < CommandProxy
-      COMMAND = "git-svn"
-
-      class UnknownRevision < BraidError
-      end
-      class VersionTooLow < VersionError
-      end
+    class GitSvn < Proxy
+      def self.command; "git-svn"; end
 
       def commit_hash(remote, revision)
         status, out, err = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
-        part = out.split(" | ")[1]
-        raise UnknownRevision, "unknown revision: #{revision}" unless part
-        Git.new.rev_parse(part) # FIXME ugly ugly ugly
+        part = out.to_s.split(" | ")[1]
+        raise UnknownRevision, "r#{revision}" unless part
+        Git.instance.rev_parse(part) # FIXME ugly ugly ugly
       end
 
       def fetch(remote)
@@ -244,13 +237,11 @@ module Braid
 
       private
         def command(name)
-          "#{COMMAND} #{name}"
+          "#{self.class.command} #{name}"
         end
     end
 
-    class Svn < CommandProxy
-      COMMAND = "svn"
-
+    class Svn < Proxy
       def clean_revision(revision)
         revision.to_i if revision
       end
@@ -264,18 +255,17 @@ module Braid
     end
 
     module VersionControl
-      private
-        def git
-          Git.new
-        end
+      def git
+        Git.instance
+      end
 
-        def git_svn
-          GitSvn.new
-        end
+      def git_svn
+        GitSvn.instance
+      end
 
-        def svn
-          Svn.new
-        end
+      def svn
+        Svn.instance
+      end
     end
   end
 end

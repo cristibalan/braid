@@ -1,9 +1,5 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-def new_from_options(url, options = {})
-  @mirror = Braid::Mirror.new_from_options(url, options)
-end
-
 describe "Braid::Mirror.new_from_options" do
   it "should default branch to master" do
     new_from_options("git://path")
@@ -45,19 +41,20 @@ describe "Braid::Mirror.new_from_options" do
   end
 end
 
-describe "Braid::Mirror#local_changes?" do
+describe "Braid::Mirror#diff" do
   before(:each) do
     @mirror = new_from_options("git://path")
-    Braid::Operations::Git.any_instance.expects(:rev_parse)
+    git.stubs(:rev_parse)
+    git.stubs(:tree_hash)
   end
 
   it "should return true when the diff is not empty" do
-    Braid::Operations::Git.any_instance.expects(:diff_tree).returns("diff --git a/path b/path\n")
+    git.expects(:diff_tree).returns("diff --git a/path b/path\n")
     @mirror.local_changes?.should == true
   end
 
   it "should return false when the diff is empty" do
-    Braid::Operations::Git.any_instance.expects(:diff_tree).returns("")
+    git.expects(:diff_tree).returns("")
     @mirror.local_changes?.should == false
   end
 end
@@ -70,8 +67,8 @@ describe "Braid::Mirror#base_revision" do
   end
 
   it "should be the parsed hash for git mirrors" do
-    Braid::Operations::Git.any_instance.expects(:rev_parse).returns('a' * 40)
     @mirror = Braid::Mirror.new("path", "revision" => ('a' * 7))
+    git.expects(:rev_parse).returns('a' * 40)
     @mirror.send(:base_revision).should == 'a' * 40
   end
 end

@@ -16,17 +16,13 @@ module Braid
       klass = Commands.const_get(command.to_s.capitalize)
       klass.new.run(*args)
 
-    rescue Operations::Git::VersionTooLow => error
-      msg "git version #{REQUIRED_GIT_VERSION} or higher is required, #{error.message} is installed."
-      msg "Exiting."
+    rescue Operations::VersionTooLow => error
+      msg "Error: git version too low: #{error.message}"
+      exit(1)
 
-    rescue Operations::Git::LocalChangesPresent => error
-      msg "Local changes are present, commit or stash them before running #{command}."
-      msg "Exiting."
-
-    rescue => error
-      #msg "braid error: #{error}"
-      raise error
+    rescue Operations::LocalChangesPresent => error
+      msg "Error: local changes are present, commit or stash them before running #{command}"
+      exit(1)
     end
 
     def self.msg(str)

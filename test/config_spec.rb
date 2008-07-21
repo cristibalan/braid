@@ -1,9 +1,5 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-def build_mirror
-  Braid::Mirror.new("path", "url" => "url")
-end
-
 describe_shared "Braid::Config, in general" do
   db = "tmp.yml"
 

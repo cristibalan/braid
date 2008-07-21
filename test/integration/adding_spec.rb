@@ -27,6 +27,19 @@ describe "Adding a mirror in a clean repository" do
       output.length.should == 2
       output[0].should =~ "Add mirror 'skit1/'"
     end
+
+    it "should create .braids and add the mirror to it" do
+      in_dir(@shiny) do
+        `braid add --type git #{@skit1}`
+      end
+
+      braids = YAML::load_file("#{@shiny}/.braids")
+      braids["skit1"]["squashed"].should == true
+      braids["skit1"]["url"].should == @skit1
+      braids["skit1"]["type"].should == "git"
+      braids["skit1"]["branch"].should == "master"
+      braids["skit1"]["remote"].should == "braid/git/skit1/master"
+    end
   end
 
   describe "from an svn repository" do
@@ -48,9 +61,20 @@ describe "Adding a mirror in a clean repository" do
       output.length.should == 2
       output[0].should =~ "Add mirror 'skit1/'"
     end
+
+    it "should create .braids and add the mirror to it" do
+      in_dir(@shiny) do
+        `braid add --type svn #{@skit1}`
+      end
+
+      braids = YAML::load_file("#{@shiny}/.braids")
+      braids["skit1"]["squashed"].should == true
+      braids["skit1"]["url"].should == @skit1
+      braids["skit1"]["type"].should == "svn"
+      braids["skit1"]["revision"].should == 1
+      braids["skit1"]["remote"].should == "braid/svn/skit1"
+    end
   end
-
-
 
 end
 

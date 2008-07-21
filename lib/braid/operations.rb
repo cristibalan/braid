@@ -158,7 +158,7 @@ module Braid
       # Checks git and svn remotes.
       def remote_exists?(remote)
         # TODO clean up and maybe return more information
-        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{remote}"\]/ }
+        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{Regexp.escape(remote)}"\]/ }
       end
 
       def reset_hard(target)

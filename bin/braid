@@ -137,7 +137,7 @@ Main {
     description 'Show braid version.'
 
     run {
-      puts "braid #{Braid::VERSION::STRING}"
+      puts "braid #{Braid::VERSION}"
     }
   }
 

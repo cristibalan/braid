@@ -38,14 +38,9 @@ module Braid
         path = "vendor/plugins/#{path}"
       end
 
-      remote = "braid/#{type}/#{path}".gsub("_", '-') # stupid git svn changes all _ to ., weird
+      remote = "braid/#{path}".gsub("_", '-') # stupid git svn changes all _ to ., weird
       squashed = !options["full"]
-
-      unless type == "svn"
-        remote << "/#{branch}"
-      else
-        branch = nil
-      end
+      branch = nil if type == "svn"
 
       attributes = { "url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed }
       self.new(path, attributes)

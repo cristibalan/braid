@@ -34,9 +34,16 @@ def run_cmds(ary)
   end
 end
 
+def update_dir_from_fixture(dir, fixture = dir)
+  to_dir = File.join(TMP_PATH, dir)
+  FileUtils.mkdir_p(to_dir)
+  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + "/.", to_dir)
+end
+
 def create_git_repo_from_fixture(fixture_name)
   git_repo = File.join(TMP_PATH, fixture_name)
-  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture_name), TMP_PATH)
+  update_dir_from_fixture(fixture_name)
+
   in_dir(git_repo) do
     run_cmds(<<-EOD)
       git init
@@ -44,17 +51,18 @@ def create_git_repo_from_fixture(fixture_name)
       git commit -m "initial commit of #{fixture_name}"
     EOD
   end
+
   git_repo
 end
 
 def create_svn_repo_from_fixture(fixture_name)
-  svn_wc = File.join(TMP_PATH, fixture_name + "_repo")
+  svn_wc = File.join(TMP_PATH, fixture_name + "_wc")
   svn_repo = File.join(TMP_PATH, fixture_name)
   run_cmds(<<-EOD)
     svnadmin create #{svn_repo}
     svn co file://#{svn_repo} #{svn_wc}
   EOD
-  FileUtils.cp_r("#{FIXTURE_PATH}/#{fixture_name}/.", svn_wc)
+  update_dir_from_fixture(fixture_name + "_wc", fixture_name)
   in_dir(svn_wc) do
     run_cmds(<<-EOD)
       svn add *

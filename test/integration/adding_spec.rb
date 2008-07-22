@@ -7,7 +7,6 @@ describe "Adding a mirror in a clean repository" do
     FileUtils.mkdir_p(TMP_PATH)
   end
 
-
   describe "from a git repository" do
     before do
       @shiny = create_git_repo_from_fixture("shiny")
@@ -77,4 +76,3 @@ describe "Adding a mirror in a clean repository" do
   end
 
 end
-

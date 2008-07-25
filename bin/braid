@@ -74,10 +74,10 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_path, :option_revision, :option_head
+    mixin :optional_path, :option_revision, :option_head, :option_break
 
     run {
-      Braid::Command.run(:update, path, { "revision" => revision, "head" => head })
+      Braid::Command.run(:update, path, { "revision" => revision, "head" => head , "break" => break? })
     }
   }
 
@@ -207,6 +207,14 @@ Main {
     option(:full) {
       optional
       desc 'include mirror history' # FIXME
+      attr
+    }
+  }
+
+  mixin(:option_break) {
+    option(:break) {
+      optional
+      desc 'break on merge errors'
       attr
     }
   }

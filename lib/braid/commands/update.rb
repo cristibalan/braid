@@ -5,15 +5,16 @@ module Braid
         bail_on_local_changes!
 
         with_reset_on_error do
-          path ? update_one(path, options) : update_all
+          path ? update_one(path, options) : update_all(options)
         end
       end
 
       protected
-        def update_all
+        def update_all(options = {})
+          options.reject! { |k,v| %w(revision head).include?(k) }
           msg "Updating all mirrors."
           config.mirrors.each do |path|
-            update_one(path)
+            update_one(path, options)
           end
         end
 
@@ -51,7 +52,9 @@ module Braid
           if mirror.squashed?
             git.rm_r(mirror.path)
             git.read_tree(target_hash, mirror.path)
-            git.apply(diff) unless diff.empty?
+            unless diff.empty?
+              git.apply(diff, *(options["break"] ? ["--reject"] : []))
+            end
           else
             git.merge_subtree(target_hash)
           end
@@ -61,6 +64,14 @@ module Braid
           revision_message = " to " + (options["revision"] ? display_revision(mirror) : "HEAD")
           commit_message = "Update mirror '#{mirror.path}/'#{revision_message}"
           git.commit(commit_message)
+
+        rescue Operations::ShellExecutionError => error
+          if options["break"]
+            msg "Caught shell error. Breaking."
+            exit(0)
+          else
+            raise error
+          end
         end
     end
   end

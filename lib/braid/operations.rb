@@ -78,7 +78,7 @@ module Braid
         end
 
         def invoke(arg, *args)
-          exec!("#{command(arg)} #{args.join(' ')}".strip)[1] # return stdout
+          exec!("#{command(arg)} #{args.join(' ')}".strip)[1].strip # return stdout
         end
 
         def method_missing(name, *args)
@@ -93,8 +93,8 @@ module Braid
 
           out, err = nil
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-            out = stdout.read.strip
-            err = stderr.read.strip
+            out = stdout.read
+            err = stderr.read
           end.exitstatus
           [status, out, err]
 

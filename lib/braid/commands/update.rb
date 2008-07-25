@@ -20,7 +20,7 @@ module Braid
         def update_one(path, options = {})
           mirror = config.get!(path)
 
-          # unlock
+          # check options for lock modification
           if mirror.locked?
             if options["head"]
               msg "Unlocking mirror '#{mirror.path}/'."
@@ -41,9 +41,14 @@ module Braid
             return
           end
 
+          diff = mirror.diff if mirror.squashed? # get diff before setting revision
+
+          mirror.revision = new_revision
+          mirror.lock = new_revision if options["revision"]
+          config.update(mirror)
+
           msg "Updating mirror '#{mirror.path}/'."
           if mirror.squashed?
-            diff = mirror.diff
             git.rm_r(mirror.path)
             git.read_tree(target_hash, mirror.path)
             git.apply(diff) unless diff.empty?
@@ -51,9 +56,6 @@ module Braid
             git.merge_subtree(target_hash)
           end
 
-          mirror.revision = new_revision
-          mirror.lock = new_revision if options["revision"]
-          config.update(mirror)
           add_config_file
 
           revision_message = " to " + (options["revision"] ? display_revision(mirror) : "HEAD")

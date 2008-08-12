@@ -123,25 +123,19 @@ module Braid
       end
 
       def inferred_revision
-        time = list_revisions("-E --grep='^(Add|Update) mirror'", "-1", "HEAD", "-- #{path}").first[0]
-        revs = list_revisions("--reverse", remote)
+        local_commits = git.rev_list("HEAD", "-- #{path}").split("\n")
+        remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split("commit ").map do |chunk|
+          chunk.split("\n", 2).map { |value| value.strip }
+        end
         hash = nil
-        revs.each_with_index do |rev, idx|
-          if !revs[idx + 1] || revs[idx + 1][0] > time
-            hash = revs[idx][1]
+        local_commits.each do |local_commit|
+          local_tree = git.tree_hash(path, local_commit)
+          if match = remote_hashes.find { |_, remote_tree| local_tree == remote_tree }
+            hash = match[0]
             break
           end
         end
         hash
-      end
-
-      def list_revisions(*args)
-        out = git.rev_list("--timestamp", *args)
-        out.split("\n").map do |line|
-          parts = line.split(' ', 2)
-          parts[0] = parts[0].to_i
-          parts
-        end
       end
 
       def self.extract_type_from_url(url)

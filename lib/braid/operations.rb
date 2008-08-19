@@ -238,7 +238,7 @@ module Braid
     end
 
     class GitSvn < Proxy
-      def self.command; "git-svn"; end
+      def self.command; "git svn"; end
 
       def commit_hash(remote, revision)
         out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
@@ -249,7 +249,7 @@ module Braid
 
       def fetch(remote)
         # open4 messes with the pipes of index-pack
-        system("git-svn fetch #{remote} &> /dev/null")
+        system("git svn fetch #{remote} &> /dev/null")
         raise ShellExecutionError, "could not fetch" unless $? == 0
         true
       end

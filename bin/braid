@@ -74,10 +74,10 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_path, :option_revision, :option_head, :option_break
+    mixin :optional_path, :option_revision, :option_head, :option_safe
 
     run {
-      Braid::Command.run(:update, path, { "revision" => revision, "head" => head , "break" => break? })
+      Braid::Command.run(:update, path, { "revision" => revision, "head" => head , "safe" => safe })
     }
   }
 
@@ -211,10 +211,10 @@ Main {
     }
   }
 
-  mixin(:option_break) {
-    option(:break) {
+  mixin(:option_safe) {
+    option(:safe) {
       optional
-      desc 'break on merge errors'
+      desc 'safe on merge errors'
       attr
     }
   }

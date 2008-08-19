@@ -53,7 +53,7 @@ module Braid
             git.rm_r(mirror.path)
             git.read_tree(target_hash, mirror.path)
             unless diff.empty?
-              git.apply(diff, *(options["break"] ? ["--reject"] : []))
+              git.apply(diff, *(options["safe"] ? ["--reject"] : []))
             end
           else
             git.merge_subtree(target_hash)
@@ -66,7 +66,7 @@ module Braid
           git.commit(commit_message)
 
         rescue Operations::ShellExecutionError => error
-          if options["break"]
+          if options["safe"]
             msg "Caught shell error. Breaking."
             exit(0)
           else

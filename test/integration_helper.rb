@@ -2,21 +2,15 @@ require 'rubygems'
 require 'test/spec'
 require 'mocha'
 
-#require File.dirname(__FILE__) + '/../lib/braid'
-
 require 'tempfile'
 require 'fileutils'
 require 'pathname'
-
-#tmp_file = Tempfile.new("braid")
-#tmp_file_path = tmp_file.path
-#tmp_file.unlink
-#TMP = File.basename(tmp_file_path)
 
 TMP_PATH = File.join(Dir.tmpdir, "braid_integration")
 BRAID_PATH = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, "test", "fixtures")
 FileUtils.mkdir_p(TMP_PATH)
+BRAID_BIN = File.join(BRAID_PATH, "bin", "braid")
 
 #def exec(cmd)
 #  `cd #{TMP} && #{cmd}`

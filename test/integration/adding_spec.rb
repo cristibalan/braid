@@ -15,7 +15,7 @@ describe "Adding a mirror in a clean repository" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `braid add --type git #{@skit1}`
+        `#{BRAID_BIN} add --type git #{@skit1}`
       end
 
       file_name = "skit1/layouts/layout.liquid"
@@ -29,7 +29,7 @@ describe "Adding a mirror in a clean repository" do
 
     it "should create .braids and add the mirror to it" do
       in_dir(@shiny) do
-        `braid add --type git #{@skit1}`
+        `#{BRAID_BIN} add --type git #{@skit1}`
       end
 
       braids = YAML::load_file("#{@shiny}/.braids")
@@ -50,7 +50,7 @@ describe "Adding a mirror in a clean repository" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `braid add --type svn #{@skit1}`
+        `#{BRAID_BIN} add --type svn #{@skit1}`
       end
 
       file_name = "skit1/layouts/layout.liquid"
@@ -64,7 +64,7 @@ describe "Adding a mirror in a clean repository" do
 
     it "should create .braids and add the mirror to it" do
       in_dir(@shiny) do
-        `braid add --type svn #{@skit1}`
+        `#{BRAID_BIN} add --type svn #{@skit1}`
       end
 
       braids = YAML::load_file("#{@shiny}/.braids")
@@ -73,7 +73,7 @@ describe "Adding a mirror in a clean repository" do
       braids["skit1"]["type"].should == "svn"
       braids["skit1"]["revision"].should == 1
       braids["skit1"]["remote"].should == "braid/skit1"
-      braids["skit1"]["branch"].should.be nil
+      braids["skit1"]["branch"].should.be == nil
     end
   end
 

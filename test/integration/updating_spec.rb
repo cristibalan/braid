@@ -13,7 +13,7 @@ describe "Updating a mirror without conflicts" do
       @skit1 = create_git_repo_from_fixture("skit1")
 
       in_dir(@shiny) do
-        `braid add --type git #{@skit1}`
+        `#{BRAID_BIN} add --type git #{@skit1}`
       end
 
       update_dir_from_fixture("skit1", "skit1.1")
@@ -32,7 +32,7 @@ describe "Updating a mirror without conflicts" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `braid update skit1`
+        `#{BRAID_BIN} update skit1`
       end
 
       file_name = "layouts/layout.liquid"
@@ -53,7 +53,7 @@ describe "Updating a mirror without conflicts" do
       @skit1_wc = File.join(TMP_PATH, "skit1_wc")
 
       in_dir(@shiny) do
-        `braid add --type svn #{@skit1}`
+        `#{BRAID_BIN} add --type svn #{@skit1}`
       end
 
       update_dir_from_fixture("skit1_wc", "skit1.1")
@@ -70,7 +70,7 @@ describe "Updating a mirror without conflicts" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `braid update skit1`
+        `#{BRAID_BIN} update skit1`
       end
 
       file_name = "layouts/layout.liquid"

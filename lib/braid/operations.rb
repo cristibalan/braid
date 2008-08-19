@@ -1,19 +1,47 @@
+require 'singleton'
 require 'rubygems'
 require 'open4'
 
 module Braid
   module Operations
     class ShellExecutionError < BraidError
+      def initialize(err = nil)
+        @err = err
+      end
+
+      def message
+        @err.to_s.split("\n").first
+      end
     end
-    class VersionError < BraidError
+    class VersionTooLow < BraidError
+      def initialize(command, version)
+        @command = command
+        @version = version.to_s.split("\n").first
+      end
+
+      def message
+        "#{@command} version too low: #{@version}"
+      end
+    end
+    class UnknownRevision < BraidError
+      def message
+        "unknown revision: #{super}"
+      end
+    end
+    class LocalChangesPresent < BraidError
+      def message
+        "local changes are present"
+      end
     end
 
-    # The command proxy is meant to encapsulate commands such as git, git svn and svn, that work with subcommands.
-    #
-    # It is expected that subclasses override the command method, define a COMMAND constant and have a VersionTooLow exception.
-    class CommandProxy
+    # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
+    class Proxy
+      include Singleton
+
+      def self.command; name.split('::').last.downcase; end # hax!
+
       def version
-        status, out, err = exec!("#{self.class::COMMAND} --version")
+        status, out, err = exec!("#{self.class.command} --version")
         out.sub(/^.* version/, "").strip
       end
 
@@ -40,7 +68,7 @@ module Braid
       end
 
       def require_version!(required)
-        require_version(required) || raise(self.class::VersionTooLow, version)
+        require_version(required) || raise(VersionTooLow.new(self.class.command, version))
       end
 
       private
@@ -50,7 +78,7 @@ module Braid
         end
 
         def invoke(arg, *args)
-          exec!("#{command(arg)} #{args.join(' ')}".strip)[1] # return stdout
+          exec!("#{command(arg)} #{args.join(' ')}".strip)[1].strip # return stdout
         end
 
         def method_missing(name, *args)
@@ -65,8 +93,8 @@ module Braid
 
           out, err = nil
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-            out = stdout.read.strip
-            err = stderr.read.strip
+            out = stdout.read
+            err = stderr.read
           end.exitstatus
           [status, out, err]
 
@@ -81,18 +109,9 @@ module Braid
         end
     end
 
-    class Git < CommandProxy
-      COMMAND = "git"
-
-      class UnknownRevision < BraidError
-      end
-      class LocalChangesPresent < BraidError
-      end
-      class VersionTooLow < VersionError
-      end
-
-      def commit(message)
-        status, out, err = exec("git commit -m #{message.inspect} --no-verify")
+    class Git < Proxy
+      def commit(message, *args)
+        status, out, err = exec("git commit -m #{message.inspect} --no-verify #{args.join(' ')}")
 
         if status == 0
           true
@@ -106,7 +125,7 @@ module Braid
       def fetch(remote)
         # open4 messes with the pipes of index-pack
         system("git fetch -n #{remote} &> /dev/null")
-        raise ShellExecutionError unless $? == 0
+        raise ShellExecutionError, "could not fetch" unless $? == 0
         true
       end
 
@@ -200,40 +219,38 @@ module Braid
         out[2..-1]
       end
 
-      def apply(diff)
-        # always uses index
-        status = Open4.popen4("git apply --index -") do |pid, stdin, stdout, stderr|
+      def apply(diff, *args)
+        err = nil
+        status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
           stdin.puts(diff)
           stdin.close
+
+          err = stderr.read
         end.exitstatus
-        raise ShellExecutionError unless status == 0
+        raise ShellExecutionError, err unless status == 0
         true
       end
 
       private
         def command(name)
-          "#{COMMAND} #{name.to_s.gsub('_', '-')}"
+          "#{self.class.command} #{name.to_s.gsub('_', '-')}"
         end
     end
 
-    class GitSvn < CommandProxy
-      COMMAND = "git svn"
-
-      class UnknownRevision < BraidError
-      end
-      class VersionTooLow < VersionError
-      end
+    class GitSvn < Proxy
+      def self.command; "git svn"; end
 
       def commit_hash(remote, revision)
         out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
-        part = out.split(" | ")[1]
-        raise UnknownRevision, "unknown revision: #{revision}" unless part
-        Git.new.rev_parse(part) # FIXME ugly ugly ugly
+        part = out.to_s.split(" | ")[1]
+        raise UnknownRevision, "r#{revision}" unless part
+        Git.instance.rev_parse(part) # FIXME ugly ugly ugly
       end
 
       def fetch(remote)
         # open4 messes with the pipes of index-pack
         system("git svn fetch #{remote} &> /dev/null")
+        raise ShellExecutionError, "could not fetch" unless $? == 0
         true
       end
 
@@ -244,13 +261,11 @@ module Braid
 
       private
         def command(name)
-          "#{COMMAND} #{name}"
+          "#{self.class.command} #{name}"
         end
     end
 
-    class Svn < CommandProxy
-      COMMAND = "svn"
-
+    class Svn < Proxy
       def clean_revision(revision)
         revision.to_i if revision
       end
@@ -264,18 +279,19 @@ module Braid
     end
 
     module VersionControl
-      private
-        def git
-          Git.new
-        end
+      def git
+        Git.instance
+      end
 
-        def git_svn
-          GitSvn.new
-        end
+      def git_svn
+        GitSvn.instance
+      end
 
-        def svn
-          Svn.new
-        end
+      def svn
+        Svn.instance
+      end
     end
   end
 end
+
+

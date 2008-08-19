@@ -36,8 +36,9 @@ describe "Adding a mirror in a clean repository" do
       braids["skit1"]["squashed"].should == true
       braids["skit1"]["url"].should == @skit1
       braids["skit1"]["type"].should == "git"
+      braids["skit1"]["revision"].should.not.be nil
       braids["skit1"]["branch"].should == "master"
-      braids["skit1"]["remote"].should == "braid/git/skit1/master"
+      braids["skit1"]["remote"].should == "braid/skit1"
     end
   end
 
@@ -71,7 +72,8 @@ describe "Adding a mirror in a clean repository" do
       braids["skit1"]["url"].should == @skit1
       braids["skit1"]["type"].should == "svn"
       braids["skit1"]["revision"].should == 1
-      braids["skit1"]["remote"].should == "braid/svn/skit1"
+      braids["skit1"]["remote"].should == "braid/skit1"
+      braids["skit1"]["branch"].should.be nil
     end
   end
 

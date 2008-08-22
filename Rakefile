@@ -1,9 +1,13 @@
+require 'rake'
+require 'rake/testtask'
+
 desc "Run all specs by default"
 task :default => :test
-task :spec => :test
 
-task :test do
-  Dir[File.dirname(__FILE__) + '/test/**/*_spec.rb'].each do |file|
-    load file
-  end
+Rake::TestTask.new(:test) do |t|
+  ENV['TESTOPTS'] = '--runner=s'
+
+  t.libs << 'lib'
+  t.pattern = 'test/**/*_test.rb'
+  t.verbose = true
 end

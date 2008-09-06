@@ -6,13 +6,13 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cristi Balan", "Norbert Crombach"]
-  s.date = %q{2008-08-19}
+  s.date = %q{2008-09-06}
   s.default_executable = %q{braid}
   s.description = %q{A simple tool for tracking vendor branches in git.}
   s.email = %q{evil@che.lu}
   s.executables = ["braid"]
   s.extra_rdoc_files = ["README.rdoc"]
-  s.files =  ["bin", "bin/braid", "braid.gemspec", "lib", "lib/braid", "lib/braid/command.rb", "lib/braid/commands", "lib/braid/commands/add.rb", "lib/braid/commands/diff.rb", "lib/braid/commands/remove.rb", "lib/braid/commands/setup.rb", "lib/braid/commands/update.rb", "lib/braid/config.rb", "lib/braid/mirror.rb", "lib/braid/operations.rb", "lib/braid.rb", "LICENSE", "Rakefile", "README.rdoc", "test", "test/braid_test.rb", "test/config_test.rb", "test/fixtures", "test/fixtures/shiny", "test/fixtures/shiny/README", "test/fixtures/skit1", "test/fixtures/skit1/layouts", "test/fixtures/skit1/layouts/layout.liquid", "test/fixtures/skit1/preview.png", "test/fixtures/skit1.1", "test/fixtures/skit1.1/layouts", "test/fixtures/skit1.1/layouts/layout.liquid", "test/fixtures/skit1.2", "test/fixtures/skit1.2/layouts", "test/fixtures/skit1.2/layouts/layout.liquid", "test/integration", "test/integration/adding_test.rb", "test/integration/updating_test.rb", "test/integration_helper.rb", "test/mirror_test.rb", "test/operations_test.rb", "test/test_helper.rb"]
+  s.files = ["LICENSE", "README.rdoc", "Rakefile", "braid.gemspec", "bin/braid", "lib/braid/command.rb", "lib/braid/commands/add.rb", "lib/braid/commands/diff.rb", "lib/braid/commands/remove.rb", "lib/braid/commands/setup.rb", "lib/braid/commands/update.rb", "lib/braid/config.rb", "lib/braid/mirror.rb", "lib/braid/operations.rb", "lib/braid.rb", "test/braid_test.rb", "test/config_test.rb", "test/mirror_test.rb", "test/operations_test.rb", "test/test_helper.rb"]
   s.has_rdoc = true
   s.homepage = %q{http://evil.che.lu/projects/braid}
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "braid", "--main", "README.rdoc"]

@@ -29,7 +29,7 @@ module Braid
     end
 
     def self.new_from_options(url, options = {})
-      url.sub!(/\/$/, '')
+      url = url.sub(/\/$/, '')
 
       branch = options["branch"] || "master"
 

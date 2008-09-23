@@ -107,6 +107,11 @@ module Braid
           raise ShellExecutionError, err unless status == 0
           [status, out, err]
         end
+
+        def msg(str)
+          puts str
+        end
+
     end
 
     class Git < Proxy
@@ -278,6 +283,22 @@ module Braid
       end
     end
 
+    class GitCache < Proxy
+      def init_or_fetch(url, dir)
+        if File.exists? dir
+          msg "Updating local cache of '#{url}' into '#{dir}'."
+          FileUtils.cd(dir) do |d|
+            status, out, err = exec!("git fetch")
+          end
+        else
+          FileUtils.mkdir_p(Braid::LOCAL_CACHE_DIR)
+
+          msg "Caching '#{url}' into '#{dir}'."
+          status, out, err = exec!("git clone --mirror #{url} #{dir}")
+        end
+      end
+    end
+
     module VersionControl
       def git
         Git.instance
@@ -289,6 +310,10 @@ module Braid
 
       def svn
         Svn.instance
+      end
+
+      def git_cache
+        GitCache.instance
       end
     end
   end

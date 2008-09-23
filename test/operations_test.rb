@@ -67,3 +67,8 @@ describe "Braid::Operations::Git#require_version" do
     end
   end
 end
+
+describe "Braid::Operations::GitCache#init_or_fetch" do
+  it "should initialize or fetch a local clone of the given url in the given directory" do
+  end
+end

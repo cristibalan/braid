@@ -4,6 +4,8 @@ module Braid
   VERSION = "0.4.9"
 
   CONFIG_FILE = ".braids"
+  USE_LOCAL_CACHE = ENV["BRAID_USE_LOCAL_CACHE"] || true
+  LOCAL_CACHE_DIR = ENV["BRAID_LOCAL_CACHE_DIR"] || "#{ENV["HOME"]}/.braid/cache/"
   REQUIRED_GIT_VERSION = "1.5.4.5"
 
   class BraidError < StandardError

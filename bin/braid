@@ -51,9 +51,10 @@ Main {
       . braid add svn://remote/path --branch notmaster
     TXT
 
-    mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full
+    mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full, :option_verbose
 
     run {
+      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:add, url, { "type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full })
     }
   }
@@ -74,9 +75,10 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_path, :option_revision, :option_head, :option_safe
+    mixin :optional_path, :option_revision, :option_head, :option_safe, :option_verbose
 
     run {
+      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:update, path, { "revision" => revision, "head" => head , "safe" => safe })
     }
   }
@@ -94,9 +96,10 @@ Main {
       . braid remove local/dir
     TXT
 
-    mixin :argument_path
+    mixin :argument_path, :option_verbose
 
     run {
+      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:remove, path)
     }
   }
@@ -110,9 +113,10 @@ Main {
       . braid setup local/dir
     TXT
 
-    mixin :optional_path
+    mixin :optional_path, :option_verbose
 
     run {
+      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:setup, path)
     }
   }
@@ -215,6 +219,14 @@ Main {
     option(:safe) {
       optional
       desc 'safe on merge errors'
+      attr
+    }
+  }
+  
+  mixin(:option_verbose) {
+    option(:verbose, :v) {
+      optional 
+      desc 'log shell commands'
       attr
     }
   }

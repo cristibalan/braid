@@ -39,6 +39,7 @@ module Braid
       include Singleton
 
       def self.command; name.split('::').last.downcase; end # hax!
+      def self.verbose; Braid::Operations::VERBOSE ; end
 
       def version
         status, out, err = exec!("#{self.class.command} --version")
@@ -92,6 +93,7 @@ module Braid
           ENV['LANG'] = 'C'
 
           out, err = nil
+          puts "executing cmd(#{cmd})" if Proxy.verbose
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
             err = stderr.read

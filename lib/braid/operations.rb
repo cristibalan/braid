@@ -294,7 +294,7 @@ module Braid
           FileUtils.mkdir_p(Braid::LOCAL_CACHE_DIR)
 
           msg "Caching '#{url}' into '#{dir}'."
-          status, out, err = exec!("git clone --mirror #{url} #{dir}")
+          status, out, err = exec!("git clone --no-checkout #{url} #{dir}")
         end
       end
     end

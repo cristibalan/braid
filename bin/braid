@@ -130,9 +130,10 @@ Main {
       . braid diff local/dir
     TXT
 
-    mixin :argument_path
+    mixin :argument_path, :option_verbose
 
     run {
+      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:diff, path)
     }
   }

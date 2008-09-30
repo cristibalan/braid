@@ -54,7 +54,7 @@ Main {
     mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full, :option_verbose
 
     run {
-      Braid::Operations::VERBOSE = verbose
+      Braid.verbose = verbose
       Braid::Command.run(:add, url, { "type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full })
     }
   }
@@ -78,7 +78,7 @@ Main {
     mixin :optional_path, :option_revision, :option_head, :option_safe, :option_verbose
 
     run {
-      Braid::Operations::VERBOSE = verbose
+      Braid.verbose = verbose
       Braid::Command.run(:update, path, { "revision" => revision, "head" => head , "safe" => safe })
     }
   }
@@ -99,7 +99,7 @@ Main {
     mixin :argument_path, :option_verbose
 
     run {
-      Braid::Operations::VERBOSE = verbose
+      Braid.verbose = verbose
       Braid::Command.run(:remove, path)
     }
   }
@@ -116,7 +116,7 @@ Main {
     mixin :optional_path, :option_verbose
 
     run {
-      Braid::Operations::VERBOSE = verbose
+      Braid.verbose = verbose
       Braid::Command.run(:setup, path)
     }
   }
@@ -133,7 +133,6 @@ Main {
     mixin :argument_path, :option_verbose
 
     run {
-      Braid::Operations::VERBOSE = verbose
       Braid::Command.run(:diff, path)
     }
   }

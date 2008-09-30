@@ -49,7 +49,6 @@ module Braid
       include Singleton
 
       def self.command; name.split('::').last.downcase; end # hax!
-      def self.verbose; Braid::Operations::VERBOSE ; end
 
       def version
         status, out, err = exec!("#{self.class.command} --version")
@@ -103,7 +102,7 @@ module Braid
           ENV['LANG'] = 'C'
 
           out, err = nil
-          puts "executing cmd(#{cmd})" if Proxy.verbose
+          log(cmd)
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
             err = stderr.read
@@ -120,10 +119,25 @@ module Braid
           [status, out, err]
         end
 
+        def sh(cmd, message = nil)
+          message ||= "could not fetch" if cmd =~ /fetch/
+          log(cmd)
+          system(cmd)
+          raise ShellExecutionError, message unless $? == 0
+          true
+        end
+
         def msg(str)
           puts str
         end
 
+        def log(cmd)
+          msg "Executing `#{cmd}`" if verbose?
+        end
+
+        def verbose?
+          Braid.verbose
+        end
     end
 
     class Git < Proxy
@@ -141,9 +155,7 @@ module Braid
 
       def fetch(remote)
         # open4 messes with the pipes of index-pack
-        system("git fetch -n #{remote} 2>&1 >/dev/null")
-        raise ShellExecutionError, "could not fetch" unless $? == 0
-        true
+        sh("git fetch -n #{remote} 2>&1 >/dev/null")
       end
 
       def checkout(treeish)
@@ -265,10 +277,7 @@ module Braid
       end
 
       def fetch(remote)
-        # open4 messes with the pipes of index-pack
-        system("git svn fetch #{remote} 2>&1 >/dev/null")
-        raise ShellExecutionError, "could not fetch" unless $? == 0
-        true
+        sh("git svn fetch #{remote} 2>&1 >/dev/null")
       end
 
       def init(remote, path)

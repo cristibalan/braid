@@ -8,6 +8,9 @@ module Braid
   LOCAL_CACHE_DIR = ENV["BRAID_LOCAL_CACHE_DIR"] || "#{ENV["HOME"]}/.braid/cache/"
   REQUIRED_GIT_VERSION = "1.6"
 
+  def self.verbose; @verbose || false; end
+  def self.verbose=(new_value); @verbose = !!new_value; end
+
   class BraidError < StandardError
     def message
       value = super

@@ -34,6 +34,15 @@ module Braid
         "local changes are present"
       end
     end
+    class LocalCacheDirBroken < BraidError
+      def initialize(dir)
+        @dir = dir
+      end
+
+      def message
+        "Local cache '#{@dir}' needs to be recreated. Remove the directory and run the command again."
+      end
+    end
 
     # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
     class Proxy
@@ -289,6 +298,11 @@ module Braid
     class GitCache < Proxy
       def init_or_fetch(url, dir)
         if File.exists? dir
+          # bail if the local cache was created with --no-checkout
+          if File.exists? "#{dir}/.git"
+            raise LocalCacheDirBroken.new(dir)
+          end
+
           msg "Updating local cache of '#{url}' into '#{dir}'."
           FileUtils.cd(dir) do |d|
             status, out, err = exec!("git fetch")

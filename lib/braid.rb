@@ -6,7 +6,7 @@ module Braid
   CONFIG_FILE = ".braids"
   USE_LOCAL_CACHE = ENV["BRAID_USE_LOCAL_CACHE"] != "no"
   LOCAL_CACHE_DIR = ENV["BRAID_LOCAL_CACHE_DIR"] || "#{ENV["HOME"]}/.braid/cache/"
-  REQUIRED_GIT_VERSION = "1.5.4.5"
+  REQUIRED_GIT_VERSION = "1.6"
 
   class BraidError < StandardError
     def message

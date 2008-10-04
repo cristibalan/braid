@@ -14,13 +14,14 @@ module Braid
       end
     end
     class VersionTooLow < BraidError
-      def initialize(command, version)
+      def initialize(command, version, required)
         @command = command
         @version = version.to_s.split("\n").first
+        @required = required
       end
 
       def message
-        "#{@command} version too low: #{@version}"
+        "#{@command} version too low: #{@version}. #{@required} needed."
       end
     end
     class UnknownRevision < BraidError
@@ -69,7 +70,7 @@ module Braid
       end
 
       def require_version!(required)
-        require_version(required) || raise(VersionTooLow.new(self.class.command, version))
+        require_version(required) || raise(VersionTooLow.new(self.class.command, version, required))
       end
 
       private

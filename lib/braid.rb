@@ -1,7 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
 module Braid
-  VERSION = "0.4.11"
+  VERSION = "0.4.12"
 
   CONFIG_FILE = ".braids"
   USE_LOCAL_CACHE = ENV["BRAID_USE_LOCAL_CACHE"] != "no"

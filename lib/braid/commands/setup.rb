@@ -23,7 +23,8 @@ module Braid
 
           msg "Setting up remote for '#{mirror.path}/'."
           unless mirror.type == "svn"
-            git.remote_add(mirror.remote, mirror.cached_url, mirror.branch)
+            url = Braid.use_local_cache ? git_cache.path(mirror.url) : mirror.url
+            git.remote_add(mirror.remote, url, mirror.branch)
           else
             git_svn.init(mirror.remote, mirror.url)
           end

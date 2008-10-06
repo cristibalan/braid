@@ -68,7 +68,9 @@ describe "Braid::Operations::Git#require_version" do
   end
 end
 
-describe "Braid::Operations::GitCache#init_or_fetch" do
-  it "should initialize or fetch a local clone of the given url in the given directory" do
+describe "Braid::Operations::GitCache#path" do
+  it "should use the local cache directory and strip characters" do
+    git_cache.path("git://path").should == File.join(Braid.local_cache_dir, "git___path")
+    git_cache.path("git@domain:repository.git").should == File.join(Braid.local_cache_dir, "git_domain_repository.git")
   end
 end

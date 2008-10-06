@@ -34,15 +34,6 @@ module Braid
         "local changes are present"
       end
     end
-    class LocalCacheDirBroken < BraidError
-      def initialize(dir)
-        @dir = dir
-      end
-
-      def message
-        "Local cache '#{@dir}' needs to be recreated. Remove the directory and run the command again."
-      end
-    end
 
     # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
     class Proxy
@@ -153,14 +144,13 @@ module Braid
         end
       end
 
-      def fetch(remote)
+      def fetch(remote = nil)
+        args = remote && "-n #{remote}"
         # open4 messes with the pipes of index-pack
-        sh("git fetch -n #{remote} 2>&1 >/dev/null")
+        sh("git fetch #{args} 2>&1 >/dev/null")
       end
 
       def checkout(treeish)
-        # TODO debug
-        msg "Checking out '#{treeish}'."
         invoke(:checkout, treeish)
         true
       end
@@ -260,6 +250,11 @@ module Braid
         true
       end
 
+      def clone(*args)
+        # overrides builtin
+        invoke(:clone, *args)
+      end
+
       private
         def command(name)
           "#{self.class.command} #{name.to_s.gsub('_', '-')}"
@@ -273,7 +268,7 @@ module Braid
         out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
         part = out.to_s.split(" | ")[1]
         raise UnknownRevision, "r#{revision}" unless part
-        Git.instance.rev_parse(part) # FIXME ugly ugly ugly
+        git.rev_parse(part)
       end
 
       def fetch(remote)
@@ -288,6 +283,10 @@ module Braid
       private
         def command(name)
           "#{self.class.command} #{name}"
+        end
+
+        def git
+          Git.instance
         end
     end
 
@@ -304,25 +303,35 @@ module Braid
       end
     end
 
-    class GitCache < Proxy
-      def init_or_fetch(url, dir)
-        if File.exists? dir
-          # bail if the local cache was created with --no-checkout
-          if File.exists? "#{dir}/.git"
-            raise LocalCacheDirBroken.new(dir)
-          end
+    class GitCache
+      include Singleton
 
-          msg "Updating local cache of '#{url}' into '#{dir}'."
-          FileUtils.cd(dir) do |d|
-            status, out, err = exec!("git fetch")
+      def fetch(url)
+        dir = path(url)
+
+        # remove local cache if it was created with --no-checkout
+        if File.exists?("#{dir}/.git")
+          FileUtils.rm_r(dir)
+        end
+
+        if File.exists?(dir)
+          Dir.chdir(dir) do
+            git.fetch
           end
         else
-          FileUtils.mkdir_p(Braid::LOCAL_CACHE_DIR)
-
-          msg "Caching '#{url}' into '#{dir}'."
-          status, out, err = exec!("git clone --mirror #{url} #{dir}")
+          FileUtils.mkdir_p(Braid.local_cache_dir)
+          git.clone("--mirror", url, dir)
         end
       end
+
+      def path(url)
+        File.join(Braid.local_cache_dir, url.gsub(/[\/:@]/, "_"))
+      end
+
+      private
+        def git
+          Git.instance
+        end
     end
 
     module VersionControl
@@ -344,5 +353,3 @@ module Braid
     end
   end
 end
-
-

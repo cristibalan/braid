@@ -91,23 +91,11 @@ module Braid
 
     def fetch
       unless type == "svn"
-        init_or_fetch_local_cache
+        git_cache.fetch(url) if Braid.use_local_cache
         git.fetch(remote)
       else
         git_svn.fetch(remote)
       end
-    end
-
-    def cached_url
-      if Braid::USE_LOCAL_CACHE
-        File.join(Braid::LOCAL_CACHE_DIR, url.gsub(/[\/:@]/, "_"))
-      else
-        url
-      end
-    end
-
-    def init_or_fetch_local_cache
-      git_cache.init_or_fetch(url, cached_url)
     end
 
     private

@@ -92,27 +92,3 @@ describe "Braid::Mirror#inferred_revision" do
     @mirror.send(:inferred_revision).should == 'b' * 40
   end
 end
-
-describe "Braid::Mirror#cached_url" do
-  it "should return a valid local cache name" do
-    @mirror = new_from_options("git://remoteurl/path/to/repo.git")
-    @mirror.cached_url.should == "#{ENV["HOME"]}/.braid/cache/git___remoteurl_path_to_repo.git"
-
-    @mirror = new_from_options("git@remoteurl/path/to/repo.git")
-    @mirror.cached_url.should == "#{ENV["HOME"]}/.braid/cache/git_remoteurl_path_to_repo.git"
-
-    @mirror = new_from_options("remoteurl/path/to/repo/", "type" => "git")
-    @mirror.cached_url.should == "#{ENV["HOME"]}/.braid/cache/remoteurl_path_to_repo"
-  end
-end
-
-describe "Braid::Mirror#init_or_fetch_local_cache" do
-  it "should " do
-    @mirror = new_from_options("git@remoteurl/path/to/repo.git")
-    git_cache.expects(:init_or_fetch).with("git@remoteurl/path/to/repo.git", "#{ENV["HOME"]}/.braid/cache/git_remoteurl_path_to_repo.git")
-    @mirror.init_or_fetch_local_cache
-  end
-
-end
-
-

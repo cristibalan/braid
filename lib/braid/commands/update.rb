@@ -49,28 +49,30 @@ module Braid
           config.update(mirror)
 
           msg "Updating mirror '#{mirror.path}/'."
-          if mirror.squashed?
-            git.rm_r(mirror.path)
-            git.read_tree(target_hash, mirror.path)
-            unless diff.empty?
-              git.apply(diff, *(options["safe"] ? ["--reject"] : []))
+          begin
+            if mirror.squashed?
+              git.rm_r(mirror.path)
+              git.read_tree(target_hash, mirror.path)
+              unless diff.empty?
+                git.apply(diff, *(options["safe"] ? ["--reject"] : []))
+              end
+            else
+              git.merge_subtree(target_hash)
             end
-          else
-            git.merge_subtree(target_hash)
+          rescue Operations::ShellExecutionError => error
+            msg "Caught merge error. Breaking."
           end
 
           add_config_file
 
           revision_message = " to " + (options["revision"] ? display_revision(mirror) : "HEAD")
           commit_message = "Update mirror '#{mirror.path}/'#{revision_message}"
-          git.commit(commit_message)
 
-        rescue Operations::ShellExecutionError => error
-          if options["safe"]
-            msg "Caught shell error. Breaking."
-            exit(0)
+          if error
+            File.open(".git/MERGE_MSG", 'w') { |f| f.puts(commit_message) }
+            return
           else
-            raise error
+            git.commit(commit_message)
           end
         end
     end

@@ -102,6 +102,18 @@ module Braid
       git.remote_url(remote) == git_cache.path(url)
     end
 
+    def base_revision
+      if revision
+        unless type == "svn"
+          git.rev_parse(revision)
+        else
+          git_svn.commit_hash(remote, revision)
+        end
+      else
+        inferred_revision
+      end
+    end
+
     private
       def method_missing(name, *args)
         if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }
@@ -112,18 +124,6 @@ module Braid
           end
         else
           raise NameError, "unknown attribute `#{name}'"
-        end
-      end
-
-      def base_revision
-        if revision
-          unless type == "svn"
-            git.rev_parse(revision)
-          else
-            git_svn.commit_hash(remote, revision)
-          end
-        else
-          inferred_revision
         end
       end
 

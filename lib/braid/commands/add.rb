@@ -18,12 +18,12 @@ module Braid
           mirror.fetch
 
           new_revision = validate_new_revision(mirror, options["revision"])
-          target_hash = determine_target_commit(mirror, new_revision)
+          target_revision = determine_target_revision(mirror, new_revision)
 
           unless mirror.squashed?
-            git.merge_ours(target_hash)
+            git.merge_ours(target_revision)
           end
-          git.read_tree(target_hash, mirror.path)
+          git.read_tree_prefix(target_revision, mirror.path)
 
           mirror.revision = new_revision
           mirror.lock = new_revision if options["revision"]

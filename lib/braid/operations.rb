@@ -34,6 +34,11 @@ module Braid
         "local changes are present"
       end
     end
+    class MergeError < BraidError
+      def message
+        "could not merge"
+      end
+    end
 
     # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
     class Proxy
@@ -202,9 +207,18 @@ module Braid
         # TODO which options are needed?
         invoke(:merge, "-s subtree --no-commit --no-ff", opt)
         true
+      rescue ShellExecutionError
+        raise MergeError
       end
 
-      def read_tree(treeish, prefix)
+      def merge_recursive(base_hash, local_hash, remote_hash)
+        invoke(:merge_recursive, base_hash, "-- #{local_hash} #{remote_hash}")
+        true
+      rescue ShellExecutionError
+        raise MergeError
+      end
+
+      def read_tree_prefix(treeish, prefix)
         invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
         true
       end

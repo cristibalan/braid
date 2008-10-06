@@ -112,7 +112,7 @@ module Braid
         new_revision
       end
 
-      def determine_target_commit(mirror, new_revision)
+      def determine_target_revision(mirror, new_revision)
         unless mirror.type == "svn"
           git.rev_parse(new_revision)
         else

@@ -71,13 +71,13 @@ describe "Braid::Mirror#base_revision" do
     @mirror = build_mirror
     @mirror.revision.should.be.nil
     @mirror.expects(:inferred_revision).returns('b' * 40)
-    @mirror.send(:base_revision).should == 'b' * 40
+    @mirror.base_revision.should == 'b' * 40
   end
 
   it "should be the parsed hash for git mirrors" do
     @mirror = build_mirror("revision" => 'a' * 7)
     git.expects(:rev_parse).with('a' * 7).returns('a' * 40)
-    @mirror.send(:base_revision).should == 'a' * 40
+    @mirror.base_revision.should == 'a' * 40
   end
 end
 

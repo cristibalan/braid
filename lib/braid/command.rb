@@ -35,6 +35,10 @@ module Braid
     end
 
     private
+      def use_local_cache?
+        Braid.use_local_cache
+      end
+
       def self.verify_git_version!
         git.require_version!(REQUIRED_GIT_VERSION)
       end

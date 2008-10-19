@@ -175,9 +175,15 @@ module Braid
       end
 
       # Checks git and svn remotes.
-      def remote_exists?(remote)
-        # TODO clean up and maybe return more information
-        !!File.readlines(".git/config").find { |line| line =~ /^\[(svn-)?remote "#{Regexp.escape(remote)}"\]/ }
+      def remote_url(remote)
+        key = "remote.#{remote}.url"
+        begin
+          invoke(:config, key)
+        rescue ShellExecutionError
+          invoke(:config, "svn-#{key}")
+        end
+      rescue ShellExecutionError
+        nil
       end
 
       def reset_hard(target)
@@ -319,16 +325,20 @@ module Braid
             git.fetch
           end
         else
-          FileUtils.mkdir_p(Braid.local_cache_dir)
+          FileUtils.mkdir_p(local_cache_dir)
           git.clone("--mirror", url, dir)
         end
       end
 
       def path(url)
-        File.join(Braid.local_cache_dir, url.gsub(/[\/:@]/, "_"))
+        File.join(local_cache_dir, url.gsub(/[\/:@]/, "_"))
       end
 
       private
+        def local_cache_dir
+          Braid.local_cache_dir
+        end
+
         def git
           Git.instance
         end

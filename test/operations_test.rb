@@ -1,20 +1,10 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-describe "Braid::Operations::Git#remote_exists?" do
-  before(:each) do
-    File.expects(:readlines).returns(["[remote \"braid/git/one\"]\n", "[svn-remote \"braid/git/two\"]\n"])
-  end
-
-  it "should return true for existing git remotes" do
-    git.remote_exists?("braid/git/one").should == true
-  end
-
-  it "should return true for existing svn remotes" do
-    git.remote_exists?("braid/git/two").should == true
-  end
-
-  it "should return false for nonexistent remotes" do
-    git.remote_exists?("N/A").should == false
+describe "Braid::Operations::Git#remote_url" do
+  it "should use git config" do
+    # FIXME weak test
+    git.expects(:invoke).with(:config, 'remote.braid/git/one.url').returns("git://path")
+    git.remote_url("braid/git/one").should == "git://path"
   end
 end
 

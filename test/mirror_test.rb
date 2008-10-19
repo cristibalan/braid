@@ -92,3 +92,19 @@ describe "Braid::Mirror#inferred_revision" do
     @mirror.send(:inferred_revision).should == 'b' * 40
   end
 end
+
+describe "Braid::Mirror#cached?" do
+  before(:each) do
+    @mirror = new_from_options("git://path")
+  end
+
+  it "should be true when the remote path matches the cache path" do
+    git.expects(:remote_url).with(@mirror.remote).returns(git_cache.path(@mirror.url))
+    @mirror.should.be.cached
+  end
+
+  it "should be false if the remote does not point to the cache" do
+    git.expects(:remote_url).with(@mirror.remote).returns(@mirror.url)
+    @mirror.should.not.be.cached
+  end
+end

@@ -16,14 +16,14 @@ module Braid
         def setup_one(path)
           mirror = config.get!(path)
 
-          if git.remote_exists?(mirror.remote)
+          if git.remote_url(mirror.remote)
             msg "Mirror '#{mirror.path}/' already has a remote. Skipping."
             return
           end
 
           msg "Setting up remote for '#{mirror.path}/'."
           unless mirror.type == "svn"
-            url = Braid.use_local_cache ? git_cache.path(mirror.url) : mirror.url
+            url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
             git.remote_add(mirror.remote, url, mirror.branch)
           else
             git_svn.init(mirror.remote, mirror.url)

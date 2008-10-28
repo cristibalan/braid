@@ -1,6 +1,7 @@
 require 'singleton'
 require 'rubygems'
 require 'open4'
+require 'tempfile'
 
 module Braid
   module Operations
@@ -138,7 +139,11 @@ module Braid
 
     class Git < Proxy
       def commit(message, *args)
-        status, out, err = exec("git commit -m #{message.inspect} --no-verify #{args.join(' ')}")
+
+        commit_message_file = Tempfile.new("braid_commit", ".")
+        commit_message_file.print("Braid: " + message)
+        commit_message_file.flush
+        status, out, err = exec("git commit -F #{commit_message_file.path} --no-verify #{args.join(' ')}")
 
         if status == 0
           true
@@ -147,6 +152,7 @@ module Braid
         else
           raise ShellExecutionError, err
         end
+        commit_message_file.unlink
       end
 
       def fetch(remote = nil)

@@ -35,6 +35,10 @@ module Braid
     end
 
     private
+      def setup_remote(mirror)
+        Command.run(:setup, mirror.path)
+      end
+
       def use_local_cache?
         Braid.use_local_cache
       end

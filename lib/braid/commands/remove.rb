@@ -11,6 +11,9 @@ module Braid
 
           git.rm_r(mirror.path)
 
+          # will need this in case we decide to remove the .git/config entry also
+          # setup_remote(mirror)
+
           config.remove(mirror)
           add_config_file
 

@@ -32,6 +32,7 @@ module Braid
             end
           end
 
+          setup_remote(mirror)
           mirror.fetch
 
           new_revision = validate_new_revision(mirror, options["revision"])

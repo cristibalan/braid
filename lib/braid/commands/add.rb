@@ -35,10 +35,6 @@ module Braid
         end
       end
 
-      private
-        def setup_remote(mirror)
-          Command.run(:setup, mirror.path)
-        end
     end
   end
 end

@@ -1,7 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
 module Braid
-  VERSION = "0.4.13"
+  VERSION = "0.4.14"
 
   CONFIG_FILE = ".braids"
   REQUIRED_GIT_VERSION = "1.6"

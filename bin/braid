@@ -106,17 +106,21 @@ Main {
 
   mode(:setup) {
     description <<-TXT
-      Deprecated: braid setup is no longer required and is now a NOOP.
-      All commands that need a remote setup, will set it up themselves.
+      Set up git or git-svn remote for a mirror.
+      All commands that need a remote run setup internally.
+
+      Defaults to setting up remotes for all mirrors if none is specified.
     TXT
 
     examples <<-TXT
+      . braid setup local/dir
     TXT
 
     mixin :optional_path, :option_verbose
 
     run {
-      puts description
+      Braid.verbose = verbose
+      Braid::Command.run(:setup, path)
     }
   }
 

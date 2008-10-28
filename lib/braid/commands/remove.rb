@@ -7,7 +7,7 @@ module Braid
         bail_on_local_changes!
 
         with_reset_on_error do
-          msg "Removing mirror from '#{mirror.path}/'."
+          msg "Removing mirror from '#{mirror.path}'."
 
           git.rm_r(mirror.path)
 
@@ -17,8 +17,9 @@ module Braid
           config.remove(mirror)
           add_config_file
 
-          commit_message = "Remove mirror '#{mirror.path}/'"
-          git.commit(commit_message)
+          commit_message = "Removed mirror '#{mirror.path}'"
+          git.commit("#{commit_message}\n\n#{mirror.to_yaml}")
+          msg commit_message
         end
       end
     end

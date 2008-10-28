@@ -23,7 +23,7 @@ module Braid
     end
 
     def self.msg(str)
-      puts str
+      puts "Braid: #{str}"
     end
 
     def msg(str)

@@ -124,7 +124,7 @@ module Braid
         end
 
         def msg(str)
-          puts str
+          puts "Braid: #{str}"
         end
 
         def log(cmd)

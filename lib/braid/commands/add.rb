@@ -32,7 +32,7 @@ module Braid
 
           commit_message = "Added mirror '#{mirror.path}' at #{display_revision(mirror)}"
 
-          git.commit("#{commit_message}\n\n#{mirror.to_yaml}")
+          git.commit(commit_message)
           msg commit_message
         end
       end

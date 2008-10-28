@@ -85,7 +85,7 @@ module Braid
             return
           end
 
-          git.commit("#{commit_message}\n\n#{mirror.to_yaml}")
+          git.commit(commit_message)
           msg commit_message
         end
 

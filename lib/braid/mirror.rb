@@ -114,19 +114,6 @@ module Braid
       end
     end
 
-    def to_yaml
-      hsh = {}
-      hsh[path] = {
-        "squashed" => squashed,
-        "type" => type,
-        "url" => url,
-        "revision" => revision,
-        "branch" => branch,
-        "remote" => remote
-      }
-      hsh.to_yaml
-    end
-
     private
       def method_missing(name, *args)
         if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }

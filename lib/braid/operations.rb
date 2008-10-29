@@ -119,8 +119,8 @@ module Braid
         def sh(cmd, message = nil)
           message ||= "could not fetch" if cmd =~ /fetch/
           log(cmd)
-          system(cmd)
-          raise ShellExecutionError, message unless $? == 0
+          `#{cmd}`
+          raise ShellExecutionError, message unless $?.exitstatus == 0
           true
         end
 

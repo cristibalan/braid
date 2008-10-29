@@ -27,7 +27,7 @@ module Braid
           # check options for lock modification
           if mirror.locked?
             if options["head"]
-              msg "Unlocking mirror '#{mirror.path}'."
+              msg "Unlocking mirror '#{mirror.path}'." if verbose?
               mirror.lock = nil
             elsif !options["revision"]
               msg "Mirror '#{mirror.path}' is locked to #{display_revision(mirror, mirror.lock)}. Use --head to force."
@@ -36,14 +36,14 @@ module Braid
           end
 
           setup_remote(mirror)
-          msg "Fetching new commits for '#{mirror.path}'."
+          msg "Fetching new commits for '#{mirror.path}'." if verbose?
           mirror.fetch
 
           new_revision = validate_new_revision(mirror, options["revision"])
           target_revision = determine_target_revision(mirror, new_revision)
 
           if mirror.merged?(target_revision)
-            msg "Mirror '#{mirror.path}' is already up to date. Skipping."
+            msg "Mirror '#{mirror.path}' is already up to date."
             return
           end
 
@@ -55,7 +55,7 @@ module Braid
           mirror.revision = new_revision
           mirror.lock = new_revision if options["revision"]
 
-          msg "Merging in mirror '#{mirror.path}'."
+          msg "Merging in mirror '#{mirror.path}'." if verbose?
           begin
             if mirror.squashed?
               local_hash = git.rev_parse("HEAD")

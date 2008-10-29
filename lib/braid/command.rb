@@ -34,6 +34,10 @@ module Braid
       @config ||= load_and_migrate_config
     end
 
+    def verbose?
+      Braid.verbose
+    end
+
     private
       def setup_remote(mirror)
         Command.run(:setup, mirror.path)

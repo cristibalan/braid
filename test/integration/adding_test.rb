@@ -24,7 +24,7 @@ describe "Adding a mirror in a clean repository" do
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 2
-      output[0].should =~ "Add mirror 'skit1/'"
+      output[0].should =~ /Braid: Added mirror 'skit1' at '[0-9a-f]{7}'/
     end
 
     it "should create .braids and add the mirror to it" do
@@ -59,7 +59,7 @@ describe "Adding a mirror in a clean repository" do
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 2
-      output[0].should =~ "Add mirror 'skit1/'"
+      output[0].should =~ /Braid: Added mirror 'skit1' at r1/
     end
 
     it "should create .braids and add the mirror to it" do

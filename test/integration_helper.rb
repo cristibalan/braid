@@ -9,6 +9,7 @@ require 'pathname'
 TMP_PATH = File.join(Dir.tmpdir, "braid_integration")
 BRAID_PATH = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, "test", "fixtures")
+FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)
 BRAID_BIN = File.join(BRAID_PATH, "bin", "braid")
 

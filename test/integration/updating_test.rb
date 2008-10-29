@@ -41,7 +41,7 @@ describe "Updating a mirror without conflicts" do
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 3
-      output[0].should =~ /Update mirror 'skit1\/' to '[0-9a-f]{7}'/
+      output[0].should =~ /Braid: Updated mirror 'skit1' to '[0-9a-f]{7}'/
     end
 
   end
@@ -79,7 +79,7 @@ describe "Updating a mirror without conflicts" do
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 3
-      output[0].should =~ "Update mirror 'skit1/' to r3"
+      output[0].should =~ /Braid: Updated mirror 'skit1' to r3/
     end
 
   end

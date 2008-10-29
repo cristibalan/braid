@@ -144,6 +144,7 @@ module Braid
         commit_message_file.print("Braid: " + message)
         commit_message_file.flush
         status, out, err = exec("git commit -F #{commit_message_file.path} --no-verify #{args.join(' ')}")
+        commit_message_file.unlink
 
         if status == 0
           true
@@ -152,7 +153,6 @@ module Braid
         else
           raise ShellExecutionError, err
         end
-        commit_message_file.unlink
       end
 
       def fetch(remote = nil)

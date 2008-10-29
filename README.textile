@@ -10,10 +10,12 @@ h2. Requirements
 * main >= 2.8.0
 * open4 >= 0.9.6
 
-h2. Installing using rubygems
+h2. Installing using rubygems - official releases
 
-  gem install main
-  gem install open4
+  gem install braid
+
+h2. Installing using rubygems - development releases
+
   gem sources -a http://gems.github.com
   gem install evilchelu-braid
 

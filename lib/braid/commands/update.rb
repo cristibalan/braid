@@ -59,7 +59,7 @@ module Braid
           begin
             if mirror.squashed?
               local_hash = git.rev_parse("HEAD")
-              if diff
+              if !diff.empty?
                 base_hash = generate_tree_hash(mirror, base_revision)
               else
                 base_hash = local_hash

@@ -86,7 +86,7 @@ module Braid
     def diff
       remote_hash = git.rev_parse("#{base_revision}:")
       local_hash = git.tree_hash(path)
-      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash, path) : ""
+      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ""
     end
 
     def fetch

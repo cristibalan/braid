@@ -107,16 +107,34 @@ Main {
     }
   }
 
-  mode(:setup) {
+  mode(:diff) {
     description <<-TXT
-      Set up git or git-svn remote for a mirror.
-      All commands that need a remote run setup internally.
-
-      Defaults to setting up remotes for all mirrors if none is specified.
+      Show diff of local changes to mirror.
     TXT
 
-    examples <<-TXT
-      . braid setup local/dir
+    mixin :argument_path, :option_verbose
+
+    run {
+      Braid::Command.run(:diff, path)
+    }
+  }
+
+  mode(:push) {
+    description <<-TXT
+      Push local mirror changes to remote.
+    TXT
+
+    mixin :argument_path, :option_verbose
+
+    run {
+      Braid.verbose = verbose
+      Braid::Command.run(:push, path)
+    }
+  }
+
+  mode(:setup) {
+    description <<-TXT
+      Set up git and git-svn remotes.
     TXT
 
     mixin :optional_path, :option_verbose
@@ -124,22 +142,6 @@ Main {
     run {
       Braid.verbose = verbose
       Braid::Command.run(:setup, path)
-    }
-  }
-
-  mode(:diff) {
-    description <<-TXT
-      Show diff of local changes to mirror.
-    TXT
-
-    examples <<-TXT
-      . braid diff local/dir
-    TXT
-
-    mixin :argument_path, :option_verbose
-
-    run {
-      Braid::Command.run(:diff, path)
     }
   }
 

@@ -139,12 +139,16 @@ module Braid
 
     class Git < Proxy
       def commit(message, *args)
-
-        commit_message_file = Tempfile.new("braid_commit", ".")
-        commit_message_file.print("Braid: " + message)
-        commit_message_file.flush
-        status, out, err = exec("git commit -F #{commit_message_file.path} --no-verify #{args.join(' ')}")
-        commit_message_file.unlink
+        cmd = "git commit --no-verify"
+        if message # allow nil
+          message_file = Tempfile.new("braid_commit")
+          message_file.print(message)
+          message_file.flush
+          cmd << " -F #{message_file.path}"
+        end
+        cmd << " #{args.join(' ')}" unless args.empty?
+        status, out, err = exec(cmd)
+        message_file.unlink if message_file
 
         if status == 0
           true
@@ -155,10 +159,10 @@ module Braid
         end
       end
 
-      def fetch(remote = nil)
-        args = remote && "-n #{remote}"
+      def fetch(remote = nil, *args)
+        args.unshift "-n #{remote}" if remote
         # open4 messes with the pipes of index-pack
-        sh("git fetch #{args} 2>&1 >/dev/null")
+        sh("git fetch #{args.join(' ')} 2>&1 >/dev/null")
       end
 
       def checkout(treeish)

@@ -185,6 +185,11 @@ module Braid
         true
       end
 
+      def remote_rm(remote)
+        invoke(:remote, "rm", remote)
+        true
+      end
+
       # Checks git and svn remotes.
       def remote_url(remote)
         key = "remote.#{remote}.url"

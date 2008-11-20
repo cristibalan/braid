@@ -89,18 +89,21 @@ Main {
 
         * removes metadata from .braids
         * removes the local directory and commits the removal
-        * does NOT remove the git and git svn remotes in case you still need them around
+        * removes the git remote by default, --keep can be used to supress that
     TXT
 
     examples <<-TXT
       . braid remove local/dir
     TXT
 
-    mixin :argument_path, :option_verbose
+    mixin :argument_path, :option_verbose, :option_keep_remote
 
     run {
+      options = {
+        :keep => keep
+      }
       Braid.verbose = verbose
-      Braid::Command.run(:remove, path)
+      Braid::Command.run(:remove, path, options)
     }
   }
 
@@ -222,6 +225,14 @@ Main {
     option(:verbose, :v) {
       optional 
       desc 'log shell commands'
+      attr
+    }
+  }
+
+  mixin(:option_keep_remote) {
+    option(:keep) {
+      optional
+      desc 'do not remove the remote'
       attr
     }
   }

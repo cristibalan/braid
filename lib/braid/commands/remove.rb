@@ -11,25 +11,21 @@ module Braid
 
           git.rm_r(mirror.path)
 
-          # will need this in case we decide to remove the .git/config entry also
-          # setup_remote(mirror)
-
           config.remove(mirror)
           add_config_file
+
+          if options[:keep]
+            msg "Not removing remote '#{mirror.remote}'" if verbose?
+          elsif git.remote_url(mirror.remote)
+            msg "Removed remote '#{mirror.path}'" if verbose?
+            git.remote_rm mirror.remote
+          else
+            msg "Remote '#{mirror.remote}' not found, nothing to cleanup" if verbose?
+          end
 
           commit_message = "Removed mirror '#{mirror.path}'"
           git.commit(commit_message)
           msg commit_message
-
-          if options[:keep]
-            msg "Not removing remote '#{mirror.remote}'"
-          elsif git.remote_url(mirror.remote)
-            msg "Removed remote '#{mirror.path}'"
-            git.remote_rm mirror.remote
-          else
-            msg "Remote '#{mirror.remote}' not found, nothing to cleanup"
-          end
-
         end
       end
     end

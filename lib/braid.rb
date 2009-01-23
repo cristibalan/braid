@@ -1,4 +1,4 @@
-$:.unshift File.dirname(__FILE__)
+$:.unshift dirname = File.dirname(__FILE__)
 
 module Braid
   VERSION = "0.5"
@@ -20,10 +20,11 @@ module Braid
   end
 end
 
+require dirname + '/core_ext'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'
 require 'braid/command'
-Dir[File.dirname(__FILE__) + '/braid/commands/*'].each do |file|
+Dir[dirname + '/braid/commands/*'].each do |file|
   require file
 end

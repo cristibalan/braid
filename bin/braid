@@ -153,6 +153,14 @@ Main {
     }
   }
 
+  mode(:list) {
+    description 'Show all tracked mirrors (and if updates are available).'
+
+    run {
+      Braid::Command.run(:list)
+    }
+  }
+
   mixin(:argument_path) {
     argument(:path) {
       attr

@@ -25,10 +25,11 @@ module Braid
         Dir.mkdir(clone_dir)
         source_dir = Dir.pwd
         remote_url = git.remote_url(mirror.remote)
-        if File.directory?(remote_url)
+        if remote_url == mirror.cached_url
+          remote_url = mirror.url
+        elsif File.directory?(remote_url)
           remote_url = File.expand_path(remote_url)
         end
-        STDOUT.puts remote_url
         Dir.chdir(clone_dir) do
           msg "Cloning mirror with local changes."
           git.init

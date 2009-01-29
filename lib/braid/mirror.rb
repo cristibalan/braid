@@ -99,7 +99,7 @@ module Braid
     end
 
     def cached?
-      git.remote_url(remote) == git_cache.path(url)
+      git.remote_url(remote) == cached_url
     end
 
     def base_revision
@@ -112,6 +112,10 @@ module Braid
       else
         inferred_revision
       end
+    end
+
+    def cached_url
+      git_cache.path(url)
     end
 
     private

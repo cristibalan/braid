@@ -61,7 +61,7 @@ describe "Braid::Mirror#diff" do
   it "should generate a diff when the hashes do not match" do
     set_hashes('b' * 40, 'c' * 40)
     diff = "diff --git a/path b/path\n"
-    git.expects(:diff_tree).with('b' * 40, 'c' * 40, @mirror.path).returns(diff)
+    git.expects(:diff_tree).with('b' * 40, 'c' * 40).returns(diff)
     @mirror.diff.should == diff
   end
 end

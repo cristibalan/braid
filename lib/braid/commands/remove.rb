@@ -23,9 +23,8 @@ module Braid
             msg "Remote '#{mirror.remote}' not found, nothing to cleanup" if verbose?
           end
 
-          commit_message = "Removed mirror '#{mirror.path}'"
-          git.commit(commit_message)
-          msg commit_message
+          git.commit("Remove mirror '#{mirror.path}'")
+          msg "Removed mirror." if verbose?
         end
       end
     end

@@ -30,10 +30,8 @@ module Braid
           config.update(mirror)
           add_config_file
 
-          commit_message = "Added mirror '#{mirror.path}' at #{display_revision(mirror)}"
-
-          git.commit(commit_message)
-          msg commit_message
+          git.commit("Add mirror '#{mirror.path}' at #{display_revision(mirror)}")
+          msg "Added mirror at #{display_revision(mirror)}."
         end
       end
 

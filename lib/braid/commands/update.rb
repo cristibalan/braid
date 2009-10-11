@@ -78,15 +78,14 @@ module Braid
           config.update(mirror)
           add_config_file
 
-          commit_message = "Updated mirror '#{mirror.path}' to #{display_revision(mirror)}"
-
+          commit_message = "Update mirror '#{mirror.path}' to #{display_revision(mirror)}"
           if error
             File.open(".git/MERGE_MSG", 'w') { |f| f.puts(commit_message) }
             return
           end
 
           git.commit(commit_message)
-          msg commit_message
+          msg "Updated mirror to #{display_revision(mirror)}."
         end
 
         def generate_tree_hash(mirror, revision)

@@ -142,7 +142,7 @@ module Braid
         cmd = "git commit --no-verify"
         if message # allow nil
           message_file = Tempfile.new("braid_commit")
-          message_file.print(message)
+          message_file.print("Braid: #{message}")
           message_file.flush
           cmd << " -F #{message_file.path}"
         end

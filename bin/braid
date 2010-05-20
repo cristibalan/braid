@@ -14,7 +14,7 @@ Main {
   description <<-TXT
     braid is a simple tool to help track git or svn repositories inside a git repository.
 
-    Run 'braid help commandname' for more details.
+    Run 'braid commandname help' for more details.
 
     All operations will be executed in the braid/track branch.
     You can then merge back or cherry-pick changes.

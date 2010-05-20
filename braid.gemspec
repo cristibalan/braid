@@ -20,6 +20,6 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.1.0}
   s.summary = %q{A simple tool for tracking vendor branches in git.}
 
-  s.add_dependency(%q<main>, [">= 2.8.0"])
+  s.add_dependency(%q<main>, [">= 3.0.0"])
   s.add_dependency(%q<open4>, [">= 0.9.6"])
 end

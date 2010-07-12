@@ -320,7 +320,8 @@ module Braid
 
       def commit_hash(remote, revision)
         out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
-        part = out.to_s.split(" | ")[1]
+        part = out.to_s.split("|")[1]
+        part.strip!
         raise UnknownRevision, "r#{revision}" unless part
         git.rev_parse(part)
       end

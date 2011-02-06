@@ -8,23 +8,18 @@ h2. Requirements
 
 * git 1.6+ (and git-svn if you want to mirror svn repositories)
 * main >= 2.8.0
-* open4 >= 0.9.6
+* open4 >= 0.9.6 (unless using jruby)
 
 h2. Installing using rubygems - official releases
 
   gem install braid
 
-h2. Installing using rubygems - development releases
-
-  gem sources -a http://gems.github.com
-  gem install evilchelu-braid
-
 h2. Installing from source
 
   git clone git://github.com/evilchelu/braid.git
   cd braid
-  gem build braid.gemspec
-  sudo gem install braid-x.y.z.gem
+  bundle install
+  rake install # possibly requiring sudo
 
 h2. Quick usage - ruby project
 
@@ -116,5 +111,5 @@ h2. Contributors (alphabetically)
 * Ferdinand Svehla
 * Michael Klishin
 * Roman Heinrich
+* Travis Tilley
 * Tyler Rick
-

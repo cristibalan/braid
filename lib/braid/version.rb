@@ -1,3 +1,3 @@
 module Braid
-  VERSION = "0.6.2.1"
+  VERSION = "0.6.2.2"
 end

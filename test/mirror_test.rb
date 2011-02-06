@@ -85,8 +85,8 @@ describe "Braid::Mirror#inferred_revision" do
   it "should return the last commit before the most recent update" do
     @mirror = new_from_options("git://path")
     git.expects(:rev_list).times(2).returns(
-      "#{'a' * 40}\n",
-      "commit #{'b' * 40}\n#{'t' * 40}\n"
+        "#{'a' * 40}\n",
+        "commit #{'b' * 40}\n#{'t' * 40}\n"
     )
     git.expects(:tree_hash).with(@mirror.path, 'a' * 40).returns('t' * 40)
     @mirror.send(:inferred_revision).should == 'b' * 40

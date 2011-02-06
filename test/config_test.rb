@@ -52,7 +52,7 @@ describe "Braid::Config, with one mirror" do
   it "should update the mirror with new params" do
     @mirror.branch = "other"
     @config.update(@mirror)
-    @config.get("path").attributes.should == { "branch" => "other" }
+    @config.get("path").attributes.should == {"branch" => "other"}
   end
 
   it "should raise when trying to update nonexistent mirror" do

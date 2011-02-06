@@ -5,7 +5,7 @@ module Braid
   module Commands
     class Push < Command
       def run(path, options = {})
-        mirror = config.get!(path)
+        mirror        = config.get!(path)
 
         #mirror.fetch
 

@@ -55,7 +55,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, { "type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full })
+      Braid::Command.run(:add, url, {"type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full})
     }
   }
 
@@ -79,7 +79,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:update, path, { "revision" => revision, "head" => head })
+      Braid::Command.run(:update, path, {"revision" => revision, "head" => head})
     }
   }
 
@@ -99,8 +99,8 @@ Main {
     mixin :argument_path, :option_verbose, :option_keep_remote
 
     run {
-      options = {
-        :keep => keep
+      options       = {
+          :keep => keep
       }
       Braid.verbose = verbose
       Braid::Command.run(:remove, path, options)
@@ -233,7 +233,7 @@ Main {
 
   mixin(:option_verbose) {
     option(:verbose, :v) {
-      optional 
+      optional
       desc 'log shell commands'
       attr
     }

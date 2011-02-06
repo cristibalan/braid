@@ -5,9 +5,9 @@ module Braid
         bail_on_local_changes!
 
         with_reset_on_error do
-          mirror = config.add_from_options(url, options)
+          mirror           = config.add_from_options(url, options)
 
-          branch_message = (mirror.type == "svn" || mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
+          branch_message   = (mirror.type == "svn" || mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
           revision_message = options["revision"] ? " at #{display_revision(mirror, options["revision"])}" : ""
           msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
 
@@ -17,7 +17,7 @@ module Braid
           setup_remote(mirror)
           mirror.fetch
 
-          new_revision = validate_new_revision(mirror, options["revision"])
+          new_revision    = validate_new_revision(mirror, options["revision"])
           target_revision = determine_target_revision(mirror, new_revision)
 
           unless mirror.squashed?

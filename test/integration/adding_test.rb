@@ -19,7 +19,7 @@ describe "Adding a mirror in a clean repository" do
       end
 
       file_name = "skit1/layouts/layout.liquid"
-      output = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
+      output    = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
       $?.should.be.success
 
       output = `git log --pretty=oneline`.split("\n")
@@ -54,7 +54,7 @@ describe "Adding a mirror in a clean repository" do
       end
 
       file_name = "skit1/layouts/layout.liquid"
-      output = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
+      output    = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
       $?.should.be.success
 
       output = `git log --pretty=oneline`.split("\n")

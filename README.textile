@@ -7,8 +7,8 @@ The project homepage is at "http://github.com/evilchelu/braid/wikis/home":http:/
 h2. Requirements
 
 * git 1.6+ (and git-svn if you want to mirror svn repositories)
-* main >= 2.8.0
-* open4 >= 0.9.6 (unless using jruby)
+* main >= 4.2.0
+* open4 >= 1.0.1 (unless using jruby)
 
 h2. Installing using rubygems - official releases
 

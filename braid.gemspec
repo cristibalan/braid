@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{braid}
-  s.version = "0.6.2"
+  s.version = "0.6.2.1"
 
   s.specification_version = 2 if s.respond_to? :specification_version=
 
@@ -21,5 +21,8 @@ Gem::Specification.new do |s|
   s.summary = %q{A simple tool for tracking vendor branches in git.}
 
   s.add_dependency(%q<main>, [">= 4.2.0"])
-  s.add_dependency(%q<open4>, [">= 1.0.1"])
+  s.add_dependency(%q<open4>, [">= 1.0.1"]) unless defined?(JRUBY_VERSION)
+
+  s.add_development_dependency(%q<test-spec>, ["> 0"])
+  s.add_development_dependency(%q<mocha>, ["> 0"])
 end

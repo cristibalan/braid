@@ -1,6 +1,6 @@
 require 'singleton'
 require 'rubygems'
-require 'open4'
+require defined?(JRUBY_VERSION) ? 'open3' : 'open4'
 require 'tempfile'
 
 module Braid
@@ -100,12 +100,21 @@ module Braid
 
           out, err = nil
           log(cmd)
-          status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-            out = stdout.read
-            err = stderr.read
-          end.exitstatus
-          [status, out, err]
 
+          if defined?(JRUBY_VERSION)
+            Open3.popen3(cmd) do |stdin, stdout, stderr|
+              out = stdout.read
+              err = stderr.read
+            end
+            status = $?.exitstatus
+          else
+            status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
+              out = stdout.read
+              err = stderr.read
+            end.exitstatus
+          end
+
+          [status, out, err]
         ensure
           ENV['LANG'] = previous_lang
         end
@@ -275,12 +284,22 @@ module Braid
 
       def apply(diff, *args)
         err = nil
-        status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
-          stdin.puts(diff)
-          stdin.close
 
-          err = stderr.read
-        end.exitstatus
+        if defined?(JRUBY_VERSION)
+          Open3.popen3("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |stdin, stdout, stderr|
+            stdin.puts(diff)
+            stdin.close
+            err = stderr.read
+          end
+          status = $?.exitstatus
+        else
+          status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
+            stdin.puts(diff)
+            stdin.close
+            err = stderr.read
+          end.exitstatus
+        end
+
         raise ShellExecutionError, err unless status == 0
         true
       end

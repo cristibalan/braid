@@ -36,7 +36,7 @@ describe "Updating a mirror without conflicts" do
       end
 
       file_name = "layouts/layout.liquid"
-      output = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
+      output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
       $?.should.be.success
 
       output = `git log --pretty=oneline`.split("\n")
@@ -48,8 +48,8 @@ describe "Updating a mirror without conflicts" do
 
   describe "from a svn repository" do
     before do
-      @shiny = create_git_repo_from_fixture("shiny")
-      @skit1 = create_svn_repo_from_fixture("skit1")
+      @shiny    = create_git_repo_from_fixture("shiny")
+      @skit1    = create_svn_repo_from_fixture("skit1")
       @skit1_wc = File.join(TMP_PATH, "skit1_wc")
 
       in_dir(@shiny) do
@@ -74,7 +74,7 @@ describe "Updating a mirror without conflicts" do
       end
 
       file_name = "layouts/layout.liquid"
-      output = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
+      output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
       $?.should.be.success
 
       output = `git log --pretty=oneline`.split("\n")

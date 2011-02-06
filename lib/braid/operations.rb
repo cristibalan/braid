@@ -16,8 +16,8 @@ module Braid
     end
     class VersionTooLow < BraidError
       def initialize(command, version, required)
-        @command = command
-        @version = version.to_s.split("\n").first
+        @command  = command
+        @version  = version.to_s.split("\n").first
         @required = required
       end
 
@@ -45,8 +45,11 @@ module Braid
     class Proxy
       include Singleton
 
-      def self.command; name.split('::').last.downcase; end # hax!
+      def self.command;
+        name.split('::').last.downcase;
+      end
 
+      # hax!
       def version
         status, out, err = exec!("#{self.class.command} --version")
         out.sub(/^.* version/, "").strip
@@ -54,7 +57,7 @@ module Braid
 
       def require_version(required)
         required = required.split(".")
-        actual = version.split(".")
+        actual   = version.split(".")
 
         actual.each_with_index do |actual_piece, idx|
           required_piece = required[idx]
@@ -79,71 +82,72 @@ module Braid
       end
 
       private
-        def command(name)
-          # stub
-          name
-        end
 
-        def invoke(arg, *args)
-          exec!("#{command(arg)} #{args.join(' ')}".strip)[1].strip # return stdout
-        end
+      def command(name)
+        # stub
+        name
+      end
 
-        def method_missing(name, *args)
-          invoke(name, *args)
-        end
+      def invoke(arg, *args)
+        exec!("#{command(arg)} #{args.join(' ')}".strip)[1].strip # return stdout
+      end
 
-        def exec(cmd)
-          cmd.strip!
+      def method_missing(name, *args)
+        invoke(name, *args)
+      end
 
-          previous_lang = ENV['LANG']
-          ENV['LANG'] = 'C'
+      def exec(cmd)
+        cmd.strip!
 
-          out, err = nil
-          log(cmd)
+        previous_lang = ENV['LANG']
+        ENV['LANG']   = 'C'
 
-          if defined?(JRUBY_VERSION)
-            Open3.popen3(cmd) do |stdin, stdout, stderr|
-              out = stdout.read
-              err = stderr.read
-            end
-            status = $?.exitstatus
-          else
-            status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-              out = stdout.read
-              err = stderr.read
-            end.exitstatus
+        out, err = nil
+        log(cmd)
+
+        if defined?(JRUBY_VERSION)
+          Open3.popen3(cmd) do |stdin, stdout, stderr|
+            out = stdout.read
+            err = stderr.read
           end
-
-          [status, out, err]
-        ensure
-          ENV['LANG'] = previous_lang
+          status = $?.exitstatus
+        else
+          status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
+            out = stdout.read
+            err = stderr.read
+          end.exitstatus
         end
 
-        def exec!(cmd)
-          status, out, err = exec(cmd)
-          raise ShellExecutionError, err unless status == 0
-          [status, out, err]
-        end
+        [status, out, err]
+      ensure
+        ENV['LANG'] = previous_lang
+      end
 
-        def sh(cmd, message = nil)
-          message ||= "could not fetch" if cmd =~ /fetch/
-          log(cmd)
-          `#{cmd}`
-          raise ShellExecutionError, message unless $?.exitstatus == 0
-          true
-        end
+      def exec!(cmd)
+        status, out, err = exec(cmd)
+        raise ShellExecutionError, err unless status == 0
+        [status, out, err]
+      end
 
-        def msg(str)
-          puts "Braid: #{str}"
-        end
+      def sh(cmd, message = nil)
+        message ||= "could not fetch" if cmd =~ /fetch/
+        log(cmd)
+        `#{cmd}`
+        raise ShellExecutionError, message unless $?.exitstatus == 0
+        true
+      end
 
-        def log(cmd)
-          msg "Executing `#{cmd}`" if verbose?
-        end
+      def msg(str)
+        puts "Braid: #{str}"
+      end
 
-        def verbose?
-          Braid.verbose
-        end
+      def log(cmd)
+        msg "Executing `#{cmd}`" if verbose?
+      end
+
+      def verbose?
+        Braid.verbose
+      end
     end
 
     class Git < Proxy
@@ -310,16 +314,19 @@ module Braid
       end
 
       private
-        def command(name)
-          "#{self.class.command} #{name.to_s.gsub('_', '-')}"
-        end
+
+      def command(name)
+        "#{self.class.command} #{name.to_s.gsub('_', '-')}"
+      end
     end
 
     class GitSvn < Proxy
-      def self.command; "git svn"; end
+      def self.command;
+        "git svn";
+      end
 
       def commit_hash(remote, revision)
-        out = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
+        out  = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
         part = out.to_s.split("|")[1]
         part.strip!
         raise UnknownRevision, "r#{revision}" unless part
@@ -336,13 +343,14 @@ module Braid
       end
 
       private
-        def command(name)
-          "#{self.class.command} #{name}"
-        end
 
-        def git
-          Git.instance
-        end
+      def command(name)
+        "#{self.class.command} #{name}"
+      end
+
+      def git
+        Git.instance
+      end
     end
 
     class Svn < Proxy
@@ -384,13 +392,14 @@ module Braid
       end
 
       private
-        def local_cache_dir
-          Braid.local_cache_dir
-        end
 
-        def git
-          Git.instance
-        end
+      def local_cache_dir
+        Braid.local_cache_dir
+      end
+
+      def git
+        Git.instance
+      end
     end
 
     module VersionControl

@@ -6,8 +6,8 @@ require 'tempfile'
 require 'fileutils'
 require 'pathname'
 
-TMP_PATH = File.join(Dir.tmpdir, "braid_integration")
-BRAID_PATH = Pathname.new(File.dirname(__FILE__)).parent.realpath
+TMP_PATH     = File.join(Dir.tmpdir, "braid_integration")
+BRAID_PATH   = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, "test", "fixtures")
 FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)
@@ -51,7 +51,7 @@ def create_git_repo_from_fixture(fixture_name)
 end
 
 def create_svn_repo_from_fixture(fixture_name)
-  svn_wc = File.join(TMP_PATH, fixture_name + "_wc")
+  svn_wc   = File.join(TMP_PATH, fixture_name + "_wc")
   svn_repo = File.join(TMP_PATH, fixture_name)
   run_cmds(<<-EOD)
     svnadmin create #{svn_repo}

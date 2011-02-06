@@ -79,10 +79,10 @@ module Braid
         @db.roots.each do |path|
           attributes = @db[path]
           if attributes["local_branch"]
-            attributes["url"] = attributes.delete("remote")
-            attributes["remote"] = attributes.delete("local_branch")
+            attributes["url"]      = attributes.delete("remote")
+            attributes["remote"]   = attributes.delete("local_branch")
             attributes["squashed"] = attributes.delete("squash")
-            attributes["lock"] = attributes["revision"] # so far this has always been true
+            attributes["lock"]     = attributes["revision"] # so far this has always been true
           end
           @db[path] = clean_attributes(attributes)
         end
@@ -90,12 +90,12 @@ module Braid
     end
 
     private
-      def write_mirror(mirror)
-        @db[mirror.path] = clean_attributes(mirror.attributes)
-      end
+    def write_mirror(mirror)
+      @db[mirror.path] = clean_attributes(mirror.attributes)
+    end
 
-      def clean_attributes(hash)
-        hash.reject { |k,v| v.nil? }
-      end
+    def clean_attributes(hash)
+      hash.reject { |k, v| v.nil? }
+    end
   end
 end

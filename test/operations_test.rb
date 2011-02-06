@@ -36,8 +36,8 @@ end
 
 describe "Braid::Operations::Git#require_version" do
   REQUIRED_VERSION = "1.5.4.5"
-  PASS_VERSIONS = %w(1.5.4.6 1.5.5 1.6 1.5.4.5.2 1.5.5.1.98.gf0ec4)
-  FAIL_VERSIONS  = %w(1.5.4.4 1.5.4 1.5.3 1.4.5.6)
+  PASS_VERSIONS    = %w(1.5.4.6 1.5.5 1.6 1.5.4.5.2 1.5.5.1.98.gf0ec4)
+  FAIL_VERSIONS    = %w(1.5.4.4 1.5.4 1.5.3 1.4.5.6)
 
   def set_version(str)
     git.expects(:exec).returns([0, "git version #{str}\n", ""])

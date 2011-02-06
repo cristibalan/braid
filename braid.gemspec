@@ -1,24 +1,29 @@
+# -*- encoding: utf-8 -*-
+$:.push File.expand_path("../lib", __FILE__)
+require 'braid/version'
+
 Gem::Specification.new do |s|
   s.name = %q{braid}
-  s.version = "0.6.2.1"
+  s.version = Braid::VERSION
+  s.platform = Gem::Platform::RUBY
 
-  s.specification_version = 2 if s.respond_to? :specification_version=
-
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cristi Balan", "Norbert Crombach"]
-  s.date = %q{2010-07-19}
-  s.default_executable = %q{braid}
-  s.description = %q{A simple tool for tracking vendor branches in git.}
   s.email = %q{evil@che.lu}
-  s.executables = ["braid"]
-  s.files = ["braid.gemspec", "LICENSE", "README.textile", "Rakefile"] + Dir["bin/*"] + Dir["lib/**/*.rb"] + Dir["test/**/*.rb"]
-  s.has_rdoc = false
+
   s.homepage = %q{http://evil.che.lu/projects/braid}
-  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "braid", "--main"]
-  s.require_paths = ["lib"]
-  s.rubyforge_project = %q{braid}
-  s.rubygems_version = %q{1.1.0}
   s.summary = %q{A simple tool for tracking vendor branches in git.}
+  s.description = %q{A simple tool for tracking vendor branches in git.}
+
+  s.rubyforge_project = %q{braid}
+
+  s.files             = `git ls-files`.split("\n")
+  s.test_files        = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables       = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+  s.default_executable = %q{braid}
+  s.require_paths = ["lib"]
+
+  s.has_rdoc = false
+  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "braid", "--main"]
 
   s.add_dependency(%q<main>, [">= 4.2.0"])
   s.add_dependency(%q<open4>, [">= 1.0.1"]) unless defined?(JRUBY_VERSION)

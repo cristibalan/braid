@@ -38,6 +38,10 @@ module Braid
       Braid.verbose
     end
 
+    def force?
+      Braid.force
+    end
+
     private
 
     def setup_remote(mirror)

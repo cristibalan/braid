@@ -387,8 +387,8 @@ module Braid
         end
       end
 
-      def path(url)
-        File.join(local_cache_dir, url.gsub(/[\/:@]/, "_"))
+      def path(url, branch="master")
+        File.join(local_cache_dir, url.gsub(/[\/:@]/, "_") + "@#{branch}")
       end
 
       private

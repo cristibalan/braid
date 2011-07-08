@@ -34,7 +34,7 @@ module Braid
           msg "Cloning mirror with local changes."
           git.init
           git.fetch(source_dir)
-          git.fetch(remote_url)
+          git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
           git.checkout(base_revision)
           git.apply(diff)
           system("git commit -v")

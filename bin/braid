@@ -137,10 +137,11 @@ Main {
       Set up git and git-svn remotes.
     TXT
 
-    mixin :optional_path, :option_verbose
+    mixin :optional_path, :option_verbose, :option_force
 
     run {
       Braid.verbose = verbose
+      Braid.force = force
       Braid::Command.run(:setup, path)
     }
   }
@@ -238,6 +239,14 @@ Main {
     option(:verbose, :v) {
       optional
       desc 'log shell commands'
+      attr
+    }
+  }
+
+  mixin(:option_force) {
+    option(:force, :f) {
+      optional
+      desc 'force'
       attr
     }
   }

@@ -13,6 +13,14 @@ module Braid
     @verbose = !!new_value
   end
 
+  def self.force
+    @force || false
+  end
+
+  def self.force=(new_value)
+    @force = !!new_value
+  end
+
   def self.use_local_cache
     [nil, "true", "1"].include?(ENV["BRAID_USE_LOCAL_CACHE"])
   end

@@ -47,7 +47,7 @@ module Braid
         path = "vendor/plugins/#{path}"
       end
 
-      remote   = "braid/#{path}".gsub("_", '-') # stupid git svn changes all _ to ., weird
+      remote   = "#{branch}/braid/#{path}".gsub("_", '-') # stupid git svn changes all _ to ., weird
       squashed = !options["full"]
       branch = nil if type == "svn"
 
@@ -116,6 +116,14 @@ module Braid
 
     def cached_url
       git_cache.path(url)
+    end
+
+    def remote
+      if (attributes["remote"] && attributes["remote"] =~ /^braid\//)
+        attributes["remote"] = "#{branch}/#{attributes["remote"]}"
+      else
+        attributes["remote"]
+      end
     end
 
     private

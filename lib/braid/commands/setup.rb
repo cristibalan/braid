@@ -18,8 +18,13 @@ module Braid
         mirror = config.get!(path)
 
         if git.remote_url(mirror.remote)
-          msg "Setup: Mirror '#{mirror.path}' already has a remote. Reusing it." if verbose?
-          return
+          if force?
+            msg "Setup: Mirror '#{mirror.path}' already has a remote. Replacing it (force)" if verbose?
+            git.remote_rm(mirror.remote)
+          else
+            msg "Setup: Mirror '#{mirror.path}' already has a remote. Reusing it." if verbose?
+            return
+          end
         end
 
         msg "Setup: Creating remote for '#{mirror.path}'."

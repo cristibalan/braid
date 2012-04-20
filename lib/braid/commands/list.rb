@@ -21,7 +21,7 @@ module Braid
           mirror.fetch
           new_revision    = validate_new_revision(mirror, options["revision"])
           target_revision = determine_target_revision(mirror, new_revision)
-          print " !!! UPDATE AVAILABLE !!!" if new_revision.to_s != mirror.base_revision.to_s
+          print " !!! UPDATE AVAILABLE !!!" if target_revision.to_s != mirror.base_revision.to_s
           print "\n"
         end
         print "\n"

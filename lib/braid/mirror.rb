@@ -115,7 +115,7 @@ module Braid
     end
 
     def cached_url
-      git_cache.path(url)
+      git_cache.path(url, branch)
     end
 
     def remote

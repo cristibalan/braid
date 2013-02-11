@@ -1,9 +1,4 @@
 require 'yaml'
-
-# psych throws such wonderful errors as: 
-#  `@vendor/rails' is not allowed as an instance variable name (NameError)
-YAML::ENGINE.yamler = 'syck' if RUBY_VERSION >= '1.9.1'
-
 require 'yaml/store'
 
 module Braid

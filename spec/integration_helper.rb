@@ -13,10 +13,6 @@ FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)
 BRAID_BIN = File.join(BRAID_PATH, "bin", "braid")
 
-#def exec(cmd)
-#  `cd #{TMP} && #{cmd}`
-#end
-
 def in_dir(dir = TMP_PATH)
   Dir.chdir(dir)
   yield

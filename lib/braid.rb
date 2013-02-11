@@ -1,4 +1,3 @@
-$:.unshift dirname = File.dirname(__FILE__)
 require 'braid/version'
 
 module Braid
@@ -37,7 +36,7 @@ module Braid
   end
 end
 
-require dirname + '/core_ext'
+require 'braid/core_ext'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'

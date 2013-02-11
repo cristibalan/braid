@@ -40,7 +40,7 @@ end
 describe "Braid::Mirror#base_revision" do
   it "should be inferred when no revision is set" do
     @mirror = build_mirror
-    @mirror.revision.should.be.nil
+    @mirror.revision.should be_nil
     @mirror.expects(:inferred_revision).returns('b' * 40)
     @mirror.base_revision.should == 'b' * 40
   end
@@ -71,11 +71,11 @@ describe "Braid::Mirror#cached?" do
 
   it "should be true when the remote path matches the cache path" do
     git.expects(:remote_url).with(@mirror.remote).returns(git_cache.path(@mirror.url))
-    @mirror.should.be.cached
+    @mirror.should be_cached
   end
 
   it "should be false if the remote does not point to the cache" do
     git.expects(:remote_url).with(@mirror.remote).returns(@mirror.url)
-    @mirror.should.not.be.cached
+    @mirror.should_not be_cached
   end
 end

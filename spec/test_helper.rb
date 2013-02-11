@@ -1,6 +1,6 @@
 require 'rubygems'
-require 'test/spec'
-require 'mocha'
+require 'rspec'
+require 'mocha/api'
 
 require File.dirname(__FILE__) + '/../lib/braid'
 

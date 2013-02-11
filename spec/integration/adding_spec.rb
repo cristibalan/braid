@@ -15,12 +15,12 @@ describe "Adding a mirror in a clean repository" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `#{BRAID_BIN} add --type git #{@skit1}`
+        `#{BRAID_BIN} add #{@skit1}`
       end
 
       file_name = "skit1/layouts/layout.liquid"
       output    = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
-      $?.should.be.success
+      $?.should be_success
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 2
@@ -29,16 +29,15 @@ describe "Adding a mirror in a clean repository" do
 
     it "should create .braids and add the mirror to it" do
       in_dir(@shiny) do
-        `#{BRAID_BIN} add --type git #{@skit1}`
+        `#{BRAID_BIN} add #{@skit1}`
       end
 
       braids = YAML::load_file("#{@shiny}/.braids")
       braids["skit1"]["squashed"].should == true
       braids["skit1"]["url"].should == @skit1
-      braids["skit1"]["type"].should == "git"
-      braids["skit1"]["revision"].should.not.be nil
+      braids["skit1"]["revision"].should_not be_nil
       braids["skit1"]["branch"].should == "master"
-      braids["skit1"]["remote"].should == "braid/skit1"
+      braids["skit1"]["remote"].should == "master/braid/skit1"
     end
   end
 end

@@ -18,7 +18,7 @@ describe "Braid::Operations::Git#rev_parse" do
   it "should raise a revision error when the hash is not found" do
     ambiguous_revision = 'b' * 7
     git.expects(:exec).returns([1, ambiguous_revision, "fatal: ..."])
-    lambda { git.rev_parse(ambiguous_revision) }.should.raise(Braid::Operations::UnknownRevision)
+    lambda { git.rev_parse(ambiguous_revision) }.should raise_error(Braid::Operations::UnknownRevision)
   end
 end
 

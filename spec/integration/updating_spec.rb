@@ -13,7 +13,7 @@ describe "Updating a mirror without conflicts" do
       @skit1 = create_git_repo_from_fixture("skit1")
 
       in_dir(@shiny) do
-        `#{BRAID_BIN} add --type git #{@skit1}`
+        `#{BRAID_BIN} add #{@skit1}`
       end
 
       update_dir_from_fixture("skit1", "skit1.1")
@@ -37,7 +37,7 @@ describe "Updating a mirror without conflicts" do
 
       file_name = "layouts/layout.liquid"
       output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
-      $?.should.be.success
+      $?.should be_success
 
       output = `git log --pretty=oneline`.split("\n")
       output.length.should == 3

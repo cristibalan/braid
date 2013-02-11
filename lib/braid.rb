@@ -36,7 +36,7 @@ module Braid
   end
 end
 
-require 'braid/core_ext'
+#require 'braid/core_ext'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'

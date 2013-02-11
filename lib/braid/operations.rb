@@ -157,6 +157,7 @@ module Braid
           message_file = Tempfile.new("braid_commit")
           message_file.print("Braid: #{message}")
           message_file.flush
+          message_file.close
           cmd << " -F #{message_file.path}"
         end
         cmd << " #{args.join(' ')}" unless args.empty?

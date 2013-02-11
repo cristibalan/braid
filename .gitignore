@@ -10,3 +10,6 @@ nbproject
 pkg
 pkg/*
 rdoc
+/*.iml
+/*.ipr
+/*.iws

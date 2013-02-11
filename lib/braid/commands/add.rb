@@ -9,7 +9,7 @@ module Braid
 
           branch_message   = (mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
           revision_message = options["revision"] ? " at #{display_revision(mirror, options["revision"])}" : ""
-          msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
+          msg "Adding mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
 
           # these commands are explained in the subtree merge guide
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html

@@ -42,7 +42,10 @@ require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'
 require 'braid/command'
-
-Dir[dirname + '/braid/commands/*'].each do |file|
-  require file
-end
+require 'braid/commands/add'
+require 'braid/commands/diff'
+require 'braid/commands/list'
+require 'braid/commands/push'
+require 'braid/commands/remove'
+require 'braid/commands/setup'
+require 'braid/commands/update'

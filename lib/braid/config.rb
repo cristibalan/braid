@@ -73,9 +73,7 @@ module Braid
 
     def valid?
       @db.transaction(true) do
-        !@db.roots.any? do |path|
-          @db[path]["url"].nil?
-        end
+        !@db.roots.any? {|path| @db[path]["url"].nil?}
       end
     end
 

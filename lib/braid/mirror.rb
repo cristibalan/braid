@@ -1,16 +1,10 @@
 module Braid
   class Mirror
-    TYPES      = %w(git svn)
     ATTRIBUTES = %w(url remote type branch squashed revision lock)
 
     class UnknownType < BraidError
       def message
         "unknown type: #{super}"
-      end
-    end
-    class CannotGuessType < BraidError
-      def message
-        "cannot guess type: #{super}"
       end
     end
     class PathRequired < BraidError
@@ -33,12 +27,6 @@ module Braid
 
       branch = options["branch"] || "master"
 
-      if type = options["type"] || extract_type_from_url(url)
-        raise UnknownType, type unless TYPES.include?(type)
-      else
-        raise CannotGuessType, url
-      end
-
       unless path = options["path"] || extract_path_from_url(url)
         raise PathRequired
       end
@@ -47,21 +35,15 @@ module Braid
         path = "vendor/plugins/#{path}"
       end
 
-      remote   = "#{branch}/braid/#{path}".gsub("_", '-') # stupid git svn changes all _ to ., weird
+      remote   = "#{branch}/braid/#{path}"
       squashed = !options["full"]
-      branch = nil if type == "svn"
 
-      attributes = {"url" => url, "remote" => remote, "type" => type, "branch" => branch, "squashed" => squashed}
+      attributes = {"url" => url, "remote" => remote, "branch" => branch, "squashed" => squashed}
       self.new(path, attributes)
     end
 
     def ==(comparison)
       path == comparison.path && attributes == comparison.attributes
-    end
-
-    def type
-      # override Object#type
-      attributes["type"]
     end
 
     def locked?
@@ -90,12 +72,8 @@ module Braid
     end
 
     def fetch
-      unless type == "svn"
-        git_cache.fetch(url) if cached?
-        git.fetch(remote)
-      else
-        git_svn.fetch(remote)
-      end
+      git_cache.fetch(url) if cached?
+      git.fetch(remote)
     end
 
     def cached?
@@ -104,11 +82,7 @@ module Braid
 
     def base_revision
       if revision
-        unless type == "svn"
-          git.rev_parse(revision)
-        else
-          git_svn.commit_hash(remote, revision)
-        end
+        git.rev_parse(revision)
       else
         inferred_revision
       end
@@ -154,18 +128,6 @@ module Braid
         end
       end
       hash
-    end
-
-    def self.extract_type_from_url(url)
-      return nil unless url
-      url.sub!(/\/$/, '')
-
-      # check for git:// and svn:// URLs
-      url_scheme = url.split(":").first
-      return url_scheme if TYPES.include?(url_scheme)
-
-      return "svn" if url[-6..-1] == "/trunk"
-      return "git" if url[-4..-1] == ".git"
     end
 
     def self.extract_path_from_url(url)

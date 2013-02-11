@@ -6,35 +6,6 @@ describe "Braid::Mirror.new_from_options" do
     @mirror.branch.should == "master"
   end
 
-  it "should default type to git, from protocol" do
-    new_from_options("git://path")
-    @mirror.type.should == "git"
-  end
-
-  it "should default type to git, if path ends in .git" do
-    new_from_options("http://path.git")
-    @mirror.type.should == "git"
-  end
-
-  it "should default type to svn, from protocol" do
-    new_from_options("svn://path")
-    @mirror.type.should == "svn"
-  end
-
-  it "should default type to svn, if path ends in /trunk" do
-    new_from_options("http://path/trunk")
-    @mirror.type.should == "svn"
-  end
-
-  it "should raise if no type can be guessed" do
-    lambda { new_from_options("http://path") }.should.raise(Braid::Mirror::CannotGuessType)
-  end
-
-  it "should default mirror to previous to last path part, if last path part is /trunk" do
-    new_from_options("http://path/trunk")
-    @mirror.path.should == "path"
-  end
-
   it "should default mirror to last path part, ignoring trailing .git" do
     new_from_options("http://path.git")
     @mirror.path.should == "path"

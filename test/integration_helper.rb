@@ -49,22 +49,3 @@ def create_git_repo_from_fixture(fixture_name)
 
   git_repo
 end
-
-def create_svn_repo_from_fixture(fixture_name)
-  svn_wc   = File.join(TMP_PATH, fixture_name + "_wc")
-  svn_repo = File.join(TMP_PATH, fixture_name)
-  run_cmds(<<-EOD)
-    svnadmin create #{svn_repo}
-    svn co file://#{svn_repo} #{svn_wc}
-  EOD
-  update_dir_from_fixture(fixture_name + "_wc", fixture_name)
-  in_dir(svn_wc) do
-    run_cmds(<<-EOD)
-      svn add *
-      svn commit -m "initial commit of #{fixture_name}"
-    EOD
-  end
-  "file://#{svn_repo}"
-end
-
-

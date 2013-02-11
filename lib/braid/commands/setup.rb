@@ -28,12 +28,8 @@ module Braid
         end
 
         msg "Setup: Creating remote for '#{mirror.path}'."
-        unless mirror.type == "svn"
-          url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
-          git.remote_add(mirror.remote, url, mirror.branch)
-        else
-          git_svn.init(mirror.remote, mirror.url)
-        end
+        url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
+        git.remote_add(mirror.remote, url, mirror.branch)
       end
     end
   end

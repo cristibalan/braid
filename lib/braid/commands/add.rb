@@ -7,7 +7,7 @@ module Braid
         with_reset_on_error do
           mirror           = config.add_from_options(url, options)
 
-          branch_message   = (mirror.type == "svn" || mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
+          branch_message   = (mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
           revision_message = options["revision"] ? " at #{display_revision(mirror, options["revision"])}" : ""
           msg "Adding #{mirror.type} mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
 

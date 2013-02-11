@@ -1,12 +1,12 @@
 # Braid
 
-Braid is a simple tool to help track git and svn vendor branches in a git repository.
+Braid is a simple tool to help track git vendor branches in a git repository.
 
 The project homepage is [here](http://github.com/evilchelu/braid/wikis/home).
 
 ## Requirements
 
- * git 1.6+ (and git-svn if you want to mirror svn repositories)
+ * git 1.6+
  * main >= 4.2.0
  * open4 >= 1.0.1 (unless using jruby)
 

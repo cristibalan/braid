@@ -41,7 +41,7 @@ module Braid
       end
     end
 
-    # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
+    # The command proxy is meant to encapsulate commands such as git, that work with subcommands.
     class Proxy
       include Singleton
 
@@ -207,14 +207,10 @@ module Braid
         true
       end
 
-      # Checks git and svn remotes.
+      # Checks git remotes.
       def remote_url(remote)
         key = "remote.#{remote}.url"
-        begin
-          invoke(:config, key)
-        rescue ShellExecutionError
-          invoke(:config, "svn-#{key}")
-        end
+        invoke(:config, key)
       rescue ShellExecutionError
         nil
       end
@@ -320,52 +316,6 @@ module Braid
       end
     end
 
-    class GitSvn < Proxy
-      def self.command;
-        "git svn";
-      end
-
-      def commit_hash(remote, revision)
-        out  = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
-        part = out.to_s.split("|")[1]
-        part.strip!
-        raise UnknownRevision, "r#{revision}" unless part
-        git.rev_parse(part)
-      end
-
-      def fetch(remote)
-        sh("git svn fetch #{remote} 2>&1 >/dev/null")
-      end
-
-      def init(remote, path)
-        invoke(:init, "-R", remote, "--id=#{remote}", path)
-        true
-      end
-
-      private
-
-      def command(name)
-        "#{self.class.command} #{name}"
-      end
-
-      def git
-        Git.instance
-      end
-    end
-
-    class Svn < Proxy
-      def clean_revision(revision)
-        revision.to_i if revision
-      end
-
-      def head_revision(path)
-        # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
-        # git svn has no clue on how to get the actual HEAD revision number on it's own
-        status, out, err = exec!("svn log -q --limit 1 #{path}")
-        out.split(/\n/).find { |x| x.match /^r\d+/ }.split(" | ")[0][1..-1].to_i
-      end
-    end
-
     class GitCache
       include Singleton
 
@@ -405,14 +355,6 @@ module Braid
     module VersionControl
       def git
         Git.instance
-      end
-
-      def git_svn
-        GitSvn.instance
-      end
-
-      def svn
-        Svn.instance
       end
 
       def git_cache

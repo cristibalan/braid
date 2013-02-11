@@ -12,7 +12,7 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # main kicks ass!
 Main {
   description <<-TXT
-    braid is a simple tool to help track git or svn repositories inside a git repository.
+    braid is a simple tool to help track git repositories inside a git repository.
 
     Run 'braid commandname help' for more details.
 
@@ -25,15 +25,8 @@ Main {
       Add a new mirror to be tracked.
 
         * adds metadata about the mirror to .braids
-        * adds the git or git svn remotes to .git/config
+        * adds the git remotes to .git/config
         * fetches and merges remote code into given directory
-
-      --type defaults:
-
-        * svn://path          # => svn
-        * git://path          # => git
-        * http://path/trunk   # => svn
-        * http://path.git     # => git
 
       Name defaults:
 
@@ -43,12 +36,8 @@ Main {
     TXT
 
     examples <<-TXT
-      . braid add svn://remote/path
-      . braid add svn://remote/path local/dir
-      . braid add git://remote/path local/dir
       . braid add http://remote/path.git local/dir
-      . braid add http://remote/path --type git local/dir
-      . braid add svn://remote/path --branch notmaster
+      . braid add http://remote/path local/dir
     TXT
 
     mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full, :option_verbose
@@ -134,7 +123,7 @@ Main {
 
   mode(:setup) {
     description <<-TXT
-      Set up git and git-svn remotes.
+      Set up git remotes.
     TXT
 
     mixin :optional_path, :option_verbose, :option_force

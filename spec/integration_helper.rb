@@ -18,11 +18,10 @@ def in_dir(dir = TMP_PATH)
   yield
 end
 
-def run_cmds(ary)
-  ary.each do |cmd|
-    cmd = cmd.strip!
-    out = `#{cmd}`
-  end
+def run_command(command)
+  output = `#{command}`
+  raise "Error executing command: #{command}\nOutput: #{output}" unless $?.success?
+  output
 end
 
 def update_dir_from_fixture(dir, fixture = dir)
@@ -36,11 +35,9 @@ def create_git_repo_from_fixture(fixture_name)
   update_dir_from_fixture(fixture_name)
 
   in_dir(git_repo) do
-    run_cmds(<<-EOD)
-      git init
-      git add *
-      git commit -m "initial commit of #{fixture_name}"
-    EOD
+    run_command('git init')
+    run_command('git add *')
+    run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end
 
   git_repo

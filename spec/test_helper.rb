@@ -13,3 +13,7 @@ def build_mirror(options = {})
 end
 
 include Braid::Operations::VersionControl
+
+RSpec.configure do |config|
+  config.mock_with :mocha
+end

@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/test_helper'
 describe "Braid::Operations::Git#remote_url" do
   it "should use git config" do
     # FIXME weak test
-    git.expects(:invoke).with(:config, 'remote.braid/git/one.url').returns("git://path")
+    git.stubs(:invoke).with(:config, 'remote.braid/git/one.url').returns("git://path")
     git.remote_url("braid/git/one").should == "git://path"
   end
 end

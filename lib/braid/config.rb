@@ -71,7 +71,11 @@ module Braid
     private
     def write_mirror(mirror)
       @db[mirror.path] = clean_attributes(mirror.attributes)
-      File.open(@config_file, "wb") { |f| f.write JSON.pretty_generate(@db) }
+      new_db = {}
+      @db.keys.sort.each do |key|
+        new_db[key] = @db[key]
+      end
+      File.open(@config_file, "wb") { |f| f.write JSON.pretty_generate(new_db) }
     end
 
     def clean_attributes(hash)

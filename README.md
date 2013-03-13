@@ -14,11 +14,11 @@ The project homepage is [here](http://github.com/realityforge/braid/wikis/home).
 
 ## Installing using rubygems - official releases
 
-    gem install braid
+    gem install realityforge-braid
 
 ## Installing from source
 
-    git clone git://github.com/evilchelu/braid.git
+    git clone git://github.com/realityforge/braid.git
     cd braid
     bundle install
     rake install # possibly requiring sudo
@@ -86,19 +86,11 @@ Use the built in help system to find out about all commands and options:
     braid help
     braid help add # or braid add --help
 
-You may also want to read [Usage and examples](http://github.com/evilchelu/braid/wikis/usage-and-examples).
+You may also want to read [Usage and examples](http://github.com/realityforge/braid/wikis/usage-and-examples).
 
 ## Troubleshooting
 
-Check [Troubleshooting](http://github.com/evilchelu/braid/wikis/troubleshooting) if you're having issues.
-
-## Contributing
-
-We appreciate any patches, error reports and usage ideas you may have. Please submit a lighthouse ticket or start a thread on the mailing list.
-
-Bugs and feature requests: [braid project on lighthouse](http://evilchelu.lighthouseapp.com/projects/10600-braid)
-
-Discussions and community support: [braid-gem google group](http://groups.google.com/group/braid-gem)
+Check [Troubleshooting](http://github.com/realityforge/braid/wikis/troubleshooting) if you're having issues.
 
 ## Authors
 

@@ -31,7 +31,7 @@ module Braid
     end
 
     def config
-      @config ||= load_and_migrate_config
+      @config ||= Config.new
     end
 
     def verbose?
@@ -70,17 +70,6 @@ module Braid
         git.reset_hard(work_head)
         raise error
       end
-    end
-
-    def load_and_migrate_config
-      config = Config.new
-      unless config.valid?
-        msg "Configuration is outdated. Migrating."
-        bail_on_local_changes!
-        config.migrate!
-        git.commit("Upgrade .braids", "-- .braids")
-      end
-      config
     end
 
     def add_config_file

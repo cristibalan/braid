@@ -41,7 +41,7 @@ module Braid
         mirror.fetch
 
         new_revision    = validate_new_revision(mirror, options["revision"])
-        target_revision = determine_target_revision(mirror, new_revision)
+        target_revision = determine_target_revision(new_revision)
 
         if mirror.merged?(target_revision)
           msg "Mirror '#{mirror.path}' is already up to date."

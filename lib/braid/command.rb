@@ -94,7 +94,7 @@ module Braid
       new_revision
     end
 
-    def determine_target_revision(mirror, new_revision)
+    def determine_target_revision(new_revision)
       git.rev_parse(new_revision)
     end
   end

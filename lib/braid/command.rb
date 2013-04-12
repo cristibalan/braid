@@ -61,6 +61,8 @@ module Braid
     end
 
     def with_reset_on_error
+      bail_on_local_changes!
+
       work_head = git.head
 
       begin

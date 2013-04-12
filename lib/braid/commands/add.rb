@@ -2,8 +2,6 @@ module Braid
   module Commands
     class Add < Command
       def run(url, options = {})
-        bail_on_local_changes!
-
         with_reset_on_error do
           mirror           = config.add_from_options(url, options)
 

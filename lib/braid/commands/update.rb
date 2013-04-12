@@ -2,8 +2,6 @@ module Braid
   module Commands
     class Update < Command
       def run(path, options = {})
-        bail_on_local_changes!
-
         with_reset_on_error do
           path ? update_one(path, options) : update_all(options)
         end

@@ -4,8 +4,6 @@ module Braid
       def run(path, options = {})
         mirror = config.get!(path)
 
-        bail_on_local_changes!
-
         with_reset_on_error do
           msg "Removing mirror from '#{mirror.path}'."
 

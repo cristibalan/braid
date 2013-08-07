@@ -1,5 +1,7 @@
 # Braid
 
+[![endorse](https://api.coderwall.com/ttilley/endorsecount.png)](https://coderwall.com/ttilley)
+
 Braid is a simple tool to help track git and svn vendor branches in a git repository.
 
 The project homepage is [here](http://github.com/evilchelu/braid/wikis/home).

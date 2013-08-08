@@ -60,6 +60,7 @@ module Braid
 
     def remove(mirror)
       @db.delete(mirror.path)
+      write_db
     end
 
     def update(mirror)

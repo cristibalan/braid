@@ -80,7 +80,10 @@ module Braid
       @db.keys.sort.each do |key|
         new_db[key] = @db[key]
       end
-      File.open(@config_file, "wb") { |f| f.write JSON.pretty_generate(new_db) }
+      File.open(@config_file, "wb") do |f|
+        f.write JSON.pretty_generate(new_db)
+        f.write "\n"
+      end
     end
 
     def clean_attributes(hash)

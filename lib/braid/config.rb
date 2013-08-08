@@ -71,6 +71,10 @@ module Braid
     private
     def write_mirror(mirror)
       @db[mirror.path] = clean_attributes(mirror.attributes)
+      write_db
+    end
+
+    def write_db
       new_db = {}
       @db.keys.sort.each do |key|
         new_db[key] = @db[key]

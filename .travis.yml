@@ -1,16 +1,4 @@
 language: ruby
 rvm:
   - 1.9.3
-  - jruby-18mode
   - jruby-19mode
-  - jruby-head
-jdk:
-  - openjdk6
-  - openjdk7
-  - oraclejdk7
-matrix:
-  exclude:
-    - rvm: 1.9.3
-      jdk: openjdk7
-    - rvm: 1.9.2
-      jdk: oraclejdk7

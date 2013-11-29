@@ -4,7 +4,7 @@
 
 Braid is a simple tool to help track git and svn vendor branches in a git repository.
 
-The project homepage is [here](http://github.com/evilchelu/braid/wikis/home).
+The project homepage is [here](http://github.com/cristibalan/braid/wikis/home).
 
 ## Requirements
 
@@ -18,7 +18,7 @@ The project homepage is [here](http://github.com/evilchelu/braid/wikis/home).
 
 ## Installing from source
 
-    git clone git://github.com/evilchelu/braid.git
+    git clone git://github.com/cristibalan/braid.git
     cd braid
     bundle install
     rake install # possibly requiring sudo
@@ -86,11 +86,11 @@ Use the built in help system to find out about all commands and options:
     braid help
     braid help add # or braid add --help
 
-You may also want to read [Usage and examples](http://github.com/evilchelu/braid/wikis/usage-and-examples).
+You may also want to read [Usage and examples](http://github.com/cristibalan/braid/wikis/usage-and-examples).
 
 ## Troubleshooting
 
-Check [Troubleshooting](http://github.com/evilchelu/braid/wikis/troubleshooting) if you're having issues.
+Check [Troubleshooting](http://github.com/cristibalan/braid/wikis/troubleshooting) if you're having issues.
 
 ## Contributing
 
@@ -102,7 +102,7 @@ Discussions and community support: [braid-gem google group](http://groups.google
 
 ## Authors
 
- * Cristi Balan (evilchelu)
+ * Cristi Balan (cristibalan)
  * Norbert Crombach (norbert)
 
 ## Contributors (alphabetically)

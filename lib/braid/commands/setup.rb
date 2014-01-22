@@ -6,7 +6,7 @@ module Braid
       end
 
       protected
-      
+
       def setup_all
         msg "Setting up all mirrors."
         config.mirrors.each do |path|
@@ -34,3 +34,4 @@ module Braid
     end
   end
 end
+

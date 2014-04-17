@@ -79,6 +79,9 @@ module Braid
       new_db = {}
       @db.keys.sort.each do |key|
         new_db[key] = @db[key]
+        new_db[key].keys.each do |k|
+          new_db[key].delete(k) if !Braid::Mirror::ATTRIBUTES.include?(k)
+        end
       end
       File.open(@config_file, "wb") do |f|
         f.write JSON.pretty_generate(new_db)

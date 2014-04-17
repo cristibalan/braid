@@ -78,7 +78,7 @@ Main {
 
         * removes metadata from .braids
         * removes the local directory and commits the removal
-        * removes the git remote by default, --keep can be used to supress that
+        * removes the git remote by default, --keep can be used to suppress that
     TXT
 
     examples <<-TXT

@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url remote type branch squashed revision lock)
+    ATTRIBUTES = %w(url remote branch squashed revision lock)
 
     class UnknownType < BraidError
       def message

@@ -5,8 +5,8 @@ module Braid
         with_reset_on_error do
           mirror           = config.add_from_options(url, options)
 
-          branch_message   = (mirror.branch == "master") ? "" : " branch '#{mirror.branch}'"
-          revision_message = options["revision"] ? " at #{display_revision(mirror, options["revision"])}" : ""
+          branch_message   = (mirror.branch == 'master') ? '' : " branch '#{mirror.branch}'"
+          revision_message = options['revision'] ? " at #{display_revision(mirror, options['revision'])}" : ''
           msg "Adding mirror of '#{mirror.url}'#{branch_message}#{revision_message}."
 
           # these commands are explained in the subtree merge guide
@@ -15,7 +15,7 @@ module Braid
           setup_remote(mirror)
           mirror.fetch
 
-          new_revision    = validate_new_revision(mirror, options["revision"])
+          new_revision    = validate_new_revision(mirror, options['revision'])
           target_revision = determine_target_revision(new_revision)
 
           unless mirror.squashed?
@@ -24,7 +24,7 @@ module Braid
           git.read_tree_prefix(target_revision, mirror.path)
 
           mirror.revision = new_revision
-          mirror.lock = new_revision if options["revision"]
+          mirror.lock = new_revision if options['revision']
           config.update(mirror)
           add_config_file
 

@@ -15,13 +15,13 @@ module Braid
         config.mirrors.each do |path|
           mirror = config.get!(path)
           print "#{path.to_s}"
-          print " [LOCKED]" if mirror.locked?
+          print ' [LOCKED]' if mirror.locked?
           setup_remote(mirror)
           msg "Fetching new commits for '#{mirror.path}'." if verbose?
           mirror.fetch
           new_revision    = validate_new_revision(mirror, options["revision"])
-          print " (Remote Modified)" if new_revision.to_s != mirror.base_revision.to_s
-          print " (Locally Modified)" unless mirror.diff.empty?
+          print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
+          print ' (Locally Modified)' unless mirror.diff.empty?
           print "\n"
         end
         print "\n"

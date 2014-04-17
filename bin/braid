@@ -173,15 +173,6 @@ Main {
     }
   }
 
-  mixin(:option_type) {
-    option(:type, :t) {
-      optional
-      argument :required
-      desc 'mirror type'
-      attr
-    }
-  }
-
   mixin(:option_branch) {
     option(:branch, :b) {
       optional

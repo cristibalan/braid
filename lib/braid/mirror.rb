@@ -31,10 +31,6 @@ module Braid
         raise PathRequired
       end
 
-      if options["rails_plugin"]
-        path = "vendor/plugins/#{path}"
-      end
-
       remote   = "#{branch}/braid/#{path}"
       squashed = !options["full"]
 

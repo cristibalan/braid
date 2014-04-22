@@ -103,6 +103,7 @@ module Braid
         ENV['LANG']   = 'C'
 
         out, err = nil
+        status, pid = 0
         log(cmd)
 
         if defined?(JRUBY_VERSION)

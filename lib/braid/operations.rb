@@ -284,7 +284,8 @@ module Braid
       end
 
       def apply(diff, *args)
-        err = nil
+        status, err = nil, nil
+
         command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
 
         if defined?(JRUBY_VERSION)

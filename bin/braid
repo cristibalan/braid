@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + '/../lib'))
 require 'braid'
 
 require 'rubygems'
@@ -44,7 +44,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {"path" => path, "branch" => branch, "revision" => revision, "full" => full})
+      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'full' => full})
     }
   }
 
@@ -68,7 +68,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:update, path, {"revision" => revision, "head" => head})
+      Braid::Command.run(:update, path, {'revision' => revision, 'head' => head})
     }
   }
 

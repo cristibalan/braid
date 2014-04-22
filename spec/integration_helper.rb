@@ -11,7 +11,8 @@ BRAID_PATH   = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, "spec", "fixtures")
 FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)
-BRAID_BIN = File.join(BRAID_PATH, "bin", "braid")
+
+BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
 
 def in_dir(dir = TMP_PATH)
   Dir.chdir(dir)

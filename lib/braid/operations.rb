@@ -1,5 +1,10 @@
 require 'singleton'
 require 'rubygems'
+if defined?(JRUBY_VERSION) || Gem.win_platform?
+  require'open3'
+else
+  require 'open4'
+end
 require defined?(JRUBY_VERSION) ? 'open3' : 'open4'
 require 'tempfile'
 
@@ -106,12 +111,12 @@ module Braid
         status, pid = 0
         log(cmd)
 
-        if defined?(JRUBY_VERSION)
-          Open3.popen3(cmd) do |stdin, stdout, stderr|
+        if defined?(JRUBY_VERSION) || Gem.win_platform?
+          Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
             out = stdout.read
             err = stderr.read
+            status = wait_thr.value # Process::Status object returned.
           end
-          status = $?.exitstatus
         else
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
@@ -289,13 +294,13 @@ module Braid
 
         command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
 
-        if defined?(JRUBY_VERSION)
-          Open3.popen3(command) do |stdin, stdout, stderr|
+        if defined?(JRUBY_VERSION) || Gem.win_platform?
+          Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
             stdin.puts(diff)
             stdin.close
             err = stderr.read
+            status = wait_thr.value # Process::Status object returned.
           end
-          status = $?.exitstatus
         else
           status = Open4.popen4(command) do |pid, stdin, stdout, stderr|
             stdin.puts(diff)

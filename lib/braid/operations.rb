@@ -176,7 +176,7 @@ module Braid
       def fetch(remote = nil, *args)
         args.unshift "-n #{remote}" if remote
         # open4 messes with the pipes of index-pack
-        sh("git fetch #{args.join(' ')} 2>&1 >/dev/null")
+        sh("git fetch #{args.join(' ')} 2>&1 > #{Gem.win_platform? ? 'nul' : '/dev/null'}")
       end
 
       def checkout(treeish)

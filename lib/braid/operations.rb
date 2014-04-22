@@ -285,16 +285,17 @@ module Braid
 
       def apply(diff, *args)
         err = nil
+        command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
 
         if defined?(JRUBY_VERSION)
-          Open3.popen3("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |stdin, stdout, stderr|
+          Open3.popen3(command) do |stdin, stdout, stderr|
             stdin.puts(diff)
             stdin.close
             err = stderr.read
           end
           status = $?.exitstatus
         else
-          status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
+          status = Open4.popen4(command) do |pid, stdin, stdout, stderr|
             stdin.puts(diff)
             stdin.close
             err = stderr.read

@@ -9,7 +9,7 @@ module Braid
     end
     class PathRequired < BraidError
       def message
-        "path is required"
+        'path is required'
       end
     end
 
@@ -25,16 +25,16 @@ module Braid
     def self.new_from_options(url, options = {})
       url    = url.sub(/\/$/, '')
 
-      branch = options["branch"] || "master"
+      branch = options['branch'] || 'master'
 
-      unless path = options["path"] || extract_path_from_url(url)
+      unless path = options['path'] || extract_path_from_url(url)
         raise PathRequired
       end
 
       remote   = "#{branch}/braid/#{path}"
-      squashed = !options["full"]
+      squashed = !options['full']
 
-      attributes = {"url" => url, "remote" => remote, "branch" => branch, "squashed" => squashed}
+      attributes = {'url' => url, 'remote' => remote, 'branch' => branch, 'squashed' => squashed}
       self.new(path, attributes)
     end
 
@@ -57,14 +57,14 @@ module Braid
       if squashed?
         !!base_revision && git.merge_base(commit, base_revision) == commit
       else
-        git.merge_base(commit, "HEAD") == commit
+        git.merge_base(commit, 'HEAD') == commit
       end
     end
 
     def diff
       remote_hash = git.rev_parse("#{base_revision}:")
       local_hash  = git.tree_hash(path)
-      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ""
+      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ''
     end
 
     def fetch
@@ -89,10 +89,10 @@ module Braid
     end
 
     def remote
-      if (attributes["remote"] && attributes["remote"] =~ /^braid\//)
-        attributes["remote"] = "#{branch}/#{attributes["remote"]}"
+      if (attributes['remote'] && attributes['remote'] =~ /^braid\//)
+        attributes['remote'] = "#{branch}/#{attributes['remote']}"
       else
-        attributes["remote"]
+        attributes['remote']
       end
     end
 
@@ -111,8 +111,8 @@ module Braid
     end
 
     def inferred_revision
-      local_commits = git.rev_list("HEAD", "-- #{path}").split("\n")
-      remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split("commit ").map do |chunk|
+      local_commits = git.rev_list('HEAD', "-- #{path}").split("\n")
+      remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split('commit ').map do |chunk|
         chunk.split("\n", 2).map { |value| value.strip }
       end
       hash          = nil
@@ -130,7 +130,7 @@ module Braid
       return nil unless url
       name = File.basename(url)
 
-      if File.extname(name) == ".git"
+      if File.extname(name) == '.git'
         # strip .git
         name[0..-5]
       elsif name == "trunk"

@@ -14,7 +14,7 @@ end
 
 describe "Braid::Mirror#diff" do
   before(:each) do
-    @mirror = build_mirror("revision" => 'a' * 40)
+    @mirror = build_mirror('revision' => 'a' * 40, 'url' => 'git://path')
     @mirror.stubs(:base_revision).returns(@mirror.revision) # bypass rev_parse
   end
 
@@ -25,6 +25,7 @@ describe "Braid::Mirror#diff" do
 
   it "should return an empty string when the hashes match" do
     set_hashes('b' * 40, 'b' * 40)
+    git.expects(:fetch)
     git.expects(:diff_tree).never
     @mirror.diff.should == ""
   end
@@ -32,6 +33,7 @@ describe "Braid::Mirror#diff" do
   it "should generate a diff when the hashes do not match" do
     set_hashes('b' * 40, 'c' * 40)
     diff = "diff --git a/path b/path\n"
+    git.expects(:fetch)
     git.expects(:diff_tree).with('b' * 40, 'c' * 40).returns(diff)
     @mirror.diff.should == diff
   end

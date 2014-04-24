@@ -133,9 +133,6 @@ module Braid
       if File.extname(name) == '.git'
         # strip .git
         name[0..-5]
-      elsif name == "trunk"
-        # use parent
-        File.basename(File.dirname(url))
       else
         name
       end

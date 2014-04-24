@@ -5,7 +5,7 @@ module Braid
   REQUIRED_GIT_VERSION = '1.6'
 
   def self.verbose
-    @verbose || false
+    !!@verbose
   end
 
   def self.verbose=(new_value)
@@ -13,7 +13,7 @@ module Braid
   end
 
   def self.force
-    @force || false
+    !!@force
   end
 
   def self.force=(new_value)

@@ -108,12 +108,17 @@ module Braid
         status, pid = 0
         log(cmd)
 
-        if defined?(JRUBY_VERSION) || Gem.win_platform?
-          Open3.popen3(cmd) do |stdin, stdout, stderr|
+        if USE_OPEN3
+          status = nil
+          Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
+            stdin.close
             out = stdout.read
             err = stderr.read
+            # Under earlier jrubies this is not correctly passed so add in check
+            status = wait_thread.value if wait_thread # Process::Status object returned.
           end
-          status = $?.exitstatus
+          # Handle earlier jrubies such as 1.6.7.2
+          status = $?.exitstatus if status.nil?
         else
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
@@ -291,13 +296,16 @@ module Braid
 
         command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
 
-        if defined?(JRUBY_VERSION) || Gem.win_platform?
-          Open3.popen3(command) do |stdin, stdout, stderr|
+        if USE_OPEN3
+          Open3.popen3(command) do |stdin, stdout, stderr, wait_thread|
             stdin.puts(diff)
             stdin.close
             err = stderr.read
+            # Under earlier jrubies this is not correctly passed so add in check
+            status = wait_thread.value if wait_thread # Process::Status object returned.
           end
-          status = $?.exitstatus
+          # Handle earlier jrubies such as 1.6.7.2
+          status = $?.exitstatus if status.nil?
         else
           status = Open4.popen4(command) do |pid, stdin, stdout, stderr|
             stdin.puts(diff)

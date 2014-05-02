@@ -251,6 +251,10 @@ module Braid
         raise MergeError
       end
 
+      def read_ls_files(prefix)
+        invoke('ls-files', prefix)
+      end
+
       def read_tree_prefix(treeish, prefix)
         invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
         true

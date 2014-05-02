@@ -19,7 +19,7 @@ module Braid
           setup_remote(mirror)
           msg "Fetching new commits for '#{mirror.path}'." if verbose?
           mirror.fetch
-          new_revision    = validate_new_revision(mirror, options["revision"])
+          new_revision    = validate_new_revision(mirror, options['revision'])
           print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
           print ' (Locally Modified)' unless mirror.diff.empty?
           print "\n"

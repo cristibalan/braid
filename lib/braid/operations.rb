@@ -111,7 +111,8 @@ module Braid
         if USE_OPEN3
           status = nil
           Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
-            stdin.close
+            # Under old jrubies this may sometimes throw an exception
+            stdin.close rescue nil
             out = stdout.read
             err = stderr.read
             # Under earlier jrubies this is not correctly passed so add in check

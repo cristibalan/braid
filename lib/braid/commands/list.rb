@@ -24,7 +24,7 @@ module Braid
           local_file_count = git.read_ls_files(mirror.path).split.size
           if 0 == local_file_count
             print ' (Removed Locally)'
-          elsif mirror.diff.empty?
+          elsif !mirror.diff.empty?
             print ' (Locally Modified)'
           end
           print "\n"

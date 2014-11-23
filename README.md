@@ -6,6 +6,32 @@ Braid is a simple tool to help track git vendor branches in a git repository.
 
 The project homepage is [here](http://github.com/realityforge/braid/wikis/home).
 
+## Braid on Vendoring
+
+Vendoring allows you take the source code of an external library and ensure it is version
+controlled along with the main project. This is in contrast to including a reference to a
+packaged version of an external library that is available in a binary artifact repository
+such as Maven Central, RubyGems or NPM.
+
+Vendoring is useful when you need to patch or customize the external libraries or the
+external library is expected to co-evolve with the main project. The developer can make
+changes to the main project and patch the library in a single commit.
+
+The problem arises when the external library makes changes that you want to integrate into
+your local vendored version or the developer makes changes to the local version that they
+want integrated into the external library.
+
+A typical "implementation" of vendoring is to simply download or checkout the source for the
+external library, remove the .git or .svn directories and commit it to the main source tree.
+However this approach makes it very difficult to update the library. When you want to update
+the library do you re-apply your local changes onto a new copy of the vendored library or do
+you re-apply the changes from the external library to local version. In both cases this
+involves manual generation and application of patch files to manually checked out source trees.
+
+This is where braid comes into play. Braid makes it easy to vendor in remote git repositories
+and use an automated mechanism for updating the external library and generating patches to upgrade
+the external library.
+
 ## Requirements
 
  * git 1.6+

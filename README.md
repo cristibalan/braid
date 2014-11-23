@@ -92,10 +92,11 @@ You may also want to read [Usage and examples](http://github.com/realityforge/br
 
 Check [Troubleshooting](http://github.com/realityforge/braid/wikis/troubleshooting) if you're having issues.
 
-## Authors
+# Credit
 
- * Cristi Balan (evilchelu)
- * Norbert Crombach (norbert)
+This tool is a downstream evolution of a identically named tool initially developed by Cristi Balan (evilchelu)
+and Norbert Crombach (norbert). All credit goes to the original for the initial code and idea. Further maintenance
+and bugs are courtesy of Peter Donald.
 
 ## Contributors (alphabetically)
 

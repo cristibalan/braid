@@ -34,12 +34,12 @@ module Braid
     end
     class LocalChangesPresent < BraidError
       def message
-        "local changes are present"
+        'local changes are present'
       end
     end
     class MergeError < BraidError
       def message
-        "could not merge"
+        'could not merge'
       end
     end
 
@@ -54,12 +54,12 @@ module Braid
       # hax!
       def version
         status, out, err = exec!("#{self.class.command} --version")
-        out.sub(/^.* version/, "").strip
+        out.sub(/^.* version/, '').strip
       end
 
       def require_version(required)
-        required = required.split(".")
-        actual   = version.split(".")
+        required = required.split('.')
+        actual   = version.split('.')
 
         actual.each_with_index do |actual_piece, idx|
           required_piece = required[idx]
@@ -139,7 +139,7 @@ module Braid
       end
 
       def sh(cmd, message = nil)
-        message ||= "could not fetch" if cmd =~ /fetch/
+        message ||= 'could not fetch' if cmd =~ /fetch/
         log(cmd)
         `#{cmd}`
         raise ShellExecutionError, message unless $?.exitstatus == 0
@@ -161,7 +161,7 @@ module Braid
 
     class Git < Proxy
       def commit(message, *args)
-        cmd = "git commit --no-verify"
+        cmd = 'git commit --no-verify'
         if message # allow nil
           message_file = Tempfile.new("braid_commit")
           message_file.print("Braid: #{message}")
@@ -208,12 +208,12 @@ module Braid
 
       # Implies tracking.
       def remote_add(remote, path, branch)
-        invoke(:remote, "add", "-t #{branch} -m #{branch}", remote, path)
+        invoke(:remote, 'add', "-t #{branch} -m #{branch}", remote, path)
         true
       end
 
       def remote_rm(remote)
-        invoke(:remote, "rm", remote)
+        invoke(:remote, 'rm', remote)
         true
       end
 
@@ -226,20 +226,20 @@ module Braid
       end
 
       def reset_hard(target)
-        invoke(:reset, "--hard", target)
+        invoke(:reset, '--hard', target)
         true
       end
 
       # Implies no commit.
       def merge_ours(opt)
-        invoke(:merge, "-s ours --no-commit", opt)
+        invoke(:merge, '-s ours --no-commit', opt)
         true
       end
 
       # Implies no commit.
       def merge_subtree(opt)
         # TODO which options are needed?
-        invoke(:merge, "-s subtree --no-commit --no-ff", opt)
+        invoke(:merge, '-s subtree --no-commit --no-ff', opt)
         true
       rescue ShellExecutionError
         raise MergeError
@@ -262,12 +262,12 @@ module Braid
       end
 
       def rm_r(path)
-        invoke(:rm, "-r", path)
+        invoke(:rm, '-r', path)
         true
       end
 
-      def tree_hash(path, treeish = "HEAD")
-        out = invoke(:ls_tree, treeish, "-d", path)
+      def tree_hash(path, treeish = 'HEAD')
+        out = invoke(:ls_tree, treeish, '-d', path)
         out.split[2]
       end
 
@@ -279,7 +279,7 @@ module Braid
       end
 
       def status_clean?
-        status, out, err = exec("git status")
+        status, out, err = exec('git status')
         !out.split("\n").grep(/nothing to commit/).empty?
       end
 
@@ -288,7 +288,7 @@ module Braid
       end
 
       def head
-        rev_parse("HEAD")
+        rev_parse('HEAD')
       end
 
       def branch
@@ -352,12 +352,12 @@ module Braid
           end
         else
           FileUtils.mkdir_p(local_cache_dir)
-          git.clone("--mirror", url, dir)
+          git.clone('--mirror', url, dir)
         end
       end
 
       def path(url)
-        File.join(local_cache_dir, url.gsub(/[\/:@]/, "_"))
+        File.join(local_cache_dir, url.gsub(/[\/:@]/, '_'))
       end
 
       private

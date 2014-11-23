@@ -22,7 +22,7 @@ module Braid
           end
 
           git.commit("Remove mirror '#{mirror.path}'")
-          msg "Removed mirror." if verbose?
+          msg 'Removed mirror.' if verbose?
         end
       end
     end

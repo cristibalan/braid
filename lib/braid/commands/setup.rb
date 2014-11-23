@@ -8,7 +8,7 @@ module Braid
       protected
 
       def setup_all
-        msg "Setting up all mirrors."
+        msg 'Setting up all mirrors.'
         config.mirrors.each do |path|
           setup_one(path)
         end

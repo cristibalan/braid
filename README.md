@@ -44,12 +44,6 @@ code across projects.
 Please note that you *cannot change* between mirror types after the initial add. You'll have to
 remove the mirror and add it again.
 
-## Requirements
-
- * git 1.6+
- * main >= 4.2.0
- * open4 >= 1.0.1 (unless using jruby)
-
 ## Installing using rubygems - official releases
 
     gem install realityforge-braid

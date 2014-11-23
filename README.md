@@ -133,6 +133,7 @@ and bugs are courtesy of Peter Donald.
 * Ferdinand Svehla
 * Michael Klishin
 * Norbert Crombach (Original Author)
+* Peter Donald (Current Maintainer)
 * Roman Heinrich
 * Travis Tilley
 * Tyler Rick

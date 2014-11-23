@@ -63,10 +63,10 @@ remove the mirror and add it again.
 
 ## Quick usage - ruby project
 
-Let's assume we're writing something like gitnub that needs grit in lib/grit. Initialize the repo (nothing braid related here):
+Let's assume we're writing the project `myproject` that needs grit in lib/grit. Initialize the repo (nothing braid related here):
 
-    git init gritty
-    cd gritty
+    git init myproject
+    cd myproject
     touch README
     git add README
     git commit -m "initial commit"
@@ -92,11 +92,46 @@ Use the built in help system to find out about all commands and options:
     braid help
     braid help add # or braid add --help
 
-You may also want to read [Usage and examples](http://github.com/realityforge/braid/wikis/usage-and-examples).
+### Examples
 
-## Troubleshooting
+#### Adding a mirror
 
-Check [Troubleshooting](http://github.com/realityforge/braid/wikis/troubleshooting) if you're having issues.
+    braid add git://github.com/rails/rails.git vendor/rails
+
+#### Adding mirrors with revisions
+
+    braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails
+
+#### Adding mirrors with full history
+
+    braid add --full git://github.com/mislav/will_paginate.git vendor/plugins/will_paginate
+
+#### Updating mirrors
+
+    # Update a specific mirror
+    braid update vendor/plugins/cache_fu
+    # Update all mirrors
+    braid update
+
+#### Updating mirrors with conflicts
+
+If a braid update creates a conflict, braid will stop execution and leave the partially committed
+files in your working copy, just like a normal git merge conflict would.
+
+You will then have to resolve all conflicts and manually run `git commit`. The commit message is
+already prepared.
+
+If you want to cancel the braid update and the merge, you'll have to reset your working copy and
+index with `git reset --hard`.
+
+#### Locking and unlocking mirrors
+
+    braid update --revision 6c1c16b vendor/rails
+    braid update --head vendor/rails
+
+#### Showing local changes made to mirrors
+
+    braid diff vendor/rails
 
 # Credit
 

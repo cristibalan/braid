@@ -128,9 +128,11 @@ and bugs are courtesy of Peter Donald.
 
 * Alan Harper
 * Christoph Sturm
+* Cristi Balan (Original Author)
 * Dennis Muhlestein
 * Ferdinand Svehla
 * Michael Klishin
+* Norbert Crombach (Original Author)
 * Roman Heinrich
 * Travis Tilley
 * Tyler Rick

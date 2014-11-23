@@ -4,7 +4,7 @@
 
 Braid is a simple tool to help track git vendor branches in a git repository.
 
-The project homepage is [here](http://github.com/realityforge/braid/wikis/home).
+The project homepage is [here](http://realityforge.github.io/braid).
 
 ## Braid on Vendoring
 

@@ -69,38 +69,6 @@ If further down the line, you want to bring new changes from grit in your reposi
 
     braid update lib/grit
 
-## Quick usage - rails project
-
-Let's assume you want to start a new rails app called shiny. Initialize the repo (nothing braid related here):
-
-    git init shiny
-    cd shiny
-    touch README
-    git add README
-    git commit -m "initial commit"
-
-Vendor rails (this might take a while because the rails repo is huge!):
-
-    braid add git://github.com/rails/rails.git vendor/rails
-
-Create your new rails app (nothing braid related here):
-
-    ruby vendor/rails/railties/bin/rails .
-    git add .
-    git commit -m "rails ."
-
-Add any plugins you might need:
-
-    braid add git://github.com/thoughtbot/shoulda.git -p
-    braid add git://github.com/thoughtbot/factory_girl.git -p
-    braid add git://github.com/mbleigh/subdomain-fu.git -p
-
-And you're done! Braid vendored rails and your plugins. Feel free to inspect the changes with git log or git show.
-
-If further down the line, you want to bring new changes from rails in your repository, just update the mirror:
-
-    braid update vendor/rails
-
 Or, if you want all mirrors updated:
 
     braid update

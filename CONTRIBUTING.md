@@ -24,4 +24,3 @@ Pester us if we don't get your Pull Requests merged in a timely fashion. :)
 
 * [General GitHub documentation](http://help.github.com/)
 * [GitHub pull request documentation](http://help.github.com/send-pull-requests/)
-

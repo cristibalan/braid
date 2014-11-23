@@ -34,4 +34,3 @@ module Braid
     end
   end
 end
-

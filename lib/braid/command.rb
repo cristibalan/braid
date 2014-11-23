@@ -90,7 +90,7 @@ module Braid
       old_revision = mirror.revision
 
       if new_revision == old_revision
-        raise InvalidRevision, "mirror is already at requested revision"
+        raise InvalidRevision, 'mirror is already at requested revision'
       end
 
       new_revision

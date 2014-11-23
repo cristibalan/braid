@@ -32,6 +32,18 @@ This is where braid comes into play. Braid makes it easy to vendor in remote git
 and use an automated mechanism for updating the external library and generating patches to upgrade
 the external library.
 
+Braid creates a file `.braids` in the root of your repository that contains references to
+external libraries or mirrors. There are two types of mirrors in braid: squashed and full.
+Mirrors are *squashed by default*, which is what you'll generally want because they're faster
+and don't pollute your history with commits from the mirrors.
+
+Full mirrors are useful when you want to view imported history in your own project. You usually
+want this if the mirror is also a repository you have access to, for example, when using shared
+code across projects.
+
+Please note that you *cannot change* between mirror types after the initial add. You'll have to
+remove the mirror and add it again.
+
 ## Requirements
 
  * git 1.6+

@@ -71,13 +71,18 @@ Now let's vendor grit:
 
 And you're done! Braid vendored grit into lib/grit. Feel free to inspect the changes with git log or git show.
 
-If further down the line, you want to bring new changes from grit in your repository, just update the mirror:
+If further down the line, you want to bring new changes from grit into your repository, just update the mirror:
 
     braid update lib/grit
 
-Or, if you want all mirrors updated:
+If you make changes to the grit library and want to generate a patch file so that you can submit the patch file
+to the grit project:
 
-    braid update
+    braid diff lib/grit > grit.patch
+
+Once those changes have been applied to grit you probably want to update your local version of grit again.
+
+    braid update lib/grit
 
 ## More usage
 

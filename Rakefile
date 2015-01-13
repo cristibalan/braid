@@ -2,19 +2,11 @@ require 'bundler'
 Bundler::GemHelper.install_tasks
 
 require 'rake'
-require 'rake/testtask'
-
-task :default => :test
-
-def test_task(name, pattern)
-  Rake::TestTask.new(name) do |t|
-    ENV['TESTOPTS'] = '--runner=s'
-
-    t.libs << 'lib'
-    t.pattern = pattern
-    t.verbose = true
-  end
+require 'rspec/core/rake_task'
+desc 'Run all specs'
+RSpec::Core::RakeTask.new :spec  do |task|
+  task.rspec_opts = %w{--backtrace}
 end
 
-test_task(:test, "test/*_test.rb")
-namespace(:test) { test_task(:integration, "test/integration/*_test.rb") }
+desc "Test and package the gem"
+task :default => [:spec, :build]

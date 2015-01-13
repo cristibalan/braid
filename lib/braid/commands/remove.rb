@@ -4,8 +4,6 @@ module Braid
       def run(path, options = {})
         mirror = config.get!(path)
 
-        bail_on_local_changes!
-
         with_reset_on_error do
           msg "Removing mirror from '#{mirror.path}'."
 
@@ -24,7 +22,7 @@ module Braid
           end
 
           git.commit("Remove mirror '#{mirror.path}'")
-          msg "Removed mirror." if verbose?
+          msg 'Removed mirror.' if verbose?
         end
       end
     end

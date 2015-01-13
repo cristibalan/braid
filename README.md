@@ -1,117 +1,98 @@
 # Braid
 
-[![endorse](https://api.coderwall.com/ttilley/endorsecount.png)](https://coderwall.com/ttilley)
+Braid is a simple tool to help track vendor branches in a
+[Git](http://git-scm.com/) repository.
 
-Braid is a simple tool to help track git and svn vendor branches in a git repository.
+## Motivation
 
-The project homepage is [here](http://github.com/evilchelu/braid/wikis/home).
+Vendoring allows you take the source code of an external library and ensure it's
+version controlled along with the main project. This is in contrast to including
+a reference to a packaged version of an external library that is available in a
+binary artifact repository such as Maven Central, RubyGems or NPM.
 
-## Requirements
+Vendoring is useful when you need to patch or customize the external libraries
+or the external library is expected to co-evolve with the main project. The
+developer can make changes to the main project and patch the library in a single
+commit.
 
- * git 1.6+ (and git-svn if you want to mirror svn repositories)
- * main >= 4.2.0
- * open4 >= 1.0.1 (unless using jruby)
+The problem arises when the external library makes changes that you want to
+integrate into your local vendored version or the developer makes changes to the
+local version that they want integrated into the external library.
 
-## Installing using rubygems - official releases
+A typical "implementation" of vendoring is to simply download or checkout the
+source for the external library, remove the `.git` or `.svn` directories and
+commit it to the main source tree. However this approach makes it very difficult
+to update the library. When you want to update the library do you re-apply your
+local changes onto a new copy of the vendored library or do you re-apply the
+changes from the external library to local version? Both cases involve manual
+generation and application of patch files to source trees.
+
+This is where Braid comes into play. Braid makes it easy to vendor in remote git
+repositories and use an automated mechanism for updating the external library
+and generating patches to upgrade the external library.
+
+Braid creates a file `.braids` in the root of your repository that contains
+references to external libraries or mirrors. There are two types of mirrors in
+Braid: squashed and full. Mirrors are squashed by default, which is what you'll
+generally want because they're faster and don't pollute your history with
+commits from the mirrors.
+
+Full mirrors are useful when you want to view imported history in your own
+project. You usually want this if the mirror is also a repository you have
+access to, for example, when using shared code across projects.
+
+Please note that you cannot change between mirror types after the initial add.
+You'll have to remove the mirror and add it again.
+
+## Installation
 
     gem install braid
 
-## Installing from source
+## Examples and usage
 
-    git clone git://github.com/evilchelu/braid.git
-    cd braid
-    bundle install
-    rake install # possibly requiring sudo
+Let's assume you're working on a project that needs
+[Grit](https://https://github.com/mojombo/grit) in `lib/grit`.
 
-## Quick usage - ruby project
+Now let's vendor Grit:
 
-Let's assume we're writing something like gitnub that needs grit in lib/grit. Initialize the repo (nothing braid related here):
+    $ braid add https://github.com/mojombo/grit.git lib/grit
 
-    git init gritty
-    cd gritty
-    touch README
-    git add README
-    git commit -m "initial commit"
+Done. Feel free to inspect the changes with `git log` or `git show`.
 
-Now let's vendor grit:
+If, further down the line, you want to bring new changes from Grit into your
+parent repository:
 
-    braid add git://github.com/mojombo/grit.git lib/grit
+    $ braid update lib/grit
 
-And you're done! Braid vendored grit into lib/grit. Feel free to inspect the changes with git log or git show.
+If you make changes to the vendored library and want to generate a patch file
+that you can submit back to the project:
 
-If further down the line, you want to bring new changes from grit in your repository, just update the mirror:
+    $ braid diff lib/grit > grit.patch
 
-    braid update lib/grit
+Use the built-in help system to find out about all commands and options:
 
-## Quick usage - rails project
+    $ braid help
+    $ braid help add
 
-Let's assume you want to start a new rails app called shiny. Initialize the repo (nothing braid related here):
+### Updating mirrors with conflicts
 
-    git init shiny
-    cd shiny
-    touch README
-    git add README
-    git commit -m "initial commit"
+If a `braid update` creates a conflict, Braid will stop execution and leave the
+partially committed files in your working copy, just like a normal `git merge`
+conflict would.
 
-Vendor rails (this might take a while because the rails repo is huge!):
+You'll have to resolve all conflicts and manually run `git commit`. The commit
+message is already prepared.
 
-    braid add git://github.com/rails/rails.git vendor/rails
-
-Create your new rails app (nothing braid related here):
-
-    ruby vendor/rails/railties/bin/rails .
-    git add .
-    git commit -m "rails ."
-
-Add any plugins you might need:
-
-    braid add git://github.com/thoughtbot/shoulda.git -p
-    braid add git://github.com/thoughtbot/factory_girl.git -p
-    braid add git://github.com/mbleigh/subdomain-fu.git -p
-
-And you're done! Braid vendored rails and your plugins. Feel free to inspect the changes with git log or git show.
-
-If further down the line, you want to bring new changes from rails in your repository, just update the mirror:
-
-    braid update vendor/rails
-
-Or, if you want all mirrors updated:
-
-    braid update
-
-## More usage
-
-Use the built in help system to find out about all commands and options:
-
-    braid help
-    braid help add # or braid add --help
-
-You may also want to read [Usage and examples](http://github.com/evilchelu/braid/wikis/usage-and-examples).
-
-## Troubleshooting
-
-Check [Troubleshooting](http://github.com/evilchelu/braid/wikis/troubleshooting) if you're having issues.
+If you want to cancel the update and the merge, you have to reset your working
+copy and index with `git reset --hard`.
 
 ## Contributing
 
-We appreciate any patches, error reports and usage ideas you may have. Please submit a lighthouse ticket or start a thread on the mailing list.
+We appreciate any patches, error reports and usage ideas you may have. Please
+submit an issue or pull request on GitHub.
 
-Bugs and feature requests: [braid project on lighthouse](http://evilchelu.lighthouseapp.com/projects/10600-braid)
+# Authors
 
-Discussions and community support: [braid-gem google group](http://groups.google.com/group/braid-gem)
-
-## Authors
-
- * Cristi Balan (evilchelu)
- * Norbert Crombach (norbert)
-
-## Contributors (alphabetically)
-
-* Alan Harper
-* Christoph Sturm
-* Dennis Muhlestein
-* Ferdinand Svehla
-* Michael Klishin
-* Roman Heinrich
-* Travis Tilley
-* Tyler Rick
+* Cristi Balan
+* Norbert Crombach
+* Peter Donald

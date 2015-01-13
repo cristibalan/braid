@@ -1,9 +1,11 @@
 require 'singleton'
 require 'rubygems'
-require defined?(JRUBY_VERSION) ? 'open3' : 'open4'
 require 'tempfile'
 
 module Braid
+  USE_OPEN3 = defined?(JRUBY_VERSION) || Gem.win_platform?
+  require USE_OPEN3 ? 'open3' : 'open4'
+
   module Operations
     class ShellExecutionError < BraidError
       def initialize(err = nil)
@@ -32,16 +34,16 @@ module Braid
     end
     class LocalChangesPresent < BraidError
       def message
-        "local changes are present"
+        'local changes are present'
       end
     end
     class MergeError < BraidError
       def message
-        "could not merge"
+        'could not merge'
       end
     end
 
-    # The command proxy is meant to encapsulate commands such as git, git-svn and svn, that work with subcommands.
+    # The command proxy is meant to encapsulate commands such as git, that work with subcommands.
     class Proxy
       include Singleton
 
@@ -52,12 +54,12 @@ module Braid
       # hax!
       def version
         status, out, err = exec!("#{self.class.command} --version")
-        out.sub(/^.* version/, "").strip
+        out.sub(/^.* version/, '').strip
       end
 
       def require_version(required)
-        required = required.split(".")
-        actual   = version.split(".")
+        required = required.split('.')
+        actual   = version.split('.')
 
         actual.each_with_index do |actual_piece, idx|
           required_piece = required[idx]
@@ -103,14 +105,21 @@ module Braid
         ENV['LANG']   = 'C'
 
         out, err = nil
+        status, pid = 0
         log(cmd)
 
-        if defined?(JRUBY_VERSION)
-          Open3.popen3(cmd) do |stdin, stdout, stderr|
+        if USE_OPEN3
+          status = nil
+          Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
+            # Under old jrubies this may sometimes throw an exception
+            stdin.close rescue nil
             out = stdout.read
             err = stderr.read
+            # Under earlier jrubies this is not correctly passed so add in check
+            status = wait_thread.value if wait_thread # Process::Status object returned.
           end
-          status = $?.exitstatus
+          # Handle earlier jrubies such as 1.6.7.2
+          status = $?.exitstatus if status.nil?
         else
           status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
@@ -130,7 +139,7 @@ module Braid
       end
 
       def sh(cmd, message = nil)
-        message ||= "could not fetch" if cmd =~ /fetch/
+        message ||= 'could not fetch' if cmd =~ /fetch/
         log(cmd)
         `#{cmd}`
         raise ShellExecutionError, message unless $?.exitstatus == 0
@@ -152,11 +161,12 @@ module Braid
 
     class Git < Proxy
       def commit(message, *args)
-        cmd = "git commit --no-verify"
+        cmd = 'git commit --no-verify'
         if message # allow nil
           message_file = Tempfile.new("braid_commit")
           message_file.print("Braid: #{message}")
           message_file.flush
+          message_file.close
           cmd << " -F #{message_file.path}"
         end
         cmd << " #{args.join(' ')}" unless args.empty?
@@ -175,7 +185,7 @@ module Braid
       def fetch(remote = nil, *args)
         args.unshift "-n #{remote}" if remote
         # open4 messes with the pipes of index-pack
-        sh("git fetch #{args.join(' ')} 2>&1 >/dev/null")
+        sh("git fetch #{args.join(' ')} 2>&1 > #{Gem.win_platform? ? 'nul' : '/dev/null'}")
       end
 
       def checkout(treeish)
@@ -198,42 +208,38 @@ module Braid
 
       # Implies tracking.
       def remote_add(remote, path, branch)
-        invoke(:remote, "add", "-t #{branch} -m #{branch}", remote, path)
+        invoke(:remote, 'add', "-t #{branch} -m #{branch}", remote, path)
         true
       end
 
       def remote_rm(remote)
-        invoke(:remote, "rm", remote)
+        invoke(:remote, 'rm', remote)
         true
       end
 
-      # Checks git and svn remotes.
+      # Checks git remotes.
       def remote_url(remote)
         key = "remote.#{remote}.url"
-        begin
-          invoke(:config, key)
-        rescue ShellExecutionError
-          invoke(:config, "svn-#{key}")
-        end
+        invoke(:config, key)
       rescue ShellExecutionError
         nil
       end
 
       def reset_hard(target)
-        invoke(:reset, "--hard", target)
+        invoke(:reset, '--hard', target)
         true
       end
 
       # Implies no commit.
       def merge_ours(opt)
-        invoke(:merge, "-s ours --no-commit", opt)
+        invoke(:merge, '-s ours --no-commit', opt)
         true
       end
 
       # Implies no commit.
       def merge_subtree(opt)
         # TODO which options are needed?
-        invoke(:merge, "-s subtree --no-commit --no-ff", opt)
+        invoke(:merge, '-s subtree --no-commit --no-ff', opt)
         true
       rescue ShellExecutionError
         raise MergeError
@@ -246,18 +252,22 @@ module Braid
         raise MergeError
       end
 
+      def read_ls_files(prefix)
+        invoke('ls-files', prefix)
+      end
+
       def read_tree_prefix(treeish, prefix)
         invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
         true
       end
 
       def rm_r(path)
-        invoke(:rm, "-r", path)
+        invoke(:rm, '-r', path)
         true
       end
 
-      def tree_hash(path, treeish = "HEAD")
-        out = invoke(:ls_tree, treeish, "-d", path)
+      def tree_hash(path, treeish = 'HEAD')
+        out = invoke(:ls_tree, treeish, '-d', path)
         out.split[2]
       end
 
@@ -269,7 +279,7 @@ module Braid
       end
 
       def status_clean?
-        status, out, err = exec("git status")
+        status, out, err = exec('git status')
         !out.split("\n").grep(/nothing to commit/).empty?
       end
 
@@ -278,7 +288,7 @@ module Braid
       end
 
       def head
-        rev_parse("HEAD")
+        rev_parse('HEAD')
       end
 
       def branch
@@ -287,17 +297,22 @@ module Braid
       end
 
       def apply(diff, *args)
-        err = nil
+        status, err = nil, nil
 
-        if defined?(JRUBY_VERSION)
-          Open3.popen3("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |stdin, stdout, stderr|
+        command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
+
+        if USE_OPEN3
+          Open3.popen3(command) do |stdin, stdout, stderr, wait_thread|
             stdin.puts(diff)
             stdin.close
             err = stderr.read
+            # Under earlier jrubies this is not correctly passed so add in check
+            status = wait_thread.value if wait_thread # Process::Status object returned.
           end
-          status = $?.exitstatus
+          # Handle earlier jrubies such as 1.6.7.2
+          status = $?.exitstatus if status.nil?
         else
-          status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
+          status = Open4.popen4(command) do |pid, stdin, stdout, stderr|
             stdin.puts(diff)
             stdin.close
             err = stderr.read
@@ -320,52 +335,6 @@ module Braid
       end
     end
 
-    class GitSvn < Proxy
-      def self.command;
-        "git svn";
-      end
-
-      def commit_hash(remote, revision)
-        out  = invoke(:log, "--show-commit --oneline", "-r #{revision}", remote)
-        part = out.to_s.split("|")[1]
-        part.strip!
-        raise UnknownRevision, "r#{revision}" unless part
-        git.rev_parse(part)
-      end
-
-      def fetch(remote)
-        sh("git svn fetch #{remote} 2>&1 >/dev/null")
-      end
-
-      def init(remote, path)
-        invoke(:init, "-R", remote, "--id=#{remote}", path)
-        true
-      end
-
-      private
-
-      def command(name)
-        "#{self.class.command} #{name}"
-      end
-
-      def git
-        Git.instance
-      end
-    end
-
-    class Svn < Proxy
-      def clean_revision(revision)
-        revision.to_i if revision
-      end
-
-      def head_revision(path)
-        # not using svn info because it's retarded and doesn't show the actual last changed rev for the url
-        # git svn has no clue on how to get the actual HEAD revision number on it's own
-        status, out, err = exec!("svn log -q --limit 1 #{path}")
-        out.split(/\n/).find { |x| x.match /^r\d+/ }.split(" | ")[0][1..-1].to_i
-      end
-    end
-
     class GitCache
       include Singleton
 
@@ -383,12 +352,12 @@ module Braid
           end
         else
           FileUtils.mkdir_p(local_cache_dir)
-          git.clone("--mirror", url, dir)
+          git.clone('--mirror', url, dir)
         end
       end
 
       def path(url)
-        File.join(local_cache_dir, url.gsub(/[\/:@]/, "_"))
+        File.join(local_cache_dir, url.gsub(/[\/:@]/, '_'))
       end
 
       private
@@ -405,14 +374,6 @@ module Braid
     module VersionControl
       def git
         Git.instance
-      end
-
-      def git_svn
-        GitSvn.instance
-      end
-
-      def svn
-        Svn.instance
       end
 
       def git_cache

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + '/../lib'))
 require 'braid'
 
 require 'rubygems'
@@ -12,7 +12,7 @@ Home = File.expand_path(ENV['HOME'] || '~')
 # main kicks ass!
 Main {
   description <<-TXT
-    braid is a simple tool to help track git or svn repositories inside a git repository.
+    braid is a simple tool to help track git repositories inside a git repository.
 
     Run 'braid commandname help' for more details.
 
@@ -25,15 +25,8 @@ Main {
       Add a new mirror to be tracked.
 
         * adds metadata about the mirror to .braids
-        * adds the git or git svn remotes to .git/config
+        * adds the git remotes to .git/config
         * fetches and merges remote code into given directory
-
-      --type defaults:
-
-        * svn://path          # => svn
-        * git://path          # => git
-        * http://path/trunk   # => svn
-        * http://path.git     # => git
 
       Name defaults:
 
@@ -43,19 +36,15 @@ Main {
     TXT
 
     examples <<-TXT
-      . braid add svn://remote/path
-      . braid add svn://remote/path local/dir
-      . braid add git://remote/path local/dir
       . braid add http://remote/path.git local/dir
-      . braid add http://remote/path --type git local/dir
-      . braid add svn://remote/path --branch notmaster
+      . braid add http://remote/path local/dir
     TXT
 
-    mixin :argument_url, :option_type, :optional_path, :option_branch, :option_rails_plugin, :option_revision, :option_full, :option_verbose
+    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_full, :option_verbose
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {"type" => type, "path" => path, "branch" => branch, "rails_plugin" => rails_plugin, "revision" => revision, "full" => full})
+      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'full' => full})
     }
   }
 
@@ -79,7 +68,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:update, path, {"revision" => revision, "head" => head})
+      Braid::Command.run(:update, path, {'revision' => revision, 'head' => head})
     }
   }
 
@@ -89,7 +78,7 @@ Main {
 
         * removes metadata from .braids
         * removes the local directory and commits the removal
-        * removes the git remote by default, --keep can be used to supress that
+        * removes the git remote by default, --keep can be used to suppress that
     TXT
 
     examples <<-TXT
@@ -134,7 +123,7 @@ Main {
 
   mode(:setup) {
     description <<-TXT
-      Set up git and git-svn remotes.
+      Set up git remotes.
     TXT
 
     mixin :optional_path, :option_verbose, :option_force
@@ -184,28 +173,11 @@ Main {
     }
   }
 
-  mixin(:option_type) {
-    option(:type, :t) {
-      optional
-      argument :required
-      desc 'mirror type'
-      attr
-    }
-  }
-
   mixin(:option_branch) {
     option(:branch, :b) {
       optional
       argument :required
       desc 'remote branch name'
-      attr
-    }
-  }
-
-  mixin(:option_rails_plugin) {
-    option(:rails_plugin, :p) {
-      optional
-      desc 'added mirror is a Rails plugin'
       attr
     }
   }

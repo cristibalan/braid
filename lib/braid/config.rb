@@ -1,9 +1,5 @@
 require 'yaml'
-
-# psych throws such wonderful errors as: 
-#  `@vendor/rails' is not allowed as an instance variable name (NameError)
-YAML::ENGINE.yamler = 'syck' if RUBY_VERSION >= '1.9.1'
-
+require 'json'
 require 'yaml/store'
 
 module Braid
@@ -20,7 +16,18 @@ module Braid
     end
 
     def initialize(config_file = CONFIG_FILE)
-      @db = YAML::Store.new(config_file)
+      @config_file = config_file
+      begin
+        store = YAML::Store.new(@config_file)
+        @db = {}
+        store.transaction(true) do
+          store.roots.each do |path|
+            @db[path] = store[path]
+          end
+        end
+      rescue
+        @db = JSON.parse(@config_file)
+      end
     end
 
     def add_from_options(url, options)
@@ -31,17 +38,13 @@ module Braid
     end
 
     def mirrors
-      @db.transaction(true) do
-        @db.roots
-      end
+      @db.keys
     end
 
     def get(path)
-      @db.transaction(true) do
-        if attributes = @db[path.to_s.sub(/\/$/, '')]
-          Mirror.new(path, attributes)
-        end
-      end
+      key = path.to_s.sub(/\/$/, '')
+      attributes = @db[key]
+      return attributes ? Mirror.new(path, attributes) : nil
     end
 
     def get!(path)
@@ -51,52 +54,39 @@ module Braid
     end
 
     def add(mirror)
-      @db.transaction do
-        raise PathAlreadyInUse, mirror.path if @db[mirror.path]
-        write_mirror(mirror)
-      end
+      raise PathAlreadyInUse, mirror.path if get(mirror.path)
+      write_mirror(mirror)
     end
 
     def remove(mirror)
-      @db.transaction do
-        @db.delete(mirror.path)
-      end
+      @db.delete(mirror.path)
+      write_db
     end
 
     def update(mirror)
-      @db.transaction do
-        raise MirrorDoesNotExist, mirror.path unless @db[mirror.path]
-        @db.delete(mirror.path)
-        write_mirror(mirror)
-      end
-    end
-
-    def valid?
-      @db.transaction(true) do
-        !@db.roots.any? do |path|
-          @db[path]["url"].nil?
-        end
-      end
-    end
-
-    def migrate!
-      @db.transaction do
-        @db.roots.each do |path|
-          attributes = @db[path]
-          if attributes["local_branch"]
-            attributes["url"]      = attributes.delete("remote")
-            attributes["remote"]   = attributes.delete("local_branch")
-            attributes["squashed"] = attributes.delete("squash")
-            attributes["lock"]     = attributes["revision"] # so far this has always been true
-          end
-          @db[path] = clean_attributes(attributes)
-        end
-      end
+      raise MirrorDoesNotExist, mirror.path unless get(mirror.path)
+      @db.delete(mirror.path)
+      write_mirror(mirror)
     end
 
     private
     def write_mirror(mirror)
       @db[mirror.path] = clean_attributes(mirror.attributes)
+      write_db
+    end
+
+    def write_db
+      new_db = {}
+      @db.keys.sort.each do |key|
+        new_db[key] = @db[key]
+        new_db[key].keys.each do |k|
+          new_db[key].delete(k) if !Braid::Mirror::ATTRIBUTES.include?(k)
+        end
+      end
+      File.open(@config_file, "wb") do |f|
+        f.write JSON.pretty_generate(new_db)
+        f.write "\n"
+      end
     end
 
     def clean_attributes(hash)

@@ -11,13 +11,13 @@ module Braid
 
         base_revision = git.rev_parse(mirror.remote)
         unless mirror.merged?(base_revision)
-          msg "Mirror is not up to date. Stopping."
+          msg 'Mirror is not up to date. Stopping.'
           return
         end
 
         diff = mirror.diff
         if diff.empty?
-          msg "No local changes found. Stopping."
+          msg 'No local changes found. Stopping.'
           return
         end
 
@@ -31,14 +31,14 @@ module Braid
           remote_url = File.expand_path(remote_url)
         end
         Dir.chdir(clone_dir) do
-          msg "Cloning mirror with local changes."
+          msg 'Cloning mirror with local changes.'
           git.init
           git.fetch(source_dir)
           git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
           git.checkout(base_revision)
           git.apply(diff)
-          system("git commit -v")
-          msg "Pushing changes to remote."
+          system('git commit -v')
+          msg 'Pushing changes to remote.'
           git.push(remote_url, "HEAD:#{mirror.branch}")
         end
         FileUtils.rm_r(clone_dir)

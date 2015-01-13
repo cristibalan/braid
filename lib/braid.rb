@@ -1,12 +1,11 @@
-$:.unshift dirname = File.dirname(__FILE__)
 require 'braid/version'
 
 module Braid
-  CONFIG_FILE          = ".braids"
-  REQUIRED_GIT_VERSION = "1.6"
+  CONFIG_FILE          = '.braids'
+  REQUIRED_GIT_VERSION = '1.6'
 
   def self.verbose
-    @verbose || false
+    !!@verbose
   end
 
   def self.verbose=(new_value)
@@ -14,7 +13,7 @@ module Braid
   end
 
   def self.force
-    @force || false
+    !!@force
   end
 
   def self.force=(new_value)
@@ -22,11 +21,11 @@ module Braid
   end
 
   def self.use_local_cache
-    [nil, "true", "1"].include?(ENV["BRAID_USE_LOCAL_CACHE"])
+    [nil, 'true', '1'].include?(ENV['BRAID_USE_LOCAL_CACHE'])
   end
 
   def self.local_cache_dir
-    File.expand_path(ENV["BRAID_LOCAL_CACHE_DIR"] || "#{ENV["HOME"]}/.braid/cache")
+    File.expand_path(ENV['BRAID_LOCAL_CACHE_DIR'] || "#{ENV['HOME']}/.braid/cache")
   end
 
   class BraidError < StandardError
@@ -37,12 +36,14 @@ module Braid
   end
 end
 
-require dirname + '/core_ext'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'
 require 'braid/command'
-
-Dir[dirname + '/braid/commands/*'].each do |file|
-  require file
-end
+require 'braid/commands/add'
+require 'braid/commands/diff'
+require 'braid/commands/list'
+require 'braid/commands/push'
+require 'braid/commands/remove'
+require 'braid/commands/setup'
+require 'braid/commands/update'

@@ -12,16 +12,21 @@ module Braid
         options.reject! { |k, v| %w(revision head).include?(k) }
         print "\n"
         msg "Listing all mirrors.\n=======================================================\n"
-        config.mirrors.each_with_index do |path, i|
+        config.mirrors.each do |path|
           mirror = config.get!(path)
-          print " #{i + 1}) #{path.to_s}"
-          print " [LOCKED]" if mirror.locked?
+          print path.to_s
+          print ' [LOCKED]' if mirror.locked?
           setup_remote(mirror)
           msg "Fetching new commits for '#{mirror.path}'." if verbose?
           mirror.fetch
-          new_revision    = validate_new_revision(mirror, options["revision"])
-          target_revision = determine_target_revision(mirror, new_revision)
-          print " !!! UPDATE AVAILABLE !!!" if new_revision.to_s != mirror.base_revision.to_s
+          new_revision    = validate_new_revision(mirror, options['revision'])
+          print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
+          local_file_count = git.read_ls_files(mirror.path).split.size
+          if 0 == local_file_count
+            print ' (Removed Locally)'
+          elsif !mirror.diff.empty?
+            print ' (Locally Modified)'
+          end
           print "\n"
         end
         print "\n"

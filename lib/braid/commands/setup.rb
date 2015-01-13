@@ -6,9 +6,9 @@ module Braid
       end
 
       protected
-      
+
       def setup_all
-        msg "Setting up all mirrors."
+        msg 'Setting up all mirrors.'
         config.mirrors.each do |path|
           setup_one(path)
         end
@@ -28,12 +28,8 @@ module Braid
         end
 
         msg "Setup: Creating remote for '#{mirror.path}'."
-        unless mirror.type == "svn"
-          url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
-          git.remote_add(mirror.remote, url, mirror.branch)
-        else
-          git_svn.init(mirror.remote, mirror.url)
-        end
+        url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
+        git.remote_add(mirror.remote, url, mirror.branch)
       end
     end
   end

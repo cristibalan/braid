@@ -1,6 +1,6 @@
 require 'rubygems'
-require 'test/spec'
-require 'mocha'
+require 'rspec'
+require 'mocha/api'
 
 require File.dirname(__FILE__) + '/../lib/braid'
 
@@ -13,3 +13,7 @@ def build_mirror(options = {})
 end
 
 include Braid::Operations::VersionControl
+
+RSpec.configure do |config|
+  config.mock_with :mocha
+end

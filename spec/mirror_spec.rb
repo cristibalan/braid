@@ -6,35 +6,6 @@ describe "Braid::Mirror.new_from_options" do
     @mirror.branch.should == "master"
   end
 
-  it "should default type to git, from protocol" do
-    new_from_options("git://path")
-    @mirror.type.should == "git"
-  end
-
-  it "should default type to git, if path ends in .git" do
-    new_from_options("http://path.git")
-    @mirror.type.should == "git"
-  end
-
-  it "should default type to svn, from protocol" do
-    new_from_options("svn://path")
-    @mirror.type.should == "svn"
-  end
-
-  it "should default type to svn, if path ends in /trunk" do
-    new_from_options("http://path/trunk")
-    @mirror.type.should == "svn"
-  end
-
-  it "should raise if no type can be guessed" do
-    lambda { new_from_options("http://path") }.should.raise(Braid::Mirror::CannotGuessType)
-  end
-
-  it "should default mirror to previous to last path part, if last path part is /trunk" do
-    new_from_options("http://path/trunk")
-    @mirror.path.should == "path"
-  end
-
   it "should default mirror to last path part, ignoring trailing .git" do
     new_from_options("http://path.git")
     @mirror.path.should == "path"
@@ -43,7 +14,7 @@ end
 
 describe "Braid::Mirror#diff" do
   before(:each) do
-    @mirror = build_mirror("revision" => 'a' * 40)
+    @mirror = build_mirror('revision' => 'a' * 40, 'url' => 'git://path')
     @mirror.stubs(:base_revision).returns(@mirror.revision) # bypass rev_parse
   end
 
@@ -54,6 +25,7 @@ describe "Braid::Mirror#diff" do
 
   it "should return an empty string when the hashes match" do
     set_hashes('b' * 40, 'b' * 40)
+    git.expects(:fetch)
     git.expects(:diff_tree).never
     @mirror.diff.should == ""
   end
@@ -61,6 +33,7 @@ describe "Braid::Mirror#diff" do
   it "should generate a diff when the hashes do not match" do
     set_hashes('b' * 40, 'c' * 40)
     diff = "diff --git a/path b/path\n"
+    git.expects(:fetch)
     git.expects(:diff_tree).with('b' * 40, 'c' * 40).returns(diff)
     @mirror.diff.should == diff
   end
@@ -69,7 +42,7 @@ end
 describe "Braid::Mirror#base_revision" do
   it "should be inferred when no revision is set" do
     @mirror = build_mirror
-    @mirror.revision.should.be.nil
+    @mirror.revision.should be_nil
     @mirror.expects(:inferred_revision).returns('b' * 40)
     @mirror.base_revision.should == 'b' * 40
   end
@@ -100,11 +73,11 @@ describe "Braid::Mirror#cached?" do
 
   it "should be true when the remote path matches the cache path" do
     git.expects(:remote_url).with(@mirror.remote).returns(git_cache.path(@mirror.url))
-    @mirror.should.be.cached
+    @mirror.should be_cached
   end
 
   it "should be false if the remote does not point to the cache" do
     git.expects(:remote_url).with(@mirror.remote).returns(@mirror.url)
-    @mirror.should.not.be.cached
+    @mirror.should_not be_cached
   end
 end

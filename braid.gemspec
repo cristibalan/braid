@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require 'braid/version'
 
 Gem::Specification.new do |s|
-  s.name               = %q{realityforge-braid}
+  s.name               = %q{braid}
   s.version            = Braid::VERSION
   s.platform           = Gem::Platform::RUBY
 

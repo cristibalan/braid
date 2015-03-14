@@ -48,43 +48,82 @@ You'll have to remove the mirror and add it again.
 
     gem install braid
 
-## Examples and usage
+## Quick usage - ruby project
 
-Let's assume you're working on a project that needs
-[Grit](https://https://github.com/mojombo/grit) in `lib/grit`.
+Let's assume we're writing the project `myproject` that needs grit in lib/grit. Initialize the repo (nothing braid related here):
 
-Now let's vendor Grit:
+    git init myproject
+    cd myproject
+    touch README
+    git add README
+    git commit -m "initial commit"
 
-    $ braid add https://github.com/mojombo/grit.git lib/grit
+Now let's vendor grit:
 
-Done. Feel free to inspect the changes with `git log` or `git show`.
+    braid add git://github.com/mojombo/grit.git lib/grit
 
-If, further down the line, you want to bring new changes from Grit into your
-parent repository:
+And you're done! Braid vendored grit into lib/grit. Feel free to inspect the changes with git log or git show.
 
-    $ braid update lib/grit
+If further down the line, you want to bring new changes from grit into your repository, just update the mirror:
 
-If you make changes to the vendored library and want to generate a patch file
-that you can submit back to the project:
+    braid update lib/grit
 
-    $ braid diff lib/grit > grit.patch
+If you make changes to the grit library and want to generate a patch file so that you can submit the patch file
+to the grit project:
 
-Use the built-in help system to find out about all commands and options:
+    braid diff lib/grit > grit.patch
 
-    $ braid help
-    $ braid help add
+Once those changes have been applied to grit you probably want to update your local version of grit again.
 
-### Updating mirrors with conflicts
+    braid update lib/grit
 
-If a `braid update` creates a conflict, Braid will stop execution and leave the
-partially committed files in your working copy, just like a normal `git merge`
-conflict would.
+## More usage
 
-You'll have to resolve all conflicts and manually run `git commit`. The commit
-message is already prepared.
+Use the built in help system to find out about all commands and options:
 
-If you want to cancel the update and the merge, you have to reset your working
-copy and index with `git reset --hard`.
+    braid help
+    braid help add # or braid add --help
+
+### Examples
+
+#### Adding a mirror
+
+    braid add git://github.com/rails/rails.git vendor/rails
+
+#### Adding mirrors with revisions
+
+    braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails
+
+#### Adding mirrors with full history
+
+    braid add --full git://github.com/mislav/will_paginate.git vendor/plugins/will_paginate
+
+#### Updating mirrors
+
+    # Update a specific mirror
+    braid update vendor/plugins/cache_fu
+    # Update all mirrors
+    braid update
+
+#### Updating mirrors with conflicts
+
+If a braid update creates a conflict, braid will stop execution and leave the partially committed
+files in your working copy, just like a normal git merge conflict would.
+
+You will then have to resolve all conflicts and manually run `git commit`. The commit message is
+already prepared.
+
+If you want to cancel the braid update and the merge, you'll have to reset your working copy and
+index with `git reset --hard`.
+
+#### Locking and unlocking mirrors
+
+    braid update --revision 6c1c16b vendor/rails
+    braid update --head vendor/rails
+
+#### Showing local changes made to mirrors
+
+    braid diff vendor/rails
 
 ## Contributing
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform           = Gem::Platform::RUBY
 
   s.authors            = ['Cristi Balan', 'Norbert Crombach', 'Peter Donald']
-  s.email              = %q{peter@realityforge.org}
+  s.email              = %q{evil@che.lu norbert.crombach@primetheory.org peter@realityforge.org}
 
   s.homepage           = %q{https://github.com/cristibalan/braid}
   s.summary            = %q{A simple tool for tracking vendor branches in git.}

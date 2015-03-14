@@ -96,3 +96,14 @@ submit an issue or pull request on GitHub.
 * Cristi Balan
 * Norbert Crombach
 * Peter Donald
+
+## Contributors (alphabetically)
+
+* Alan Harper
+* Christoph Sturm
+* Dennis Muhlestein
+* Ferdinand Svehla
+* Michael Klishin
+* Roman Heinrich
+* Travis Tilley
+* Tyler Rick

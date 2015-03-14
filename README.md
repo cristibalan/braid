@@ -130,6 +130,12 @@ index with `git reset --hard`.
 We appreciate any patches, error reports and usage ideas you may have. Please
 submit an issue or pull request on GitHub.
 
+### Subversion
+
+While preparing to release Braid v1.0 the support for subversion repositories was removed as
+there was no active maintainers and inadequate test coverage. If there is anyone motivated to
+re-add and maintain the Subversion support, please contact the authors.
+
 # Authors
 
 * Cristi Balan

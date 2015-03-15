@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Braid by cristibalan</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Braid</h1>
+          <h2>Simple tool to help track vendor branches in a Git repository.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/cristibalan/braid/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/cristibalan/braid/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/cristibalan/braid" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="braid" class="anchor" href="#braid" aria-hidden="true"><span class="octicon octicon-link"></span></a>Braid</h1>
+
+<p>Braid is a simple tool to help track vendor branches in a
+<a href="http://git-scm.com/">Git</a> repository.</p>
+
+<h2>
+<a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h2>
+
+<p>Vendoring allows you take the source code of an external library and ensure it's
+version controlled along with the main project. This is in contrast to including
+a reference to a packaged version of an external library that is available in a
+binary artifact repository such as Maven Central, RubyGems or NPM.</p>
+
+<p>Vendoring is useful when you need to patch or customize the external libraries
+or the external library is expected to co-evolve with the main project. The
+developer can make changes to the main project and patch the library in a single
+commit.</p>
+
+<p>The problem arises when the external library makes changes that you want to
+integrate into your local vendored version or the developer makes changes to the
+local version that they want integrated into the external library.</p>
+
+<p>A typical "implementation" of vendoring is to simply download or checkout the
+source for the external library, remove the <code>.git</code> or <code>.svn</code> directories and
+commit it to the main source tree. However this approach makes it very difficult
+to update the library. When you want to update the library do you re-apply your
+local changes onto a new copy of the vendored library or do you re-apply the
+changes from the external library to local version? Both cases involve manual
+generation and application of patch files to source trees.</p>
+
+<p>This is where Braid comes into play. Braid makes it easy to vendor in remote git
+repositories and use an automated mechanism for updating the external library
+and generating patches to upgrade the external library.</p>
+
+<p>Braid creates a file <code>.braids</code> in the root of your repository that contains
+references to external libraries or mirrors. There are two types of mirrors in
+Braid: squashed and full. Mirrors are squashed by default, which is what you'll
+generally want because they're faster and don't pollute your history with
+commits from the mirrors.</p>
+
+<p>Full mirrors are useful when you want to view imported history in your own
+project. You usually want this if the mirror is also a repository you have
+access to, for example, when using shared code across projects.</p>
+
+<p>Please note that you cannot change between mirror types after the initial add.
+You'll have to remove the mirror and add it again.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre><code>gem install braid
+</code></pre>
+
+<h2>
+<a id="quick-usage---ruby-project" class="anchor" href="#quick-usage---ruby-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick usage - ruby project</h2>
+
+<p>Let's assume we're writing the project <code>myproject</code> that needs grit in lib/grit. Initialize the repo (nothing braid related here):</p>
+
+<pre><code>git init myproject
+cd myproject
+touch README
+git add README
+git commit -m "initial commit"
+</code></pre>
+
+<p>Now let's vendor grit:</p>
+
+<pre><code>braid add git://github.com/mojombo/grit.git lib/grit
+</code></pre>
+
+<p>And you're done! Braid vendored grit into lib/grit. Feel free to inspect the changes with git log or git show.</p>
+
+<p>If further down the line, you want to bring new changes from grit into your repository, just update the mirror:</p>
+
+<pre><code>braid update lib/grit
+</code></pre>
+
+<p>If you make changes to the grit library and want to generate a patch file so that you can submit the patch file
+to the grit project:</p>
+
+<pre><code>braid diff lib/grit &gt; grit.patch
+</code></pre>
+
+<p>Once those changes have been applied to grit you probably want to update your local version of grit again.</p>
+
+<pre><code>braid update lib/grit
+</code></pre>
+
+<h2>
+<a id="more-usage" class="anchor" href="#more-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>More usage</h2>
+
+<p>Use the built in help system to find out about all commands and options:</p>
+
+<pre><code>braid help
+braid help add # or braid add --help
+</code></pre>
+
+<h3>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<h4>
+<a id="adding-a-mirror" class="anchor" href="#adding-a-mirror" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding a mirror</h4>
+
+<pre><code>braid add git://github.com/rails/rails.git vendor/rails
+</code></pre>
+
+<h4>
+<a id="adding-mirrors-with-revisions" class="anchor" href="#adding-mirrors-with-revisions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding mirrors with revisions</h4>
+
+<pre><code>braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails
+</code></pre>
+
+<h4>
+<a id="adding-mirrors-with-full-history" class="anchor" href="#adding-mirrors-with-full-history" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding mirrors with full history</h4>
+
+<pre><code>braid add --full git://github.com/mislav/will_paginate.git vendor/plugins/will_paginate
+</code></pre>
+
+<h4>
+<a id="updating-mirrors" class="anchor" href="#updating-mirrors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating mirrors</h4>
+
+<pre><code># Update a specific mirror
+braid update vendor/plugins/cache_fu
+# Update all mirrors
+braid update
+</code></pre>
+
+<h4>
+<a id="updating-mirrors-with-conflicts" class="anchor" href="#updating-mirrors-with-conflicts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating mirrors with conflicts</h4>
+
+<p>If a braid update creates a conflict, braid will stop execution and leave the partially committed
+files in your working copy, just like a normal git merge conflict would.</p>
+
+<p>You will then have to resolve all conflicts and manually run <code>git commit</code>. The commit message is
+already prepared.</p>
+
+<p>If you want to cancel the braid update and the merge, you'll have to reset your working copy and
+index with <code>git reset --hard</code>.</p>
+
+<h4>
+<a id="locking-and-unlocking-mirrors" class="anchor" href="#locking-and-unlocking-mirrors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Locking and unlocking mirrors</h4>
+
+<pre><code>braid update --revision 6c1c16b vendor/rails
+braid update --head vendor/rails
+</code></pre>
+
+<h4>
+<a id="showing-local-changes-made-to-mirrors" class="anchor" href="#showing-local-changes-made-to-mirrors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Showing local changes made to mirrors</h4>
+
+<pre><code>braid diff vendor/rails
+</code></pre>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>We appreciate any patches, error reports and usage ideas you may have. Please
+submit an issue or pull request on GitHub.</p>
+
+<h3>
+<a id="subversion" class="anchor" href="#subversion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subversion</h3>
+
+<p>While preparing to release Braid v1.0 the support for subversion repositories was removed as
+there was no active maintainers and inadequate test coverage. If there is anyone motivated to
+re-add and maintain the Subversion support, please contact the authors.</p>
+
+<h1>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h1>
+
+<ul>
+<li>Cristi Balan</li>
+<li>Norbert Crombach</li>
+<li>Peter Donald</li>
+</ul>
+
+<h2>
+<a id="contributors-alphabetically" class="anchor" href="#contributors-alphabetically" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors (alphabetically)</h2>
+
+<ul>
+<li>Alan Harper</li>
+<li>Christoph Sturm</li>
+<li>Dennis Muhlestein</li>
+<li>Ferdinand Svehla</li>
+<li>Michael Klishin</li>
+<li>Roman Heinrich</li>
+<li>Travis Tilley</li>
+<li>Tyler Rick</li>
+</ul>
+        </section>
+
+        <footer>
+          Braid is maintained by <a href="https://github.com/cristibalan">cristibalan</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>

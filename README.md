@@ -145,6 +145,7 @@ re-add and maintain the Subversion support, please contact the authors.
 ## Contributors (alphabetically)
 
 * Alan Harper
+* Brad Durrow
 * Christoph Sturm
 * Dennis Muhlestein
 * Ferdinand Svehla

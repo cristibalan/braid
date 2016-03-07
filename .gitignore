@@ -12,4 +12,5 @@ rdoc
 /*.iml
 /*.ipr
 /*.iws
+/.rakeTasks
 /Gemfile.lock

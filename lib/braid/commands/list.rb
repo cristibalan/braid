@@ -15,6 +15,7 @@ module Braid
         config.mirrors.each do |path|
           mirror = config.get!(path)
           print path.to_s
+          print ' (' + mirror.base_revision + ')'
           print ' [LOCKED]' if mirror.locked?
           setup_remote(mirror)
           msg "Fetching new commits for '#{mirror.path}'." if verbose?

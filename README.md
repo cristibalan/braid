@@ -1,5 +1,7 @@
 # Braid
 
+[![Build Status](https://secure.travis-ci.org/cristibalan/braid.png?branch=master)](http://travis-ci.org/cristibalan/braid)
+
 Braid is a simple tool to help track vendor branches in a
 [Git](http://git-scm.com/) repository.
 

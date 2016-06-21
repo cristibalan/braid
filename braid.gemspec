@@ -28,6 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<main>, ['>= 4.7.3'])
   s.add_dependency(%q<open4>, ['>= 1.0.1']) unless defined?(JRUBY_VERSION)
 
-  s.add_development_dependency(%q<rspec>, ['= 2.12.0'])
+  s.add_development_dependency(%q<rspec>, ['>= 2.12.0'])
   s.add_development_dependency(%q<mocha>, ['>= 0.9.11'])
 end

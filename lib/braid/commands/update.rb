@@ -23,6 +23,8 @@ module Braid
         revision_message = options["revision"] ? " to #{display_revision(mirror, options["revision"])}" : ""
         msg "Updating mirror '#{mirror.path}'#{revision_message}."
 
+        was_locked = mirror.locked?
+
         # check options for lock modification
         if mirror.locked?
           if options['head']
@@ -38,10 +40,16 @@ module Braid
         msg "Fetching new commits for '#{mirror.path}'." if verbose?
         mirror.fetch
 
-        new_revision    = validate_new_revision(mirror, options['revision'])
+        new_revision = options['revision']
+        begin
+          new_revision = validate_new_revision(mirror, options['revision'])
+        rescue InvalidRevision
+          # Ignored as it means the revision matches expecte
+        end
         target_revision = determine_target_revision(new_revision)
 
-        if mirror.merged?(target_revision)
+        if (options['revision'] && was_locked && target_revision == mirror.base_revision) ||
+          (options['revision'].nil? && !was_locked && mirror.merged?(target_revision))
           msg "Mirror '#{mirror.path}' is already up to date."
           return
         end

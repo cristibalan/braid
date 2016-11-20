@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../integration_helper'
 
-describe "Updating a mirror without conflicts" do
+describe "Updating a mirror" do
 
   before do
     FileUtils.rm_rf(TMP_PATH)
@@ -11,6 +11,7 @@ describe "Updating a mirror without conflicts" do
     before do
       @shiny = create_git_repo_from_fixture("shiny")
       @skit1 = create_git_repo_from_fixture("skit1")
+      @file_name = "layouts/layout.liquid"
 
       in_dir(@shiny) do
         `#{BRAID_BIN} add #{@skit1}`
@@ -30,18 +31,62 @@ describe "Updating a mirror without conflicts" do
 
     end
 
-    it "should add the files and commit" do
-      in_dir(@shiny) do
-        `#{BRAID_BIN} update skit1`
+    context "with no project-specific changes" do
+      it "should add the files and commit" do
+        in_dir(@shiny) do
+          `#{BRAID_BIN} update skit1`
+        end
+
+        output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        $?.should be_success
+
+        output = `git log --pretty=oneline`.split("\n")
+        output.length.should == 3
+        output[0].should =~ /Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/
+
+        # No temporary commits should be added to the reflog.
+        output = `git log -g --pretty=oneline`.split("\n")
+        output.length.should == 3
       end
+    end
 
-      file_name = "layouts/layout.liquid"
-      output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
-      $?.should be_success
+    context "with mergeable changes to the same file" do
+      it "should auto-merge and commit" do
+        `cp #{File.join(FIXTURE_PATH, "skit1_mergeable", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
 
-      output = `git log --pretty=oneline`.split("\n")
-      output.length.should == 3
-      output[0].should =~ /Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/
+        in_dir(@shiny) do
+          `git commit -a -m 'mergeable change'`
+          `#{BRAID_BIN} update skit1`
+        end
+
+        output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2_merged", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        $?.should be_success
+
+        output = `git log --pretty=oneline`.split("\n")
+        output.length.should == 4  # plus 'mergeable change'
+        output[0].should =~ /Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/
+      end
+    end
+
+    context "with conflicting changes" do
+      it "should leave conflict markup with the target revision" do
+        `cp #{File.join(FIXTURE_PATH, "skit1_conflicting", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+
+        target_revision = nil
+        in_dir(@skit1) do
+          target_revision = `git rev-parse HEAD`
+        end
+
+        braid_output = nil
+        in_dir(@shiny) do
+          `git commit -a -m 'conflicting change'`
+          braid_output = `#{BRAID_BIN} update skit1`
+        end
+        braid_output.should =~ /Caught merge error\. Breaking\./
+
+        `grep -q '>>>>>>> #{target_revision}' #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        $?.should be_success
+      end
     end
 
   end

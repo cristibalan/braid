@@ -65,16 +65,12 @@ module Braid
         msg "Merging in mirror '#{mirror.path}'." if verbose?
         begin
           if mirror.squashed?
-            local_hash = git.rev_parse('HEAD')
-            if !diff.empty?
-              base_hash = generate_tree_hash(mirror, base_revision)
-            else
-              base_hash = local_hash
-            end
+            local_hash                    = git.rev_parse('HEAD')
+            base_hash                     = generate_tree_hash(mirror, base_revision)
             remote_hash                   = generate_tree_hash(mirror, target_revision)
             ENV["GITHEAD_#{local_hash}"]  = 'HEAD'
             ENV["GITHEAD_#{remote_hash}"] = target_revision
-            git.merge_recursive(base_hash, local_hash, remote_hash)
+            git.merge_trees(base_hash, local_hash, remote_hash)
           else
             git.merge_subtree(target_revision)
           end
@@ -96,12 +92,10 @@ module Braid
       end
 
       def generate_tree_hash(mirror, revision)
-        git.rm_r(mirror.path)
-        git.read_tree_prefix(revision, mirror.path)
-        success = git.commit("Temporary commit for mirror '#{mirror.path}'")
-        hash    = git.rev_parse('HEAD')
-        git.reset_hard('HEAD^') if success
-        hash
+        git.with_temporary_index do
+          git.read_tree_prefix_i(revision, mirror.path)
+          git.write_tree()
+        end
       end
     end
   end

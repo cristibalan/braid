@@ -245,8 +245,16 @@ module Braid
         raise MergeError
       end
 
-      def merge_recursive(base_hash, local_hash, remote_hash)
-        invoke(:merge_recursive, base_hash, "-- #{local_hash} #{remote_hash}")
+      # Merge three trees (local_treeish should match the current state of the
+      # index) and update the index and working tree.
+      #
+      # The usage of "git merge-recursive" doesn't seem to be officially
+      # documented, but it does accept trees.  When a single base is passed, the
+      # "recursive" part (i.e., merge of bases) does not come into play and only
+      # the trees matter.  But for some reason, Git's smartest tree merge
+      # algorithm is only available via the "recursive" strategy.
+      def merge_trees(base_treeish, local_treeish, remote_treeish)
+        invoke(:merge_recursive, base_treeish, "-- #{local_treeish} #{remote_treeish}")
         true
       rescue ShellExecutionError
         raise MergeError
@@ -256,9 +264,35 @@ module Braid
         invoke('ls-files', prefix)
       end
 
-      def read_tree_prefix(treeish, prefix)
+      # Read tree into the index and working tree.
+      def read_tree_prefix_u(treeish, prefix)
         invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
         true
+      end
+
+      # Read tree into the index, regardless of the state of the working tree.
+      # Most useful with a temporary index file.
+      def read_tree_prefix_i(treeish, prefix)
+        invoke(:read_tree, "--prefix=#{prefix}/ -i", treeish)
+        true
+      end
+
+      # Write a tree object for the current index and return its ID.
+      def write_tree()
+        invoke(:write_tree)
+      end
+
+      # Execute a block using a temporary git index file, initially empty.
+      def with_temporary_index()
+        Dir.mktmpdir("braid_index") do |dir|
+          orig_index_file = ENV["GIT_INDEX_FILE"]
+          ENV["GIT_INDEX_FILE"] = File.join(dir, "index")
+          begin
+            yield
+          ensure
+            ENV["GIT_INDEX_FILE"] = orig_index_file
+          end
+        end
       end
 
       def rm_r(path)

@@ -152,6 +152,7 @@ re-add and maintain the Subversion support, please contact the authors.
 * Christoph Sturm
 * Dennis Muhlestein
 * Ferdinand Svehla
+* Matt McCutchen
 * Michael Klishin
 * Roman Heinrich
 * Travis Tilley

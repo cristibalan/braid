@@ -21,7 +21,7 @@ module Braid
           unless mirror.squashed?
             git.merge_ours(target_revision)
           end
-          git.read_tree_prefix(target_revision, mirror.path)
+          git.read_tree_prefix_u(target_revision, mirror.path)
 
           mirror.revision = new_revision
           mirror.lock = new_revision if options['revision']

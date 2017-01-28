@@ -75,6 +75,7 @@ module Braid
             git.merge_subtree(target_revision)
           end
         rescue Operations::MergeError => error
+          print error.conflicts_text
           msg 'Caught merge error. Breaking.'
         end
 

@@ -52,14 +52,14 @@ describe "Updating a mirror" do
 
     context "with mergeable changes to the same file" do
       it "should auto-merge and commit" do
-        `cp #{File.join(FIXTURE_PATH, "skit1_mergeable", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        `cp #{File.join(FIXTURE_PATH, "shiny_skit1_mergeable", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
 
         in_dir(@shiny) do
           `git commit -a -m 'mergeable change'`
           `#{BRAID_BIN} update skit1`
         end
 
-        output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2_merged", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        output    = `diff -U 3 #{File.join(FIXTURE_PATH, "shiny_skit1.2_merged", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
         $?.should be_success
 
         output = `git log --pretty=oneline`.split("\n")
@@ -70,7 +70,7 @@ describe "Updating a mirror" do
 
     context "with conflicting changes" do
       it "should leave conflict markup with the target revision" do
-        `cp #{File.join(FIXTURE_PATH, "skit1_conflicting", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
+        `cp #{File.join(FIXTURE_PATH, "shiny_skit1_conflicting", @file_name)} #{File.join(TMP_PATH, "shiny", "skit1", @file_name)}`
 
         target_revision = nil
         in_dir(@skit1) do
@@ -89,5 +89,27 @@ describe "Updating a mirror" do
       end
     end
 
+    # Regression test for https://github.com/cristibalan/braid/issues/41.
+    context "with a convergent deletion" do
+      it "should not detect a bogus rename" do
+        in_dir(@skit1) do
+          `git rm layouts/layout.liquid`
+          `git commit -m "delete"`
+        end
+        in_dir(@shiny) do
+          `git rm skit1/layouts/layout.liquid`
+          `git commit -m "delete here too"`
+        end
+
+	# Without the fix, when git diffs the base and local trees, it will
+	# think skit1/layouts/layout.liquid was renamed to
+	# other-skit/layout.liquid, resulting in a rename-delete conflict.
+        braid_output = nil
+        in_dir(@shiny) do
+          braid_output = `#{BRAID_BIN} update skit1`
+        end
+        braid_output.should_not =~ /Caught merge error\. Breaking\./
+      end
+    end
   end
 end

@@ -277,6 +277,13 @@ module Braid
         true
       end
 
+      # Read tree into the root of the index.  This may not be the preferred way
+      # to do it, but it seems to work.
+      def read_tree_im(treeish)
+        invoke(:read_tree, "-im", treeish)
+        true
+      end
+
       # Write a tree object for the current index and return its ID.
       def write_tree()
         invoke(:write_tree)
@@ -297,6 +304,12 @@ module Braid
 
       def rm_r(path)
         invoke(:rm, '-r', path)
+        true
+      end
+
+      # Remove from index only.
+      def rm_r_cached(path)
+        invoke(:rm, '-r', '--cached', path)
         true
       end
 

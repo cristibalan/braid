@@ -8,8 +8,11 @@ module Braid
 
   module Operations
     class ShellExecutionError < BraidError
-      def initialize(err = nil)
+      attr_reader :err, :out
+
+      def initialize(err = nil, out = nil)
         @err = err
+        @out = out
       end
 
       def message
@@ -38,6 +41,12 @@ module Braid
       end
     end
     class MergeError < BraidError
+      attr_reader :conflicts_text
+
+      def initialize(conflicts_text)
+        @conflicts_text = conflicts_text
+      end
+
       def message
         'could not merge'
       end
@@ -134,7 +143,7 @@ module Braid
 
       def exec!(cmd)
         status, out, err = exec(cmd)
-        raise ShellExecutionError, err unless status == 0
+        raise ShellExecutionError.new(err, out) unless status == 0
         [status, out, err]
       end
 
@@ -242,7 +251,8 @@ module Braid
         invoke(:merge, '-s subtree --no-commit --no-ff', opt)
         true
       rescue ShellExecutionError
-        raise MergeError
+        # TODO: Figure out how to pass along conflict messages.
+        raise MergeError, ''
       end
 
       # Merge three trees (local_treeish should match the current state of the
@@ -256,8 +266,9 @@ module Braid
       def merge_trees(base_treeish, local_treeish, remote_treeish)
         invoke(:merge_recursive, base_treeish, "-- #{local_treeish} #{remote_treeish}")
         true
-      rescue ShellExecutionError
-        raise MergeError
+      rescue ShellExecutionError => error
+        # "CONFLICT" messages go to stdout.
+        raise MergeError, error.out
       end
 
       def read_ls_files(prefix)

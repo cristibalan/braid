@@ -241,7 +241,7 @@ module Braid
 
       # Implies no commit.
       def merge_ours(opt)
-        invoke(:merge, '-s ours --no-commit', opt)
+        invoke(:merge, '--allow-unrelated-histories -s ours --no-commit', opt)
         true
       end
 

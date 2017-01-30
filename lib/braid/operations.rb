@@ -250,9 +250,8 @@ module Braid
         # TODO which options are needed?
         invoke(:merge, '-s subtree --no-commit --no-ff', opt)
         true
-      rescue ShellExecutionError
-        # TODO: Figure out how to pass along conflict messages.
-        raise MergeError, ''
+      rescue ShellExecutionError => error
+        raise MergeError, error.out
       end
 
       # Merge three trees (local_treeish should match the current state of the

@@ -44,7 +44,7 @@ module Braid
     def get(path)
       key = path.to_s.sub(/\/$/, '')
       attributes = @db[key]
-      return attributes ? Mirror.new(path, attributes) : nil
+      attributes ? Mirror.new(path, attributes) : nil
     end
 
     def get!(path)

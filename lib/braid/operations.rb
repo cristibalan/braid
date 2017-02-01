@@ -300,7 +300,7 @@ module Braid
       end
 
       # Execute a block using a temporary git index file, initially empty.
-      def with_temporary_index()
+      def with_temporary_index
         Dir.mktmpdir('braid_index') do |dir|
           orig_index_file = ENV['GIT_INDEX_FILE']
           ENV['GIT_INDEX_FILE'] = File.join(dir, 'index')

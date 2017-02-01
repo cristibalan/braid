@@ -70,6 +70,7 @@ module Braid
     end
 
     private
+
     def write_mirror(mirror)
       @db[mirror.path] = clean_attributes(mirror.attributes)
       write_db

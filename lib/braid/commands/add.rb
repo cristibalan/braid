@@ -32,7 +32,6 @@ module Braid
           msg "Added mirror at #{display_revision(mirror)}."
         end
       end
-
     end
   end
 end

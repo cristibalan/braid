@@ -75,6 +75,7 @@ module Braid
     end
 
     def add_config_file
+      git.rm(OLD_CONFIG_FILE) if File.exist?(OLD_CONFIG_FILE)
       git.add(CONFIG_FILE)
     end
 

@@ -34,7 +34,7 @@ This is where Braid comes into play. Braid makes it easy to vendor in remote git
 repositories and use an automated mechanism for updating the external library
 and generating patches to upgrade the external library.
 
-Braid creates a file `.braids` in the root of your repository that contains
+Braid creates a file `.braids.json` in the root of your repository that contains
 references to external libraries or mirrors. There are two types of mirrors in
 Braid: squashed and full. Mirrors are squashed by default, which is what you'll
 generally want because they're faster and don't pollute your history with

@@ -24,7 +24,7 @@ Main {
     description <<-TXT
       Add a new mirror to be tracked.
 
-        * adds metadata about the mirror to .braids
+        * adds metadata about the mirror to .braids.json
         * adds the git remotes to .git/config
         * fetches and merges remote code into given directory
 
@@ -54,7 +54,7 @@ Main {
 
         * get new changes from remote
         * always creates a merge commit
-        * updates metadata in .braids when revisions are changed
+        * updates metadata in .braids.json when revisions are changed
 
       Defaults to updating all unlocked mirrors if none is specified.
     TXT
@@ -76,7 +76,7 @@ Main {
     description <<-TXT
       Remove a mirror.
 
-        * removes metadata from .braids
+        * removes metadata from .braids.json
         * removes the local directory and commits the removal
         * removes the git remote by default, --keep can be used to suppress that
     TXT

@@ -1,7 +1,8 @@
 require 'braid/version'
 
 module Braid
-  CONFIG_FILE          = '.braids'
+  OLD_CONFIG_FILE      = '.braids'
+  CONFIG_FILE          = '.braids.json'
   REQUIRED_GIT_VERSION = '1.6'
 
   def self.verbose

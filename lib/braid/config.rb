@@ -15,19 +15,25 @@ module Braid
       end
     end
 
-    def initialize(config_file = CONFIG_FILE)
+    def initialize(config_file = CONFIG_FILE, old_config_files = [OLD_CONFIG_FILE])
       @config_file = config_file
-      begin
-        store = YAML::Store.new(@config_file)
-        @db = {}
-        store.transaction(true) do
-          store.roots.each do |path|
-            @db[path] = store[path]
+      (old_config_files + [config_file]).each do |file|
+        next unless File.exist?(file)
+        begin
+          store = YAML::Store.new(file)
+          @db = {}
+          store.transaction(true) do
+            store.roots.each do |path|
+              @db[path] = store[path]
+            end
           end
+          return
+        rescue
+          @db = JSON.parse(file)
+          return if @db
         end
-      rescue
-        @db = JSON.parse(@config_file)
       end
+      @db = {}
     end
 
     def add_from_options(url, options)

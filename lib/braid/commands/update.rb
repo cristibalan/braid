@@ -20,7 +20,7 @@ module Braid
       def update_one(path, options = {})
         mirror           = config.get!(path)
 
-        revision_message = options["revision"] ? " to #{display_revision(mirror, options["revision"])}" : ""
+        revision_message = options['revision'] ? " to #{display_revision(mirror, options['revision'])}" : ''
         msg "Updating mirror '#{mirror.path}'#{revision_message}."
 
         was_locked = mirror.locked?

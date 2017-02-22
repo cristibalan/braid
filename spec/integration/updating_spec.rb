@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../integration_helper'
 
-describe "Updating a mirror" do
+describe 'Updating a mirror' do
 
   before do
     FileUtils.rm_rf(TMP_PATH)

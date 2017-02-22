@@ -44,7 +44,7 @@ module Braid
         begin
           new_revision = validate_new_revision(mirror, options['revision'])
         rescue InvalidRevision
-          # Ignored as it means the revision matches expecte
+          # Ignored as it means the revision matches expected
         end
         target_revision = determine_target_revision(new_revision)
 

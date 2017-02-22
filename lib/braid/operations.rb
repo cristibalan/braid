@@ -172,7 +172,7 @@ module Braid
       def commit(message, *args)
         cmd = 'git commit --no-verify'
         if message # allow nil
-          message_file = Tempfile.new("braid_commit")
+          message_file = Tempfile.new('braid_commit')
           message_file.print("Braid: #{message}")
           message_file.flush
           message_file.close
@@ -257,16 +257,16 @@ module Braid
       # Merge three trees (local_treeish should match the current state of the
       # index) and update the index and working tree.
       #
-      # The usage of "git merge-recursive" doesn't seem to be officially
+      # The usage of 'git merge-recursive' doesn't seem to be officially
       # documented, but it does accept trees.  When a single base is passed, the
-      # "recursive" part (i.e., merge of bases) does not come into play and only
+      # 'recursive' part (i.e., merge of bases) does not come into play and only
       # the trees matter.  But for some reason, Git's smartest tree merge
-      # algorithm is only available via the "recursive" strategy.
+      # algorithm is only available via the 'recursive' strategy.
       def merge_trees(base_treeish, local_treeish, remote_treeish)
         invoke(:merge_recursive, base_treeish, "-- #{local_treeish} #{remote_treeish}")
         true
       rescue ShellExecutionError => error
-        # "CONFLICT" messages go to stdout.
+        # 'CONFLICT' messages go to stdout.
         raise MergeError, error.out
       end
 
@@ -290,7 +290,7 @@ module Braid
       # Read tree into the root of the index.  This may not be the preferred way
       # to do it, but it seems to work.
       def read_tree_im(treeish)
-        invoke(:read_tree, "-im", treeish)
+        invoke(:read_tree, '-im', treeish)
         true
       end
 

@@ -63,6 +63,7 @@ module Braid
         mirror.lock = new_revision if options['revision']
 
         msg "Merging in mirror '#{mirror.path}'." if verbose?
+        in_error = false
         begin
           if mirror.squashed?
             local_hash                    = git.rev_parse('HEAD')
@@ -75,6 +76,7 @@ module Braid
             git.merge_subtree(target_revision)
           end
         rescue Operations::MergeError => error
+          in_error = true
           print error.conflicts_text
           msg 'Caught merge error. Breaking.'
         end
@@ -83,7 +85,7 @@ module Braid
         add_config_file
 
         commit_message = "Update mirror '#{mirror.path}' to #{display_revision(mirror)}"
-        if error
+        if in_error
           File.open('.git/MERGE_MSG', 'w') { |f| f.puts(commit_message) }
           return
         end

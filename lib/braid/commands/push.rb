@@ -23,7 +23,6 @@ module Braid
 
         clone_dir = Dir.tmpdir + "/braid_push.#{$$}"
         Dir.mkdir(clone_dir)
-        source_dir = Dir.pwd
         remote_url = git.remote_url(mirror.remote)
         if remote_url == mirror.cached_url
           remote_url = mirror.url
@@ -33,7 +32,7 @@ module Braid
         Dir.chdir(clone_dir) do
           msg 'Cloning mirror with local changes.'
           git.init
-          git.fetch(source_dir)
+          git.fetch(mirror.cached_url) if File.exist?(mirror.cached_url)
           git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
           git.checkout(base_revision)
           git.apply(diff)

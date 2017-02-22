@@ -295,7 +295,7 @@ module Braid
       end
 
       # Write a tree object for the current index and return its ID.
-      def write_tree()
+      def write_tree
         invoke(:write_tree)
       end
 

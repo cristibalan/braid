@@ -27,9 +27,8 @@ module Braid
 
       branch = options['branch'] || 'master'
 
-      unless path = options['path'] || extract_path_from_url(url)
-        raise PathRequired
-      end
+      path = options['path'] || extract_path_from_url(url)
+      raise PathRequired unless path
 
       remote   = "#{branch}/braid/#{path}"
       squashed = !options['full']

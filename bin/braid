@@ -107,7 +107,7 @@ Main {
       Show diff of local changes to mirror.
     TXT
 
-    mixin :argument_path, :option_verbose, :option_keep_remote
+    mixin :optional_path, :option_verbose, :option_keep_remote
 
     run {
       options = {

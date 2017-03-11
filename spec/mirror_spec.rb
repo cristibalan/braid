@@ -10,6 +10,11 @@ describe 'Braid::Mirror.new_from_options' do
     new_from_options('http://path.git')
     @mirror.path.should == 'path'
   end
+
+  it 'should strip trailing slash from specified path' do
+    new_from_options('http://path.git', 'path' => 'vendor/tools/mytool/')
+    @mirror.path.should == 'vendor/tools/mytool'
+  end
 end
 
 describe 'Braid::Mirror#diff' do

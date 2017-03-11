@@ -27,7 +27,7 @@ module Braid
 
       branch = options['branch'] || 'master'
 
-      path = options['path'] || extract_path_from_url(url)
+      path = (options['path'] || extract_path_from_url(url)).sub(/\/$/, '')
       raise PathRequired unless path
 
       remote   = "#{branch}/braid/#{path}"

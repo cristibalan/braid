@@ -15,22 +15,22 @@ module Braid
         msg "Listing all mirrors.\n=======================================================\n"
         config.mirrors.each do |path|
           mirror = config.get!(path)
+          setup_remote(mirror)
+          mirror.fetch
           print path.to_s
           print ' (' + mirror.base_revision + ')'
           print ' [LOCKED]' if mirror.locked?
-          setup_remote(mirror)
           msg "Fetching new commits for '#{mirror.path}'." if verbose?
-          mirror.fetch
           new_revision    = validate_new_revision(mirror, options['revision'])
           print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
           local_file_count = git.read_ls_files(mirror.path).split.size
-          clear_remote(mirror, options)
           if 0 == local_file_count
             print ' (Removed Locally)'
           elsif !mirror.diff.empty?
             print ' (Locally Modified)'
           end
           print "\n"
+          clear_remote(mirror, options)
         end
         print "\n"
       end

@@ -2,9 +2,7 @@ module Braid
   module Commands
     class Update < Command
       def run(path, options = {})
-        with_reset_on_error do
-          path ? update_one(path, options) : update_all(options)
-        end
+        path ? update_one(path, options) : update_all(options)
       end
 
       protected

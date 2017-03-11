@@ -158,11 +158,11 @@ Main {
   mode(:list) {
     description 'Show all tracked mirrors (and if updates are available).'
 
-    mixin :option_verbose
+    mixin :optional_path, :option_verbose
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:list)
+      Braid::Command.run(:list, path)
     }
   }
 

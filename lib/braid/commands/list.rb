@@ -2,40 +2,8 @@ module Braid
   module Commands
     class List < Command
       def run(path = nil, options = {})
-        with_reset_on_error do
-          path ? list_one(path, options) : list_all(options)
-        end
-      end
-
-      protected
-
-      def list_all(options = {})
-        print "\n"
-        msg "Listing all mirrors.\n=======================================================\n"
-        config.mirrors.each do |path|
-          list_one(path, options)
-        end
-        print "\n"
-      end
-
-      def list_one(path, options = {})
-        mirror = config.get!(path)
-        setup_remote(mirror)
-        mirror.fetch
-        print path.to_s
-        print ' (' + mirror.base_revision + ')'
-        print ' [LOCKED]' if mirror.locked?
-        msg "Fetching new commits for '#{mirror.path}'." if verbose?
-        new_revision = validate_new_revision(mirror, options['revision'])
-        print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
-        local_file_count = git.read_ls_files(mirror.path).split.size
-        if 0 == local_file_count
-          print ' (Removed Locally)'
-        elsif !mirror.diff.empty?
-          print ' (Locally Modified)'
-        end
-        print "\n"
-        clear_remote(mirror, options)
+        msg "WARNING: list command is deprecated. Please use \"braid status\" instead.\n"
+        Command.run(:status, path, options)
       end
     end
   end

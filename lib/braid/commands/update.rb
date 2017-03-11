@@ -13,6 +13,7 @@ module Braid
         options.reject! { |k, v| %w(revision head).include?(k) }
         msg 'Updating all mirrors.'
         config.mirrors.each do |path|
+          bail_on_local_changes!
           update_one(path, options)
         end
       end

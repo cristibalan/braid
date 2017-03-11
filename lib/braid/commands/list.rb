@@ -8,6 +8,7 @@ module Braid
       end
 
       protected
+
       def list_all(options = {})
         options.reject! { |k, v| %w(revision head).include?(k) }
         print "\n"
@@ -32,7 +33,6 @@ module Braid
         end
         print "\n"
       end
-
     end
   end
 end

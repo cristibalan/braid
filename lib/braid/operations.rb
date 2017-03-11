@@ -147,14 +147,6 @@ module Braid
         [status, out, err]
       end
 
-      def sh(cmd, message = nil)
-        message ||= 'could not fetch' if cmd =~ /fetch/
-        log(cmd)
-        `#{cmd}`
-        raise ShellExecutionError, message unless $?.exitstatus == 0
-        true
-      end
-
       def msg(str)
         puts "Braid: #{str}"
       end
@@ -193,8 +185,7 @@ module Braid
 
       def fetch(remote = nil, *args)
         args.unshift "-n #{remote}" if remote
-        # open4 messes with the pipes of index-pack
-        sh("git fetch #{args.join(' ')} > #{Gem.win_platform? ? 'nul' : '/dev/null'}")
+        exec!("git fetch #{args.join(' ')} > #{Gem.win_platform? ? 'nul' : '/dev/null'}", 'Failed to fetch')
       end
 
       def checkout(treeish)

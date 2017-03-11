@@ -185,7 +185,7 @@ module Braid
 
       def fetch(remote = nil, *args)
         args.unshift "-n #{remote}" if remote
-        exec!("git fetch #{args.join(' ')} > #{Gem.win_platform? ? 'nul' : '/dev/null'}")
+        exec!("git fetch #{args.join(' ')}")
       end
 
       def checkout(treeish)

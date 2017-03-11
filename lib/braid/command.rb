@@ -48,6 +48,10 @@ module Braid
       Command.run(:setup, mirror.path)
     end
 
+    def clear_remote(mirror, options)
+      git.remote_rm(mirror.remote) unless options['keep']
+    end
+
     def use_local_cache?
       Braid.use_local_cache
     end

@@ -55,6 +55,7 @@ Main {
         * get new changes from remote
         * always creates a merge commit
         * updates metadata in .braids.json when revisions are changed
+        * removes the git remote by default, --keep can be used to suppress that
 
       Defaults to updating all unlocked mirrors if none is specified.
     TXT
@@ -64,11 +65,16 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_path, :option_revision, :option_head, :option_verbose
+    mixin :optional_path, :option_revision, :option_head, :option_verbose, :option_keep_remote
 
     run {
+      options = {
+        'revision' => revision,
+        'head' => head,
+        'keep' => keep
+      }
       Braid.verbose = verbose
-      Braid::Command.run(:update, path, {'revision' => revision, 'head' => head})
+      Braid::Command.run(:update, path, options)
     }
   }
 
@@ -88,8 +94,8 @@ Main {
     mixin :argument_path, :option_verbose, :option_keep_remote
 
     run {
-      options       = {
-          :keep => keep
+      options = {
+        :keep => keep
       }
       Braid.verbose = verbose
       Braid::Command.run(:remove, path, options)
@@ -101,10 +107,13 @@ Main {
       Show diff of local changes to mirror.
     TXT
 
-    mixin :argument_path, :option_verbose
+    mixin :argument_path, :option_verbose, :option_keep_remote
 
     run {
-      Braid::Command.run(:diff, path)
+      options = {
+        'keep' => keep
+      }
+      Braid::Command.run(:diff, path, options)
     }
   }
 
@@ -113,11 +122,14 @@ Main {
       Push local mirror changes to remote.
     TXT
 
-    mixin :argument_path, :option_verbose
+    mixin :argument_path, :option_verbose, :option_keep_remote
 
     run {
+      options = {
+        'keep' => keep
+      }
       Braid.verbose = verbose
-      Braid::Command.run(:push, path)
+      Braid::Command.run(:push, path, options)
     }
   }
 

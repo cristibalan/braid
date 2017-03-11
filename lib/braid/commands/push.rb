@@ -41,6 +41,8 @@ module Braid
           git.push(remote_url, "HEAD:#{mirror.branch}")
         end
         FileUtils.rm_r(clone_dir)
+
+        clear_remote(mirror, options)
       end
     end
   end

@@ -24,6 +24,7 @@ module Braid
           new_revision    = validate_new_revision(mirror, options['revision'])
           print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
           local_file_count = git.read_ls_files(mirror.path).split.size
+          clear_remote(mirror, options)
           if 0 == local_file_count
             print ' (Removed Locally)'
           elsif !mirror.diff.empty?

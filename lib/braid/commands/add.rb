@@ -30,6 +30,8 @@ module Braid
 
           git.commit("Add mirror '#{mirror.path}' at #{display_revision(mirror)}")
           msg "Added mirror at #{display_revision(mirror)}."
+
+          clear_remote(mirror, options)
         end
       end
     end

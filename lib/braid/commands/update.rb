@@ -50,6 +50,7 @@ module Braid
         if (options['revision'] && was_locked && target_revision == mirror.base_revision) ||
           (options['revision'].nil? && !was_locked && mirror.merged?(target_revision))
           msg "Mirror '#{mirror.path}' is already up to date."
+          clear_remote(mirror, options)
           return
         end
 
@@ -91,6 +92,7 @@ module Braid
 
         git.commit(commit_message)
         msg "Updated mirror to #{display_revision(mirror)}."
+        clear_remote(mirror, options)
       end
 
       def generate_tree_hash(mirror, revision)

@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url remote branch squashed revision lock)
+    ATTRIBUTES = %w(url branch squashed revision lock)
 
     class UnknownType < BraidError
       def message
@@ -30,10 +30,9 @@ module Braid
       path = (options['path'] || extract_path_from_url(url)).sub(/\/$/, '')
       raise PathRequired unless path
 
-      remote   = "#{branch}/braid/#{path}"
       squashed = !options['full']
 
-      attributes = {'url' => url, 'remote' => remote, 'branch' => branch, 'squashed' => squashed}
+      attributes = {'url' => url, 'branch' => branch, 'squashed' => squashed}
       self.new(path, attributes)
     end
 
@@ -89,11 +88,7 @@ module Braid
     end
 
     def remote
-      if (attributes['remote'] && attributes['remote'] =~ /^braid\//)
-        attributes['remote'] = "#{branch}/#{attributes['remote']}"
-      else
-        attributes['remote']
-      end
+      "#{branch}/braid/#{path}"
     end
 
     private

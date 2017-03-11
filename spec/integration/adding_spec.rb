@@ -36,7 +36,6 @@ describe 'Adding a mirror in a clean repository' do
       braids['skit1']['url'].should == @skit1
       braids['skit1']['revision'].should_not be_nil
       braids['skit1']['branch'].should == 'master'
-      braids['skit1']['remote'].should == 'master/braid/skit1'
     end
   end
 end

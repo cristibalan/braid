@@ -7,17 +7,20 @@ module Braid
       def run(path, options = {})
         mirror = config.get!(path)
 
-        #mirror.fetch
+        setup_remote(mirror)
+        mirror.fetch
 
         base_revision = git.rev_parse(mirror.remote)
         unless mirror.merged?(base_revision)
           msg 'Mirror is not up to date. Stopping.'
+          clear_remote(mirror, options)
           return
         end
 
         diff = mirror.diff
         if diff.empty?
           msg 'No local changes found. Stopping.'
+          clear_remote(mirror, options)
           return
         end
 

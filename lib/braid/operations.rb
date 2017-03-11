@@ -152,7 +152,7 @@ module Braid
       end
 
       def log(cmd)
-        msg "Executing `#{cmd}`" if verbose?
+        msg "Executing `#{cmd}` in #{Dir.pwd}" if verbose?
       end
 
       def verbose?

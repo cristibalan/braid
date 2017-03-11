@@ -41,7 +41,7 @@ module Braid
 
         new_revision = options['revision']
         begin
-          new_revision = validate_new_revision(mirror, options['revision'])
+          new_revision = validate_new_revision(mirror, new_revision)
         rescue InvalidRevision
           # Ignored as it means the revision matches expected
         end

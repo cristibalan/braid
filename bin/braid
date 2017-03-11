@@ -173,7 +173,7 @@ Main {
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:list, path)
+      Braid::Command.run(:status, path)
     }
   }
 

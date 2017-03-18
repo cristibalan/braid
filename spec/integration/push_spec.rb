@@ -18,7 +18,7 @@ describe 'Pushing to a mirror' do
       end
 
       in_dir(@vendor_repository_dir) do
-        run_command('git config receive.denyCurrentBranch updateInstead')
+        run_command('git config receive.denyCurrentBranch ignore')
       end
 
       update_dir_from_fixture('shiny/skit1', 'skit1.1')

@@ -8,7 +8,7 @@ require 'pathname'
 
 TMP_PATH     = File.join(Dir.tmpdir, 'braid_integration')
 EDITOR_CMD   = "#{TMP_PATH}/editor"
-EDITOR_CMD_PREFIX = "GIT_EDITOR=#{EDITOR_CMD}"
+EDITOR_CMD_PREFIX = "export GIT_EDITOR=#{EDITOR_CMD};"
 BRAID_PATH   = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, 'spec', 'fixtures')
 FileUtils.rm_rf(TMP_PATH)
@@ -19,7 +19,7 @@ BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + Fi
 def set_editor_message(message = 'Make some changes')
   File.write(EDITOR_CMD, <<CMD)
 #!/usr/bin/env ruby
-File.write(ARGV[0], #{message.inspect})
+File.open(ARGV[0], 'w') { |file| file.write(#{message.inspect}) }
 CMD
   FileUtils.chmod 0755, EDITOR_CMD
 end

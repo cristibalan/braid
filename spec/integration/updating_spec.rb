@@ -97,9 +97,9 @@ describe 'Updating a mirror' do
           run_command('git commit -m "delete here too"')
         end
 
-	# Without the fix, when git diffs the base and local trees, it will
-	# think skit1/layouts/layout.liquid was renamed to
-	# other-skit/layout.liquid, resulting in a rename-delete conflict.
+        # Without the fix, when git diffs the base and local trees, it will
+        # think skit1/layouts/layout.liquid was renamed to
+        # other-skit/layout.liquid, resulting in a rename-delete conflict.
         braid_output = nil
         in_dir(@shiny) do
           braid_output = run_command("#{BRAID_BIN} update skit1")

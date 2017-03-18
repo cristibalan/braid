@@ -7,4 +7,6 @@ rvm:
 git:
   depth: 10
 before_install:
+  - git config --global user.name "Somebody"
+  - git config --global user.email "you@example.com"
   - gem update bundler

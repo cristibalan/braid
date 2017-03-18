@@ -40,10 +40,7 @@ describe 'Pushing to a mirror' do
         braid_output.should =~ /Braid: Pushing changes to remote branch master./
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
-        puts "#{@vendor_repository_dir}/#{@file_name}"
-        exit
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
-
       end
 
       it 'should push changes to specified branch successfully' do

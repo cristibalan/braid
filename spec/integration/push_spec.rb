@@ -18,7 +18,7 @@ describe 'Pushing to a mirror' do
       end
 
       in_dir(@vendor_repository_dir) do
-        run_command('git config receive.denyCurrentBranch ignore')
+        run_command('git config receive.denyCurrentBranch updateInstead')
       end
 
       update_dir_from_fixture('shiny/skit1', 'skit1.1')
@@ -40,7 +40,10 @@ describe 'Pushing to a mirror' do
         braid_output.should =~ /Braid: Pushing changes to remote branch master./
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
+        puts "#{@vendor_repository_dir}/#{@file_name}"
+        exit
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
+
       end
 
       it 'should push changes to specified branch successfully' do

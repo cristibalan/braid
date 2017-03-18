@@ -122,11 +122,12 @@ Main {
       Push local mirror changes to remote.
     TXT
 
-    mixin :argument_path, :option_verbose, :option_keep_remote
+    mixin :argument_path, :option_branch, :option_verbose, :option_keep_remote
 
     run {
       options = {
-        'keep' => keep
+        'keep' => keep,
+        'branch' => branch
       }
       Braid.verbose = verbose
       Braid::Command.run(:push, path, options)

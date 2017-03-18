@@ -37,9 +37,30 @@ describe 'Pushing to a mirror' do
         end
         braid_output.should =~ /Braid: Cloning mirror with local changes./
         braid_output.should =~ /Make some changes/
-        braid_output.should =~ /Braid: Pushing changes to remote./
+        braid_output.should =~ /Braid: Pushing changes to remote branch master./
 
-        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{TMP_PATH}/shiny/skit1/#{@file_name}")
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
+      end
+
+      it 'should push changes to specified branch successfully' do
+        braid_output = nil
+        in_dir(@repository_dir) do
+          set_editor_message('Make some changes')
+          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
+        end
+        braid_output.should =~ /Braid: Cloning mirror with local changes./
+        braid_output.should =~ /Make some changes/
+        braid_output.should =~ /Braid: Pushing changes to remote branch MyBranch./
+
+        assert_no_diff("#{FIXTURE_PATH}/skit1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
+
+        in_dir(@vendor_repository_dir) do
+          run_command('git checkout MyBranch 2>&1')
+        end
+
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
       end
     end
 

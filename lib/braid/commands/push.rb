@@ -7,6 +7,8 @@ module Braid
       def run(path, options = {})
         mirror = config.get!(path)
 
+        branch = options['branch'] || mirror.branch
+
         setup_remote(mirror)
         mirror.fetch
 
@@ -40,8 +42,8 @@ module Braid
           git.checkout(base_revision)
           git.apply(diff)
           system('git commit -v')
-          msg 'Pushing changes to remote.'
-          git.push(remote_url, "HEAD:#{mirror.branch}")
+          msg "Pushing changes to remote branch #{branch}."
+          git.push(remote_url, "HEAD:refs/heads/#{branch}")
         end
         FileUtils.rm_r(clone_dir)
 

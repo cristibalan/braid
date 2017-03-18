@@ -7,6 +7,8 @@ rvm:
   - jruby-18mode
 addons:
   apt:
+    sources:
+    - git-core
     packages:
     - git
 git:

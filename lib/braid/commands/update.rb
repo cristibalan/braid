@@ -86,7 +86,8 @@ module Braid
 
         commit_message = "Update mirror '#{mirror.path}' to #{display_revision(mirror)}"
         if in_error
-          File.open('.git/MERGE_MSG', 'w') { |f| f.puts(commit_message) }
+          merge_msg_path = git.repo_file_path('MERGE_MSG')
+          File.open(merge_msg_path, 'w') { |f| f.puts(commit_message) }
           return
         end
 

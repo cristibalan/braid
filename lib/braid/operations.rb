@@ -161,6 +161,18 @@ module Braid
     end
 
     class Git < Proxy
+      # Get the physical path to a file in the git repository (e.g.,
+      # 'MERGE_MSG'), taking into account worktree configuration.  The returned
+      # path may be absolute or relative to the current working directory.
+      def repo_file_path(path)
+        if require_version('2.5')  # support for --git-path
+          invoke(:rev_parse, '--git-path', path)
+        else
+          # Git < 2.5 doesn't support linked worktrees anyway.
+          File.join(invoke(:rev_parse, '--git-dir'), path)
+        end
+      end
+
       def commit(message, *args)
         cmd = 'git commit --no-verify'
         if message # allow nil

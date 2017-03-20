@@ -113,7 +113,8 @@ module Braid
       hash          = nil
       local_commits.each do |local_commit|
         local_tree = git.tree_hash(path, local_commit)
-        if match = remote_hashes.find { |_, remote_tree| local_tree == remote_tree }
+        match = remote_hashes.find { |_, remote_tree| local_tree == remote_tree }
+        if match
           hash = match[0]
           break
         end

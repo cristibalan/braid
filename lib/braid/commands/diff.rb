@@ -2,9 +2,7 @@ module Braid
   module Commands
     class Diff < Command
       def run(path = nil, options = {})
-        with_reset_on_error do
-          path ? diff_one(path, options) : diff_all(options)
-        end
+        path ? diff_one(path, options) : diff_all(options)
       end
 
       protected

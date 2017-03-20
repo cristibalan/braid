@@ -76,6 +76,12 @@ to the grit project:
 
     braid diff lib/grit > grit.patch
 
+Alternatively you can push changes back to the source directory directly using the following command. The command
+will push the changes to the branch `myproject_customizations` that has been branched off the source branch (`master`
+in this example). Omit the `--branch` argument to push directly to the source branch.
+
+    braid push lib/grit --branch myproject_customizations
+
 Once those changes have been applied to grit you probably want to update your local version of grit again.
 
     braid update lib/grit

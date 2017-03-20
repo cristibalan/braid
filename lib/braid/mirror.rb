@@ -95,10 +95,10 @@ module Braid
 
     def method_missing(name, *args)
       if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }
-        unless $2
-          attributes[$1]
-        else
+        if $2
           attributes[$1] = args[0]
+        else
+          attributes[$1]
         end
       else
         raise NameError, "unknown attribute `#{name}'"

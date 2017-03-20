@@ -9,7 +9,7 @@ module Braid
 
       protected
 
-       def diff_all(options = {})
+      def diff_all(options = {})
         print "\n"
         msg "Diffing all mirrors.\n=======================================================\n"
         config.mirrors.each do |path|

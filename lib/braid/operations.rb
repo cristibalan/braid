@@ -224,11 +224,6 @@ module Braid
         true
       end
 
-      def add(path)
-        invoke(:add, path)
-        true
-      end
-
       def remote_rm(remote)
         invoke(:remote, 'rm', remote)
         true

@@ -55,10 +55,7 @@ module Braid
           return
         end
 
-        if mirror.squashed?
-          diff          = mirror.diff
-          base_revision = mirror.base_revision
-        end
+        base_revision = mirror.base_revision if mirror.squashed?
 
         mirror.revision = new_revision
         mirror.lock = new_revision if options['revision']

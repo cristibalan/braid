@@ -12,7 +12,7 @@ module Braid
         setup_remote(mirror)
         mirror.fetch
 
-        base_revision = git.rev_parse(mirror.remote)
+        base_revision = git.rev_parse("#{mirror.remote}/#{mirror.branch}")
         unless mirror.merged?(base_revision)
           msg 'Mirror is not up to date. Stopping.'
           clear_remote(mirror, options)

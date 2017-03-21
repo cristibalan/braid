@@ -29,7 +29,7 @@ module Braid
 
         msg "Setup: Creating remote for '#{mirror.path}'." if verbose?
         url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
-        git.remote_add(mirror.remote, url, mirror.branch)
+        git.remote_add(mirror.remote, url)
       end
     end
   end

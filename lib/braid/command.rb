@@ -89,7 +89,7 @@ module Braid
     end
 
     def validate_new_revision(mirror, new_revision)
-      return git.rev_parse(mirror.remote) unless new_revision
+      return git.rev_parse("#{mirror.remote}/#{mirror.branch}") unless new_revision
 
       new_revision = git.rev_parse(new_revision)
       old_revision = mirror.revision

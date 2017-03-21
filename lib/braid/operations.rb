@@ -219,8 +219,8 @@ module Braid
       end
 
       # Implies tracking.
-      def remote_add(remote, path, branch)
-        invoke(:remote, 'add', "-t #{branch} -m #{branch}", remote, path)
+      def remote_add(remote, path)
+        invoke(:remote, 'add', remote, path)
         true
       end
 

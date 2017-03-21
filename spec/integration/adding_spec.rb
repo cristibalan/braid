@@ -9,17 +9,17 @@ describe 'Adding a mirror in a clean repository' do
 
   describe 'from a git repository' do
     before do
-      @shiny = create_git_repo_from_fixture('shiny')
-      @skit1 = create_git_repo_from_fixture('skit1')
+      @repository_dir = create_git_repo_from_fixture('shiny')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
     end
 
     it 'should add the files and commit' do
-      in_dir(@shiny) do
-        run_command("#{BRAID_BIN} add #{@skit1}")
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir}")
       end
 
       file_name = 'skit1/layouts/layout.liquid'
-      run_command("diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, 'shiny', file_name)}")
+      assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
       output = run_command('git log --pretty=oneline').split("\n")
       output.length.should == 2
@@ -27,13 +27,13 @@ describe 'Adding a mirror in a clean repository' do
     end
 
     it 'should create .braids.json and add the mirror to it' do
-      in_dir(@shiny) do
-        run_command("#{BRAID_BIN} add #{@skit1}")
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir}")
       end
 
-      braids = YAML::load_file("#{@shiny}/.braids.json")
+      braids = YAML::load_file("#{@repository_dir}/.braids.json")
       braids['skit1']['squashed'].should == true
-      braids['skit1']['url'].should == @skit1
+      braids['skit1']['url'].should == @vendor_repository_dir
       braids['skit1']['revision'].should_not be_nil
       braids['skit1']['branch'].should == 'master'
     end

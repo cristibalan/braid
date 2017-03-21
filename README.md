@@ -99,6 +99,12 @@ Use the built in help system to find out about all commands and options:
 
     braid add git://github.com/rails/rails.git vendor/rails
 
+#### Adding a subdirectory from a mirror
+
+This is useful if you want to add a subdirectory from a mirror into your own project.
+
+    braid add --remote_path dist https://github.com/twbs/bootstrap.git vendor/assets/bootstrap
+
 #### Adding mirrors with revisions
 
     braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails

@@ -1,7 +1,7 @@
 # Braid
 
 [![Build Status](https://secure.travis-ci.org/cristibalan/braid.png?branch=master)](http://travis-ci.org/cristibalan/braid)
-[![Gem](https://img.shields.io/gem/v/braid.svg?maxAge=2592000)]()
+[![Gem](https://img.shields.io/gem/v/braid.svg?maxAge=2592000)](https://rubygems.org/gems/braid)
 
 Braid is a simple tool to help track vendor branches in a
 [Git](http://git-scm.com/) repository.

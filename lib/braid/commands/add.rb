@@ -4,6 +4,7 @@ module Braid
       def run(url, options = {})
         with_reset_on_error do
           mirror           = config.add_from_options(url, options)
+          git.add(Braid::CONFIG_FILE)
 
           branch_message   = (mirror.branch == 'master') ? '' : " branch '#{mirror.branch}'"
           revision_message = options['revision'] ? " at #{display_revision(mirror, options['revision'])}" : ''

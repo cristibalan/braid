@@ -113,6 +113,7 @@ Main {
       options = {
         'keep' => keep
       }
+      Braid.verbose = verbose
       Braid::Command.run(:diff, path, options)
     }
   }

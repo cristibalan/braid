@@ -40,11 +40,11 @@ Main {
       . braid add http://remote/path local/dir
     TXT
 
-    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_full, :option_verbose
+    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_full, :option_verbose, :option_remote_path
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'full' => full})
+      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'full' => full, 'remote_path' => remote_path})
     }
   }
 
@@ -203,6 +203,15 @@ Main {
       optional
       argument :required
       desc 'remote branch name'
+      attr
+    }
+  }
+
+  mixin(:option_remote_path) {
+    option(:remote_path, :p) {
+      optional
+      argument :required
+      desc 'remote path'
       attr
     }
   }

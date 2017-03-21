@@ -45,10 +45,11 @@ module Braid
         rescue InvalidRevision
           # Ignored as it means the revision matches expected
         end
-        target_revision = determine_target_revision(new_revision)
+        target_revision = determine_target_revision(mirror, new_revision)
+        current_revision = determine_target_revision(mirror, mirror.base_revision)
 
-        if (options['revision'] && was_locked && target_revision == mirror.base_revision) ||
-          (options['revision'].nil? && !was_locked && mirror.merged?(target_revision))
+        if (options['revision'] && was_locked && target_revision == current_revision) ||
+          (options['revision'].nil? && !was_locked && mirror.merged?(git.rev_parse(new_revision)))
           msg "Mirror '#{mirror.path}' is already up to date."
           clear_remote(mirror, options)
           return
@@ -67,7 +68,7 @@ module Braid
         begin
           if mirror.squashed?
             local_hash                    = git.rev_parse('HEAD')
-            base_hash                     = generate_tree_hash(mirror, base_revision)
+            base_hash                     = generate_tree_hash(mirror, mirror.versioned_path(base_revision))
             remote_hash                   = generate_tree_hash(mirror, target_revision)
             ENV["GITHEAD_#{local_hash}"]  = 'HEAD'
             ENV["GITHEAD_#{remote_hash}"] = target_revision

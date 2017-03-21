@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch squashed revision lock)
+    ATTRIBUTES = %w(url branch squashed revision lock remote_path)
 
     class UnknownType < BraidError
       def message
@@ -32,7 +32,9 @@ module Braid
 
       squashed = !options['full']
 
-      attributes = {'url' => url, 'branch' => branch, 'squashed' => squashed}
+      remote_path = options['remote_path']
+
+      attributes = {'url' => url, 'branch' => branch, 'squashed' => squashed, 'remote_path' => remote_path}
       self.new(path, attributes)
     end
 
@@ -59,9 +61,13 @@ module Braid
       end
     end
 
+    def versioned_path(revision)
+      "#{revision}:#{self.remote_path}"
+    end
+
     def diff
       fetch
-      remote_hash = git.rev_parse("#{base_revision}:")
+      remote_hash = git.rev_parse(versioned_path(base_revision))
       local_hash  = git.tree_hash(path)
       remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ''
     end

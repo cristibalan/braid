@@ -40,7 +40,9 @@ module Braid
           git.fetch(mirror.cached_url) if File.exist?(mirror.cached_url)
           git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
           git.checkout(base_revision)
-          git.apply(diff)
+          args =[]
+          args << "--directory=#{mirror.remote_path}" if mirror.remote_path
+          git.apply(diff, args)
           system('git commit -v')
           msg "Pushing changes to remote branch #{branch}."
           git.push(remote_url, "HEAD:refs/heads/#{branch}")

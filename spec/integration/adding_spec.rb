@@ -31,7 +31,7 @@ describe 'Adding a mirror in a clean repository' do
         run_command("#{BRAID_BIN} add #{@skit1}")
       end
 
-      braids = YAML::load_file("#{@shiny}/#{Braid::CONFIG_FILE}")
+      braids = YAML::load_file("#{@shiny}/.braids.json")
       braids['skit1']['squashed'].should == true
       braids['skit1']['url'].should == @skit1
       braids['skit1']['revision'].should_not be_nil

@@ -13,7 +13,7 @@ module Braid
         print "\n"
         msg "Listing all mirrors.\n=======================================================\n"
         config.mirrors.each do |path|
-          list_one(path, options)
+          status_one(path, options)
         end
         print "\n"
       end

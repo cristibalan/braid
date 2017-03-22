@@ -51,8 +51,8 @@ def create_git_repo_from_fixture(fixture_name, directory = fixture_name)
 
   in_dir(git_repo) do
     run_command('git init')
-    run_command("git config user.email \"you@example.com\"")
-    run_command("git config user.name \"Your Name\"")
+    run_command("git config --local user.email \"you@example.com\"")
+    run_command("git config --local user.name \"Your Name\"")
     run_command('git add *')
     run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end

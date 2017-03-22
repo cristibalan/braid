@@ -63,9 +63,10 @@ def update_dir_from_fixture(dir, fixture = dir)
   FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + '/.', to_dir)
 end
 
-def create_git_repo_from_fixture(fixture_name, directory = fixture_name)
+def create_git_repo_from_fixture(fixture_name, options = {})
+  directory = options[:directory] || fixture_name
   git_repo = File.join(TMP_PATH, directory)
-  update_dir_from_fixture(fixture_name)
+  update_dir_from_fixture(directory, fixture_name)
 
   in_dir(git_repo) do
     run_command('git init')

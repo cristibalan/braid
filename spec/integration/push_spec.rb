@@ -58,6 +58,16 @@ describe 'Pushing to a mirror' do
 
         in_dir(@vendor_repository_dir) do
           run_command('git checkout MyBranch 2>&1')
+
+          # Make sure the name is that from source repository
+          output = run_command('git log --pretty=format:%an').split("\n")
+          expect(output.length).to eq(2)
+          expect(output[0]).to match(/^Your Name$/)
+
+          # Make sure the email is that from source repository
+          output = run_command('git log --pretty=format:%ae').split("\n")
+          expect(output.length).to eq(2)
+          expect(output[0]).to match(/^you@example.com$/)
         end
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")

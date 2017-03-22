@@ -44,9 +44,10 @@ describe 'Pushing to a mirror' do
       end
 
       it 'should push changes to specified branch successfully' do
+        commit_message = 'Make some changes'
         braid_output = nil
         in_dir(@repository_dir) do
-          set_editor_message('Make some changes')
+          set_editor_message(commit_message)
           braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
@@ -59,15 +60,9 @@ describe 'Pushing to a mirror' do
         in_dir(@vendor_repository_dir) do
           run_command('git checkout MyBranch 2>&1')
 
-          # Make sure the name is that from source repository
-          output = run_command('git log --pretty=format:%an').split("\n")
-          expect(output.length).to eq(2)
-          expect(output[0]).to match(/^Your Name$/)
-
-          # Make sure the email is that from source repository
-          output = run_command('git log --pretty=format:%ae').split("\n")
-          expect(output.length).to eq(2)
-          expect(output[0]).to match(/^you@example.com$/)
+          assert_commit_subject(commit_message)
+          assert_commit_author('Your Name')
+          assert_commit_email('you@example.com')
         end
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")

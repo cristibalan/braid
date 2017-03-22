@@ -28,6 +28,21 @@ def assert_no_diff(file1, file2)
   run_command("diff -U 3 #{file1} #{file2}")
 end
 
+def assert_commit_subject(commit_subject, commit_index = 0)
+  output = run_command('git log --pretty=format:%s').split("\n")
+  expect(output[commit_index]).to match(/^#{commit_subject}$/)
+end
+
+def assert_commit_author(commit_author, commit_index = 0)
+  output = run_command('git log --pretty=format:%an').split("\n")
+  expect(output[commit_index]).to match(/^#{commit_author}$/)
+end
+
+def assert_commit_email(commit_email, commit_index = 0)
+  output = run_command('git log --pretty=format:%ae').split("\n")
+  expect(output[commit_index]).to match(/^#{commit_email}$/)
+end
+
 def in_dir(dir = TMP_PATH)
   Dir.chdir(dir)
   yield

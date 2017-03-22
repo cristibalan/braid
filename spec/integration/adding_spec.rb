@@ -18,7 +18,6 @@ describe 'Adding a mirror in a clean repository' do
         run_command("#{BRAID_BIN} add #{@vendor_repository_dir}")
       end
 
-      file_name = 'skit1/layouts/layout.liquid'
       assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
       output = run_command('git log --pretty=oneline').split("\n")

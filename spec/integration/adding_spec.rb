@@ -9,7 +9,7 @@ describe 'Adding a mirror in a clean repository' do
 
   describe 'from a git repository' do
     before do
-      @repository_dir = create_git_repo_from_fixture('shiny')
+      @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
     end
 
@@ -21,6 +21,8 @@ describe 'Adding a mirror in a clean repository' do
       assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
       assert_commit_subject(/Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/)
+      assert_commit_author('Some body')
+      assert_commit_email('somebody@example.com')
     end
 
     it 'should create .braids.json and add the mirror to it' do

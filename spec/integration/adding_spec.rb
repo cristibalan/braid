@@ -32,6 +32,7 @@ describe 'Adding a mirror in a clean repository' do
       expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
       expect(braids['skit1']['revision']).not_to be_nil
       expect(braids['skit1']['branch']).to eq('master')
+      expect(braids['skit1']['remote_path']).to be_nil
     end
   end
 end

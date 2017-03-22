@@ -35,17 +35,11 @@ repositories and use an automated mechanism for updating the external library
 and generating patches to upgrade the external library.
 
 Braid creates a file `.braids.json` in the root of your repository that contains
-references to external libraries or mirrors. There are two types of mirrors in
-Braid: squashed and full. Mirrors are squashed by default, which is what you'll
-generally want because they're faster and don't pollute your history with
-commits from the mirrors.
+references to external libraries or mirrors. The configuration allows you to control
+aspects of the mirroring process such as;
 
-Full mirrors are useful when you want to view imported history in your own
-project. You usually want this if the mirror is also a repository you have
-access to, for example, when using shared code across projects.
-
-Please note that you cannot change between mirror types after the initial add.
-You'll have to remove the mirror and add it again.
+* whether the mirror is locked to a particular version of the external library.
+* whether the mirror includes the entire external library or just a subdirectory.
 
 ## Installation
 
@@ -108,10 +102,6 @@ This is useful if you want to add a subdirectory from a mirror into your own pro
 #### Adding mirrors with revisions
 
     braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails
-
-#### Adding mirrors with full history
-
-    braid add --full git://github.com/mislav/will_paginate.git vendor/plugins/will_paginate
 
 #### Updating mirrors
 

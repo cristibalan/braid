@@ -31,7 +31,6 @@ describe 'Adding a mirror in a clean repository' do
       end
 
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit1']['squashed']).to eq(true)
       expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
       expect(braids['skit1']['revision']).not_to be_nil
       expect(braids['skit1']['branch']).to eq('master')

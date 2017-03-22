@@ -55,7 +55,7 @@ module Braid
           return
         end
 
-        base_revision = mirror.base_revision if mirror.squashed?
+        base_revision = mirror.base_revision
 
         mirror.revision = new_revision
         mirror.lock = new_revision if options['revision']
@@ -63,16 +63,12 @@ module Braid
         msg "Merging in mirror '#{mirror.path}'." if verbose?
         in_error = false
         begin
-          if mirror.squashed?
-            local_hash                    = git.rev_parse('HEAD')
-            base_hash                     = generate_tree_hash(mirror, mirror.versioned_path(base_revision))
-            remote_hash                   = generate_tree_hash(mirror, target_revision)
-            ENV["GITHEAD_#{local_hash}"]  = 'HEAD'
-            ENV["GITHEAD_#{remote_hash}"] = target_revision
-            git.merge_trees(base_hash, local_hash, remote_hash)
-          else
-            git.merge_subtree(target_revision)
-          end
+          local_hash = git.rev_parse('HEAD')
+          base_hash = generate_tree_hash(mirror, mirror.versioned_path(base_revision))
+          remote_hash = generate_tree_hash(mirror, target_revision)
+          ENV["GITHEAD_#{local_hash}"] = 'HEAD'
+          ENV["GITHEAD_#{remote_hash}"] = target_revision
+          git.merge_trees(base_hash, local_hash, remote_hash)
         rescue Operations::MergeError => error
           in_error = true
           print error.conflicts_text

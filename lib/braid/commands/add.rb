@@ -19,9 +19,6 @@ module Braid
           new_revision    = validate_new_revision(mirror, options['revision'])
           target_revision = determine_target_revision(mirror, new_revision)
 
-          unless mirror.squashed?
-            git.merge_ours(target_revision)
-          end
           git.read_tree_prefix_u(target_revision, mirror.path)
 
           mirror.revision = new_revision

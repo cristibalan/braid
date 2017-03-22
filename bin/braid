@@ -40,11 +40,11 @@ Main {
       . braid add http://remote/path local/dir
     TXT
 
-    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_full, :option_verbose, :option_remote_path
+    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_verbose, :option_remote_path
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'full' => full, 'remote_path' => remote_path})
+      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'remote_path' => remote_path})
     }
   }
 
@@ -229,14 +229,6 @@ Main {
     option(:head) {
       optional
       desc 'mirror head'
-      attr
-    }
-  }
-
-  mixin(:option_full) {
-    option(:full) {
-      optional
-      desc 'include mirror history' # FIXME
       attr
     }
   }

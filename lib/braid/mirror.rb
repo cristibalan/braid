@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch squashed revision lock remote_path)
+    ATTRIBUTES = %w(url branch revision lock remote_path)
 
     class UnknownType < BraidError
       def message
@@ -30,11 +30,9 @@ module Braid
       path = (options['path'] || extract_path_from_url(url)).sub(/\/$/, '')
       raise PathRequired unless path
 
-      squashed = !options['full']
-
       remote_path = options['remote_path']
 
-      attributes = {'url' => url, 'branch' => branch, 'squashed' => squashed, 'remote_path' => remote_path}
+      attributes = {'url' => url, 'branch' => branch, 'remote_path' => remote_path}
       self.new(path, attributes)
     end
 
@@ -46,19 +44,11 @@ module Braid
       !!lock
     end
 
-    def squashed?
-      !!squashed
-    end
-
     def merged?(commit)
       # tip from spearce in #git:
       # `test z$(git merge-base A B) = z$(git rev-parse --verify A)`
       commit = git.rev_parse(commit)
-      if squashed?
-        !!base_revision && git.merge_base(commit, base_revision) == commit
-      else
-        git.merge_base(commit, 'HEAD') == commit
-      end
+      !!base_revision && git.merge_base(commit, base_revision) == commit
     end
 
     def versioned_path(revision)

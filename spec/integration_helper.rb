@@ -6,6 +6,9 @@ require 'tempfile'
 require 'fileutils'
 require 'pathname'
 
+DEFAULT_NAME = 'Your Name'
+DEFAULT_EMAIL = 'you@example.com'
+
 TMP_PATH = File.join(Dir.tmpdir, 'braid_integration')
 EDITOR_CMD = "#{TMP_PATH}/editor"
 EDITOR_CMD_PREFIX = "export GIT_EDITOR=#{EDITOR_CMD};"
@@ -65,13 +68,15 @@ end
 
 def create_git_repo_from_fixture(fixture_name, options = {})
   directory = options[:directory] || fixture_name
+  name = options[:name] || DEFAULT_NAME
+  email = options[:email] || DEFAULT_EMAIL
   git_repo = File.join(TMP_PATH, directory)
   update_dir_from_fixture(directory, fixture_name)
 
   in_dir(git_repo) do
     run_command('git init')
-    run_command("git config --local user.email \"you@example.com\"")
-    run_command("git config --local user.name \"Your Name\"")
+    run_command("git config --local user.email \"#{email}\"")
+    run_command("git config --local user.name \"#{name}\"")
     run_command('git add *')
     run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end

@@ -40,11 +40,11 @@ Main {
       . braid add http://remote/path local/dir
     TXT
 
-    mixin :argument_url, :optional_path, :option_branch, :option_revision, :option_verbose, :option_remote_path
+    mixin :argument_url, :optional_local_path, :option_branch, :option_revision, :option_verbose, :option_path
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {'path' => path, 'branch' => branch, 'revision' => revision, 'remote_path' => remote_path})
+      Braid::Command.run(:add, url, {'path' => local_path, 'branch' => branch, 'revision' => revision, 'remote_path' => path})
     }
   }
 
@@ -65,7 +65,7 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_path, :option_revision, :option_head, :option_verbose, :option_keep_remote
+    mixin :optional_local_path, :option_revision, :option_head, :option_verbose, :option_keep_remote
 
     run {
       options = {
@@ -74,7 +74,7 @@ Main {
         'keep' => keep
       }
       Braid.verbose = verbose
-      Braid::Command.run(:update, path, options)
+      Braid::Command.run(:update, local_path, options)
     }
   }
 
@@ -91,14 +91,14 @@ Main {
       . braid remove local/dir
     TXT
 
-    mixin :argument_path, :option_verbose, :option_keep_remote
+    mixin :argument_local_path, :option_verbose, :option_keep_remote
 
     run {
       options = {
         :keep => keep
       }
       Braid.verbose = verbose
-      Braid::Command.run(:remove, path, options)
+      Braid::Command.run(:remove, local_path, options)
     }
   }
 
@@ -107,14 +107,14 @@ Main {
       Show diff of local changes to mirror.
     TXT
 
-    mixin :optional_path, :option_verbose, :option_keep_remote
+    mixin :optional_local_path, :option_verbose, :option_keep_remote
 
     run {
       options = {
         'keep' => keep
       }
       Braid.verbose = verbose
-      Braid::Command.run(:diff, path, options)
+      Braid::Command.run(:diff, local_path, options)
     }
   }
 
@@ -123,7 +123,7 @@ Main {
       Push local mirror changes to remote.
     TXT
 
-    mixin :argument_path, :option_branch, :option_verbose, :option_keep_remote
+    mixin :argument_local_path, :option_branch, :option_verbose, :option_keep_remote
 
     run {
       options = {
@@ -131,7 +131,7 @@ Main {
         'branch' => branch
       }
       Braid.verbose = verbose
-      Braid::Command.run(:push, path, options)
+      Braid::Command.run(:push, local_path, options)
     }
   }
 
@@ -140,12 +140,12 @@ Main {
       Set up git remotes.
     TXT
 
-    mixin :optional_path, :option_verbose, :option_force
+    mixin :optional_local_path, :option_verbose, :option_force
 
     run {
       Braid.verbose = verbose
       Braid.force = force
-      Braid::Command.run(:setup, path)
+      Braid::Command.run(:setup, local_path)
     }
   }
 
@@ -160,22 +160,22 @@ Main {
   mode(:status) {
     description 'Show the status of all tracked mirrors (and if updates are available).'
 
-    mixin :optional_path, :option_verbose
+    mixin :optional_local_path, :option_verbose
 
     run {
       Braid.verbose = verbose
-      Braid::Command.run(:status, path)
+      Braid::Command.run(:status, local_path)
     }
   }
 
-  mixin(:argument_path) {
-    argument(:path) {
+  mixin(:argument_local_path) {
+    argument(:local_path) {
       attr
     }
   }
 
-  mixin(:optional_path) {
-    argument(:path) {
+  mixin(:optional_local_path) {
+    argument(:local_path) {
       optional
       attr
     }
@@ -196,8 +196,8 @@ Main {
     }
   }
 
-  mixin(:option_remote_path) {
-    option(:remote_path, :p) {
+  mixin(:option_path) {
+    option(:path, :p) {
       optional
       argument :required
       desc 'remote path'

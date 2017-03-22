@@ -40,7 +40,7 @@ describe 'Adding a mirror in a clean repository' do
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
 
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add --remote_path layouts #{@vendor_repository_dir}")
+        run_command("#{BRAID_BIN} add --path layouts #{@vendor_repository_dir}")
       end
     end
 

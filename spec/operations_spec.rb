@@ -4,7 +4,7 @@ describe 'Braid::Operations::Git#remote_url' do
   it 'should use git config' do
     # FIXME weak test
     git.stubs(:invoke).with(:config, 'remote.braid/git/one.url').returns('git://path')
-    git.remote_url('braid/git/one').should == 'git://path'
+    expect(git.remote_url('braid/git/one')).to eq('git://path')
   end
 end
 
@@ -12,13 +12,13 @@ describe 'Braid::Operations::Git#rev_parse' do
   it 'should return the full hash when a hash is found' do
     full_revision = 'a' * 40
     git.expects(:exec).returns([0, full_revision, ''])
-    git.rev_parse('a' * 7).should == full_revision
+    expect(git.rev_parse('a' * 7)).to eq(full_revision)
   end
 
   it 'should raise a revision error when the hash is not found' do
     ambiguous_revision = 'b' * 7
     git.expects(:exec).returns([1, ambiguous_revision, 'fatal: ...'])
-    lambda { git.rev_parse(ambiguous_revision) }.should raise_error(Braid::Operations::UnknownRevision)
+    expect { git.rev_parse(ambiguous_revision) }.to raise_error(Braid::Operations::UnknownRevision)
   end
 end
 
@@ -30,7 +30,7 @@ describe 'Braid::Operations::Git#version' do
   end
 
   it 'should extract from git --version output' do
-    git.version.should == ACTUAL_VERSION
+    expect(git.version).to eq(ACTUAL_VERSION)
   end
 end
 
@@ -46,21 +46,21 @@ describe 'Braid::Operations::Git#require_version' do
   it 'should return true for higher revisions' do
     PASS_VERSIONS.each do |version|
       set_version(version)
-      git.require_version(REQUIRED_VERSION).should == true
+      expect(git.require_version(REQUIRED_VERSION)).to eq(true)
     end
   end
 
   it 'should return false for lower revisions' do
     FAIL_VERSIONS.each do |version|
       set_version(version)
-      git.require_version(REQUIRED_VERSION).should == false
+      expect(git.require_version(REQUIRED_VERSION)).to eq(false)
     end
   end
 end
 
 describe 'Braid::Operations::GitCache#path' do
   it 'should use the local cache directory and strip characters' do
-    git_cache.path('git://path').should == File.join(Braid.local_cache_dir, 'git___path')
-    git_cache.path('git@domain:repository.git').should == File.join(Braid.local_cache_dir, 'git_domain_repository.git')
+    expect(git_cache.path('git://path')).to eq(File.join(Braid.local_cache_dir, 'git___path'))
+    expect(git_cache.path('git@domain:repository.git')).to eq(File.join(Braid.local_cache_dir, 'git_domain_repository.git'))
   end
 end

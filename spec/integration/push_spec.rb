@@ -35,9 +35,9 @@ describe 'Pushing to a mirror' do
           set_editor_message('Make some changes')
           braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
         end
-        braid_output.should =~ /Braid: Cloning mirror with local changes./
-        braid_output.should =~ /Make some changes/
-        braid_output.should =~ /Braid: Pushing changes to remote branch master./
+        expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
+        expect(braid_output).to match(/Make some changes/)
+        expect(braid_output).to match(/Braid: Pushing changes to remote branch master./)
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
@@ -49,9 +49,9 @@ describe 'Pushing to a mirror' do
           set_editor_message('Make some changes')
           braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
         end
-        braid_output.should =~ /Braid: Cloning mirror with local changes./
-        braid_output.should =~ /Make some changes/
-        braid_output.should =~ /Braid: Pushing changes to remote branch MyBranch./
+        expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
+        expect(braid_output).to match(/Make some changes/)
+        expect(braid_output).to match(/Braid: Pushing changes to remote branch MyBranch./)
 
         assert_no_diff("#{FIXTURE_PATH}/skit1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
@@ -79,7 +79,7 @@ describe 'Pushing to a mirror' do
           set_editor_message('Make some changes')
           braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
         end
-        braid_output.should =~ /Braid: Mirror is not up to date. Stopping./
+        expect(braid_output).to match(/Braid: Mirror is not up to date. Stopping./)
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{TMP_PATH}/skit1/#{@file_name}")
       end

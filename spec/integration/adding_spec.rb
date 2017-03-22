@@ -22,8 +22,8 @@ describe 'Adding a mirror in a clean repository' do
       assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
       output = run_command('git log --pretty=oneline').split("\n")
-      output.length.should == 2
-      output[0].should =~ /Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/
+      expect(output.length).to eq(2)
+      expect(output[0]).to match(/Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/)
     end
 
     it 'should create .braids.json and add the mirror to it' do
@@ -32,10 +32,10 @@ describe 'Adding a mirror in a clean repository' do
       end
 
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      braids['skit1']['squashed'].should == true
-      braids['skit1']['url'].should == @vendor_repository_dir
-      braids['skit1']['revision'].should_not be_nil
-      braids['skit1']['branch'].should == 'master'
+      expect(braids['skit1']['squashed']).to eq(true)
+      expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
+      expect(braids['skit1']['revision']).not_to be_nil
+      expect(braids['skit1']['branch']).to eq('master')
     end
   end
 end

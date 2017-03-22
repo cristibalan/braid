@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch revision lock remote_path)
+    ATTRIBUTES = %w(url branch revision lock path)
 
     class UnknownType < BraidError
       def message
@@ -32,7 +32,7 @@ module Braid
 
       remote_path = options['remote_path']
 
-      attributes = {'url' => url, 'branch' => branch, 'remote_path' => remote_path}
+      attributes = {'url' => url, 'branch' => branch, 'path' => remote_path}
       self.new(path, attributes)
     end
 
@@ -77,6 +77,14 @@ module Braid
       else
         inferred_revision
       end
+    end
+
+    def remote_path
+      self.attributes['path']
+    end
+
+    def remote_path=(remote_path)
+      self.attributes['path'] = remote_path
     end
 
     def cached_url

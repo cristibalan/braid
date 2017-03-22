@@ -9,7 +9,7 @@ describe 'Pushing to a mirror' do
 
   describe 'from a git repository' do
     before do
-      @repository_dir = create_git_repo_from_fixture('shiny')
+      @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
       @file_name = 'layouts/layout.liquid'
 
@@ -61,8 +61,8 @@ describe 'Pushing to a mirror' do
           run_command('git checkout MyBranch 2>&1')
 
           assert_commit_subject(commit_message)
-          assert_commit_author('Your Name')
-          assert_commit_email('you@example.com')
+          assert_commit_author('Some body')
+          assert_commit_email('somebody@example.com')
         end
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")

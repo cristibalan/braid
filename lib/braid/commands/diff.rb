@@ -8,24 +8,33 @@ module Braid
       protected
 
       def diff_all(options = {})
-        print "\n"
-        msg "Diffing all mirrors.\n=======================================================\n"
         config.mirrors.each do |path|
-          msg "Diffing #{path}\n=======================================================\n"
-          diff_one(path, options)
-          msg "=======================================================\n"
+          separator
+          msg "Diffing #{path}\n"
+          separator
+          diff = perform_diff(path, options)
+          puts diff unless diff.empty?
         end
-        print "\n"
       end
 
       def diff_one(path, options = {})
+        diff = perform_diff(path, options)
+        puts diff unless diff.empty?
+      end
+
+      def separator
+        puts "=======================================================\n"
+      end
+
+      def perform_diff(path, options = {})
         mirror = config.get!(path)
         setup_remote(mirror)
 
         diff = mirror.diff
-        puts diff unless diff.empty?
 
         clear_remote(mirror, options)
+
+        diff
       end
     end
   end

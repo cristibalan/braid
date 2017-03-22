@@ -40,7 +40,7 @@ describe 'Updating a mirror' do
 
         output = run_command('git log --pretty=oneline').split("\n")
         output.length.should == 3
-        output[0].should =~ /Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/
+        output[0].should =~ /^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/
 
         # No temporary commits should be added to the reflog.
         output = `git log -g --pretty=oneline`.split("\n")

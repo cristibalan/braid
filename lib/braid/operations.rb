@@ -315,6 +315,10 @@ module Braid
         end
       end
 
+      def config(args)
+        invoke(:config, args) rescue nil
+      end
+
       def rm_r(path)
         invoke(:rm, '-r', path)
         true

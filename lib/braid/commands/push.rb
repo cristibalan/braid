@@ -34,9 +34,13 @@ module Braid
         elsif File.directory?(remote_url)
           remote_url = File.expand_path(remote_url)
         end
+        user_name = git.config(%w(--local --get user.name))
+        user_email = git.config(%w(--local --get user.email))
         Dir.chdir(clone_dir) do
           msg 'Cloning mirror with local changes.'
           git.init
+          git.config(['--local', 'user.name', "\"#{user_name}\""]) if user_name
+          git.config(['--local', 'user.email', "\"#{user_email}\""]) if user_email
           git.fetch(mirror.cached_url) if File.exist?(mirror.cached_url)
           git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
           git.checkout(base_revision)

@@ -20,9 +20,7 @@ describe 'Adding a mirror in a clean repository' do
 
       assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
-      output = run_command('git log --pretty=oneline').split("\n")
-      expect(output.length).to eq(2)
-      expect(output[0]).to match(/Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/)
+      assert_commit_subject(/Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/)
     end
 
     it 'should create .braids.json and add the mirror to it' do

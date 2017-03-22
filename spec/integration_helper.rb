@@ -28,19 +28,22 @@ def assert_no_diff(file1, file2)
   run_command("diff -U 3 #{file1} #{file2}")
 end
 
-def assert_commit_subject(commit_subject, commit_index = 0)
-  output = run_command('git log --pretty=format:%s').split("\n")
-  expect(output[commit_index]).to match(/^#{commit_subject}$/)
+def assert_commit_attribute(format_key, value, commit_index = 0)
+  output = run_command("git log --pretty=format:#{format_key}").split("\n")
+  regex = value.is_a?(Regexp) ? value : /^#{value}$/
+  expect(output[commit_index]).to match(regex)
 end
 
-def assert_commit_author(commit_author, commit_index = 0)
-  output = run_command('git log --pretty=format:%an').split("\n")
-  expect(output[commit_index]).to match(/^#{commit_author}$/)
+def assert_commit_subject(value, commit_index = 0)
+  assert_commit_attribute('%s', value, commit_index)
 end
 
-def assert_commit_email(commit_email, commit_index = 0)
-  output = run_command('git log --pretty=format:%ae').split("\n")
-  expect(output[commit_index]).to match(/^#{commit_email}$/)
+def assert_commit_author(value, commit_index = 0)
+  assert_commit_attribute('%an', value, commit_index)
+end
+
+def assert_commit_email(value, commit_index = 0)
+  assert_commit_attribute('%ae', value, commit_index)
 end
 
 def in_dir(dir = TMP_PATH)

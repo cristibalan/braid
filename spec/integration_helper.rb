@@ -6,10 +6,10 @@ require 'tempfile'
 require 'fileutils'
 require 'pathname'
 
-TMP_PATH     = File.join(Dir.tmpdir, 'braid_integration')
-EDITOR_CMD   = "#{TMP_PATH}/editor"
+TMP_PATH = File.join(Dir.tmpdir, 'braid_integration')
+EDITOR_CMD = "#{TMP_PATH}/editor"
 EDITOR_CMD_PREFIX = "export GIT_EDITOR=#{EDITOR_CMD};"
-BRAID_PATH   = Pathname.new(File.dirname(__FILE__)).parent.realpath
+BRAID_PATH = Pathname.new(File.dirname(__FILE__)).parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, 'spec', 'fixtures')
 FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)

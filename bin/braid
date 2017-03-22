@@ -157,17 +157,6 @@ Main {
     }
   }
 
-  mode(:list) {
-    description 'Show all tracked mirrors (and if updates are available).'
-
-    mixin :option_verbose
-
-    run {
-      Braid.verbose = verbose
-      Braid::Command.run(:list)
-    }
-  }
-
   mode(:status) {
     description 'Show the status of all tracked mirrors (and if updates are available).'
 

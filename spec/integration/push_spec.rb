@@ -83,7 +83,7 @@ describe 'Pushing to a mirror' do
           run_command('git commit -m "Update vendored directory"')
         end
       end
-      it 'should push changes successfully' do
+      it 'should halt before attempting to push changes' do
         braid_output = nil
         in_dir(@repository_dir) do
           set_editor_message('Make some changes')

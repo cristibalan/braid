@@ -2,9 +2,7 @@ module Braid
   module Commands
     class Status < Command
       def run(path = nil, options = {})
-        with_reset_on_error do
-          path ? status_one(path, options) : status_all(options)
-        end
+        path ? status_one(path, options) : status_all(options)
       end
 
       protected

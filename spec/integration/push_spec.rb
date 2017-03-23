@@ -31,8 +31,9 @@ describe 'Pushing to a mirror' do
     context 'with remote updtodate' do
       it 'should push changes successfully' do
         braid_output = nil
+        commit_message = 'Make some changes'
         in_dir(@repository_dir) do
-          set_editor_message('Make some changes')
+          set_editor_message(commit_message)
           braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
@@ -41,6 +42,14 @@ describe 'Pushing to a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
+
+        in_dir(@vendor_repository_dir) do
+          run_command('git checkout master 2>&1')
+
+          assert_commit_subject(commit_message)
+          assert_commit_author('Some body')
+          assert_commit_email('somebody@example.com')
+        end
       end
 
       it 'should push changes to specified branch successfully' do

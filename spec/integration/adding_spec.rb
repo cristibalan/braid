@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../integration_helper'
+require File.dirname(__FILE__) + '/integration_helper'
 
 describe 'Adding a mirror in a clean repository' do
 

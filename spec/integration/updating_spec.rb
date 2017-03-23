@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../integration_helper'
+require File.dirname(__FILE__) + '/integration_helper'
 
 describe 'Updating a mirror' do
 

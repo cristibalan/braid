@@ -60,7 +60,7 @@ describe 'Updating a mirror' do
         assert_no_diff("#{FIXTURE_PATH}/shiny_skit1.2_merged/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
         output = run_command('git log --pretty=oneline').split("\n")
-        expect(output.length).to eq(4)  # plus 'mergeable change'
+        expect(output.length).to eq(4) # plus 'mergeable change'
         expect(output[0]).to match(/Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/)
       end
     end

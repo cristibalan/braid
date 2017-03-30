@@ -99,6 +99,10 @@ This is useful if you want to add a subdirectory from a mirror into your own pro
 
     braid add --path dist https://github.com/twbs/bootstrap.git vendor/assets/bootstrap
 
+#### Adding a mirror based on a branch
+
+    braid add --branch 5-0-stable https://github.com/rails/rails.git vendor/rails
+
 #### Adding mirrors with revisions
 
     braid add --revision bf1b1e0 git://github.com/rails/rails.git vendor/rails

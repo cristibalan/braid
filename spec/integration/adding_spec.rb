@@ -93,4 +93,23 @@ describe 'Adding a mirror in a clean repository' do
       expect(braids['skit1']['path']).to be_nil
     end
   end
+
+  describe 'with a git repository' do
+    before do
+      @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
+      in_dir(@vendor_repository_dir) do
+        run_command('git tag v1')
+      end
+    end
+
+    it 'should generate an error if both tag and revision specified' do
+      output = nil
+      in_dir(@repository_dir) do
+        output = `#{BRAID_BIN} add #{@vendor_repository_dir} --revision X --tag v1`
+      end
+
+      expect(output).to match(/^Braid: Error: Can not add mirror specifying both a revision and a tag$/)
+    end
+  end
 end

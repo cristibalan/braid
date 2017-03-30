@@ -8,6 +8,7 @@ module Braid
 
           branch_message   = (mirror.branch.nil? || mirror.branch == 'master') ? '' : " branch '#{mirror.branch}'"
           tag_message      = mirror.tag.nil? ? '' : " tag '#{mirror.tag}'"
+          raise BraidError, 'Can not add mirror specifying both a revision and a tag' if options['revision'] && mirror.tag
           revision_message = options['revision'] ? " at #{display_revision(mirror, options['revision'])}" : ''
           msg "Adding mirror of '#{mirror.url}'#{branch_message}#{tag_message}#{revision_message}."
 

@@ -22,7 +22,14 @@ module Braid
         mirror.fetch
         print path.to_s
         print ' (' + mirror.base_revision + ')'
-        print ' [LOCKED]' if mirror.locked?
+        # TODO: Update status to include type of mirror (tag + tag_name vs branch + branch_name) as well as path (if appropriate)
+        if mirror.locked?
+          print ' [LOCKED]'
+        elsif mirror.tag
+          print " [TAG=#{mirror.tag}]"
+        else # mirror.branch
+          print " [BRANCH=#{mirror.branch}]"
+        end
         msg "Fetching new commits for '#{mirror.path}'." if verbose?
         new_revision = validate_new_revision(mirror, options['revision'])
         print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s

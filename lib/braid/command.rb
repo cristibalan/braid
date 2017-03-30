@@ -45,7 +45,13 @@ module Braid
     private
 
     def setup_remote(mirror)
-      Command.run(:setup, mirror.path)
+      existing_force = Braid.force
+      begin
+        Braid.force = true
+        Command.run(:setup, mirror.path)
+      ensure
+        Braid.force = existing_force
+      end
     end
 
     def clear_remote(mirror, options)

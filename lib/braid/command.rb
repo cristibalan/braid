@@ -88,17 +88,32 @@ module Braid
       "'#{revision[0, 7]}'"
     end
 
-    def validate_new_revision(mirror, new_revision)
-      return git.rev_parse("#{mirror.remote}/#{mirror.branch}") unless new_revision
-
-      new_revision = git.rev_parse(new_revision)
-      old_revision = mirror.revision
-
-      if new_revision == old_revision
-        raise InvalidRevision, 'mirror is already at requested revision'
+    def determine_repository_revision(mirror)
+      if mirror.tag
+        if use_local_cache?
+          Dir.chdir git_cache.path(mirror.url) do
+            git.rev_parse(mirror.local_ref)
+          end
+        else
+          raise BraidError, 'unable to retrieve tag version when cache disabled.'
+        end
+      else
+        git.rev_parse(mirror.local_ref)
       end
+    end
 
-      new_revision
+    def validate_new_revision(mirror, revision)
+      if revision.nil?
+        determine_repository_revision(mirror)
+      else
+        new_revision = git.rev_parse(revision)
+
+        if new_revision == mirror.revision
+          raise InvalidRevision, 'mirror is already at requested revision'
+        end
+
+        new_revision
+      end
     end
 
     def determine_target_revision(mirror, new_revision)

@@ -2,6 +2,12 @@ require 'fileutils'
 require 'tmpdir'
 
 module Braid
+    class NoPushToTag < BraidError
+      def message
+        "mirror is based off a tag. Can not push to a tag: #{super}"
+      end
+    end
+
   module Commands
     class Push < Command
       def run(path, options = {})
@@ -9,10 +15,12 @@ module Braid
 
         branch = options['branch'] || mirror.branch
 
+        raise NoPushToTag, path unless branch
+
         setup_remote(mirror)
         mirror.fetch
 
-        base_revision = git.rev_parse("#{mirror.remote}/#{mirror.branch}")
+        base_revision = determine_repository_revision(mirror)
         unless mirror.merged?(base_revision)
           msg 'Mirror is not up to date. Stopping.'
           clear_remote(mirror, options)
@@ -42,7 +50,7 @@ module Braid
           git.config(['--local', 'user.name', "\"#{user_name}\""]) if user_name
           git.config(['--local', 'user.email', "\"#{user_email}\""]) if user_email
           git.fetch(mirror.cached_url) if File.exist?(mirror.cached_url)
-          git.fetch(remote_url, "+refs/heads/#{mirror.branch}")
+          git.fetch(remote_url, mirror.remote_ref)
           git.checkout(base_revision)
           args =[]
           args << "--directory=#{mirror.remote_path}" if mirror.remote_path

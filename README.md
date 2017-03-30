@@ -39,6 +39,7 @@ references to external libraries or mirrors. The configuration allows you to con
 aspects of the mirroring process such as;
 
 * whether the mirror is locked to a particular version of the external library.
+* whether the mirror is based off a tag or a branch.
 * whether the mirror includes the entire external library or just a subdirectory.
 
 ## Installation
@@ -102,6 +103,10 @@ This is useful if you want to add a subdirectory from a mirror into your own pro
 #### Adding a mirror based on a branch
 
     braid add --branch 5-0-stable https://github.com/rails/rails.git vendor/rails
+
+#### Adding a mirror based on a tag
+
+    braid add --tag v1.0 https://github.com/realityforge/backpack.git vendor/tools/backpack
 
 #### Adding mirror locked to a revision
 

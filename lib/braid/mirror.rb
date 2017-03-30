@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch revision lock path)
+    ATTRIBUTES = %w(url branch revision lock tag path)
 
     class UnknownType < BraidError
       def message
@@ -10,6 +10,11 @@ module Braid
     class PathRequired < BraidError
       def message
         'path is required'
+      end
+    end
+    class NoTagAndBranch < BraidError
+      def message
+        'can not specify both tag and branch configuration'
       end
     end
 
@@ -25,14 +30,17 @@ module Braid
     def self.new_from_options(url, options = {})
       url    = url.sub(/\/$/, '')
 
-      branch = options['branch'] || 'master'
+      raise NoTagAndBranch if options['tag'] && options['branch']
+
+      tag = options['tag']
+      branch = options['branch'] || (tag.nil? ? 'master' : nil)
 
       path = (options['path'] || extract_path_from_url(url)).sub(/\/$/, '')
       raise PathRequired unless path
 
       remote_path = options['remote_path']
 
-      attributes = {'url' => url, 'branch' => branch, 'path' => remote_path}
+      attributes = {'url' => url, 'branch' => branch, 'path' => remote_path, 'tag' => tag}
       self.new(path, attributes)
     end
 
@@ -79,6 +87,15 @@ module Braid
       end
     end
 
+    def local_ref
+      # We are assuming that if no branch is present then must come from a tag
+      self.branch.nil? ? "tags/#{self.tag}" : "#{self.remote}/#{self.branch}"
+    end
+
+    def remote_ref
+      self.branch.nil? ? "+refs/tags/#{self.tag}" : "+refs/heads/#{self.branch}"
+    end
+
     def remote_path
       self.attributes['path']
     end
@@ -92,7 +109,7 @@ module Braid
     end
 
     def remote
-      "#{branch}/braid/#{path}"
+      "#{branch || tag }/braid/#{path}"
     end
 
     private

@@ -15,6 +15,58 @@ describe 'Braid::Mirror.new_from_options' do
     new_from_options('http://path.git', 'path' => 'vendor/tools/mytool/')
     expect(@mirror.path).to eq('vendor/tools/mytool')
   end
+
+  it 'should define local_ref correctly when default branch specified' do
+    new_from_options('http://mytool.git')
+    expect(@mirror.local_ref).to eq('master/braid/mytool/master')
+  end
+
+  it 'should define local_ref correctly when explicit branch specified' do
+    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    expect(@mirror.local_ref).to eq('mybranch/braid/mytool/mybranch')
+  end
+
+  it 'should define local_ref correctly when explicit tag specified' do
+    new_from_options('http://mytool.git', 'tag' => 'v1')
+    expect(@mirror.local_ref).to eq('tags/v1')
+  end
+
+  it 'should raise an exception if both tag and branch specified' do
+    expect {
+      new_from_options('http://mytool.git', 'tag' => 'v1', 'branch' => 'mybranch')
+    }.to raise_error(Braid::Mirror::NoTagAndBranch)
+  end
+
+  it 'should define remote_ref correctly when default branch specified' do
+    new_from_options('http://mytool.git')
+    expect(@mirror.remote_ref).to eq('+refs/heads/master')
+  end
+
+  it 'should define remote_ref correctly when explicit branch specified' do
+    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    expect(@mirror.remote_ref).to eq('+refs/heads/mybranch')
+  end
+
+  it 'should define remote_ref correctly when explicit tag specified' do
+    new_from_options('http://mytool.git', 'tag' => 'v1')
+    expect(@mirror.remote_ref).to eq('+refs/tags/v1')
+  end
+
+  it 'should define remote correctly when default branch specified' do
+    new_from_options('http://mytool.git')
+    expect(@mirror.remote).to eq('master/braid/mytool')
+  end
+
+  it 'should define remote correctly when explicit branch specified' do
+    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    expect(@mirror.remote).to eq('mybranch/braid/mytool')
+  end
+
+  it 'should define remote correctly when explicit tag specified' do
+    new_from_options('http://mytool.git', 'tag' => 'v1')
+    expect(@mirror.remote).to eq('v1/braid/mytool')
+  end
+
 end
 
 describe 'Braid::Mirror#diff' do

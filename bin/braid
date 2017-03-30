@@ -191,7 +191,7 @@ Main {
     option(:branch, :b) {
       optional
       argument :required
-      desc 'remote branch name'
+      desc 'remote branch name to track'
       attr
     }
   }
@@ -200,7 +200,7 @@ Main {
     option(:tag, :t) {
       optional
       argument :required
-      desc 'remote tag name'
+      desc 'remote tag name to track'
       attr
     }
   }

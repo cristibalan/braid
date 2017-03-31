@@ -109,7 +109,7 @@ module Braid
     end
 
     def remote
-      "#{branch || tag }/braid/#{path}"
+      "#{branch || tag || 'revision'}/braid/#{path}"
     end
 
     private

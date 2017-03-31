@@ -59,24 +59,30 @@ module Braid
         target_revision = determine_target_revision(mirror, new_revision)
         current_revision = determine_target_revision(mirror, mirror.base_revision)
 
-        if (options['revision'] && was_locked && target_revision == current_revision) ||
-          (options['revision'].nil? && !was_locked && mirror.merged?(git.rev_parse(new_revision)))
-          msg "Mirror '#{mirror.path}' is already up to date."
-          clear_remote(mirror, options)
-          return
-        end
-
         from_desc =
           original_tag ? "tag '#{original_tag}'" :
             !was_locked ? "branch '#{original_branch}'" :
               "revision '#{original_revision}'"
 
+        switching = true
         if mirror.branch && (original_branch != mirror.branch || (was_locked && !mirror.locked?))
           msg "Switching mirror '#{mirror.path}' to branch '#{mirror.branch}' from #{from_desc}."
         elsif mirror.tag && original_tag != mirror.tag
           msg "Switching mirror '#{mirror.path}' to tag '#{mirror.tag}' from #{from_desc}."
         elsif options['revision'] && original_revision != options['revision']
           msg "Switching mirror '#{mirror.path}' to revision '#{options['revision']}' from #{from_desc}."
+        else
+          switching = false
+        end
+
+        if !switching &&
+          (
+            (options['revision'] && was_locked && target_revision == current_revision) ||
+            (options['revision'].nil? && !was_locked && mirror.merged?(git.rev_parse(new_revision)))
+          )
+          msg "Mirror '#{mirror.path}' is already up to date."
+          clear_remote(mirror, options)
+          return
         end
 
         base_revision = mirror.base_revision

@@ -65,10 +65,12 @@ Main {
       . braid update local/dir
     TXT
 
-    mixin :optional_local_path, :option_revision, :option_head, :option_verbose, :option_keep_remote
+    mixin :optional_local_path, :option_head, :option_revision, :option_tag, :option_branch, :option_verbose, :option_keep_remote
 
     run {
       options = {
+        'branch' => branch,
+        'tag' => tag,
         'revision' => revision,
         'head' => head,
         'keep' => keep
@@ -226,7 +228,7 @@ Main {
   mixin(:option_head) {
     option(:head) {
       optional
-      desc 'mirror head'
+      desc 'unused option'
       attr
     }
   }

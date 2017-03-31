@@ -22,9 +22,8 @@ module Braid
         mirror.fetch
         print path.to_s
         print ' (' + mirror.base_revision + ')'
-        # TODO: Update status to include type of mirror (tag + tag_name vs branch + branch_name) as well as path (if appropriate)
         if mirror.locked?
-          print ' [LOCKED]'
+          print ' [REVISION LOCKED]'
         elsif mirror.tag
           print " [TAG=#{mirror.tag}]"
         else # mirror.branch

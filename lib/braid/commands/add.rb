@@ -27,7 +27,6 @@ module Braid
           git.read_tree_prefix_u(target_revision, mirror.path)
 
           mirror.revision = new_revision
-          mirror.lock = new_revision if options['revision']
           config.update(mirror)
           add_config_file
 

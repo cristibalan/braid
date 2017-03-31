@@ -1,6 +1,6 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch revision lock tag path)
+    ATTRIBUTES = %w(url branch revision tag path)
 
     class UnknownType < BraidError
       def message
@@ -49,7 +49,7 @@ module Braid
     end
 
     def locked?
-      !!lock
+      branch.nil? && tag.nil?
     end
 
     def merged?(commit)
@@ -88,8 +88,9 @@ module Braid
     end
 
     def local_ref
-      # We are assuming that if no branch is present then must come from a tag
-      self.branch.nil? ? "tags/#{self.tag}" : "#{self.remote}/#{self.branch}"
+      return "#{self.remote}/#{self.branch}" unless self.branch.nil?
+      return "tags/#{self.tag}" unless self.tag.nil?
+      self.revision
     end
 
     def remote_ref

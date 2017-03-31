@@ -132,8 +132,13 @@ index with `git reset --hard`.
 
 #### Locking and unlocking mirrors
 
+Lock to a particular version in the mirror.
+
     braid update --revision 6c1c16b vendor/rails
-    braid update --head vendor/rails
+
+Go back to tracking a particular branch.
+
+    braid update --branch master vendor/rails
 
 #### Showing local changes made to mirrors
 

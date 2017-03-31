@@ -17,23 +17,32 @@ module Braid
       end
 
       def update_one(path, options = {})
+        raise BraidError, "Do not specify --head option anymore. Please use '--branch MyBranch' to track a branch or '--tag MyTag' to track a branch" if options['head']
+
         mirror           = config.get!(path)
 
-        revision_message = options['revision'] ? " to #{display_revision(mirror, options['revision'])}" : ''
-        msg "Updating mirror '#{mirror.path}'#{revision_message}."
+        msg "Updating mirror '#{mirror.path}'."
 
         was_locked = mirror.locked?
+        original_revision = mirror.revision
+        original_branch = mirror.branch
+        original_tag = mirror.tag
 
-        # check options for lock modification
-        if mirror.locked?
-          if options['head']
-            msg "Unlocking mirror '#{mirror.path}'." if verbose?
-            mirror.lock = nil
-          elsif !options['revision']
-            msg "Mirror '#{mirror.path}' is locked to #{display_revision(mirror, mirror.lock)}. Use --head to force."
-            return
-          end
+        raise BraidError, 'Can not update mirror specifying both a revision and a tag' if options['revision'] && options['tag']
+        raise BraidError, 'Can not update mirror specifying both a branch and a tag' if options['branch'] && options['tag']
+
+        if options['tag']
+          mirror.tag = options['tag']
+          mirror.branch = nil
+        elsif options['branch']
+          mirror.tag = nil
+          mirror.branch = options['branch']
+        elsif options['revision']
+          mirror.tag = nil
+          mirror.branch = nil
         end
+
+        config.update(mirror)
 
         setup_remote(mirror)
         msg "Fetching new commits for '#{mirror.path}'." if verbose?
@@ -55,10 +64,22 @@ module Braid
           return
         end
 
+        from_desc =
+          original_tag ? "tag '#{original_tag}'" :
+            !was_locked ? "branch '#{original_branch}'" :
+              "revision '#{original_revision}'"
+
+        if mirror.branch && (original_branch != mirror.branch || (was_locked && !mirror.locked?))
+          msg "Switching mirror '#{mirror.path}' to branch '#{mirror.branch}' from #{from_desc}."
+        elsif mirror.tag && original_tag != mirror.tag
+          msg "Switching mirror '#{mirror.path}' to tag '#{mirror.tag}' from #{from_desc}."
+        elsif options['revision'] && original_revision != options['revision']
+          msg "Switching mirror '#{mirror.path}' to revision '#{options['revision']}' from #{from_desc}."
+        end
+
         base_revision = mirror.base_revision
 
         mirror.revision = new_revision
-        mirror.lock = new_revision if options['revision']
 
         msg "Merging in mirror '#{mirror.path}'." if verbose?
         in_error = false

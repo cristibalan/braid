@@ -39,7 +39,7 @@ references to external libraries or mirrors. The configuration allows you to con
 aspects of the mirroring process such as;
 
 * whether the mirror is locked to a particular version of the external library.
-* whether the mirror is based off a tag or a branch.
+* whether the mirror is tracking a tag or a branch.
 * whether the mirror includes the entire external library or just a subdirectory.
 
 ## Installation

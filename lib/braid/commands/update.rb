@@ -17,6 +17,8 @@ module Braid
       end
 
       def update_one(path, options = {})
+        bail_on_local_changes!
+
         raise BraidError, "Do not specify --head option anymore. Please use '--branch MyBranch' to track a branch or '--tag MyTag' to track a branch" if options['head']
 
         mirror           = config.get!(path)

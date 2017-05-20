@@ -33,7 +33,14 @@ module Braid
           clear_remote(mirror, options)
           return
         end
+        local_mirror_tree = git.rev_parse("HEAD:#{mirror.path}")
 
+        odb_paths = [File.expand_path(git.repo_file_path('objects'))]
+        if File.exist?(mirror.cached_url)
+          Dir.chdir(mirror.cached_url) do
+            odb_paths.push(File.expand_path(git.repo_file_path('objects')))
+          end
+        end
         clone_dir = Dir.tmpdir + "/braid_push.#{$$}"
         Dir.mkdir(clone_dir)
         remote_url = git.remote_url(mirror.remote)
@@ -49,12 +56,20 @@ module Braid
           git.init
           git.config(['--local', 'user.name', "\"#{user_name}\""]) if user_name
           git.config(['--local', 'user.email', "\"#{user_email}\""]) if user_email
-          git.fetch(mirror.cached_url) if File.exist?(mirror.cached_url)
+          # Adding other repositories as alternates is safe (we don't have to
+          # worry about them being moved or deleted during the lifetime of this
+          # temporary repository) and faster than fetching from them.  We don't
+          # need git.repo_file_path because the temporary repository isn't using
+          # a linked worktree.
+          File.open('.git/objects/info/alternates', 'w') { |f|
+            f.puts(odb_paths)
+          }
           git.fetch(remote_url, mirror.remote_ref)
           git.checkout(base_revision)
-          args =[]
-          args << "--directory=#{mirror.remote_path}" if mirror.remote_path
-          git.apply(diff, args)
+          git.rm_r(mirror.remote_path || '.')
+          # Yes, when mirror.remote_path is unset, "git read-tree --prefix=/"
+          # seems to work. :/
+          git.read_tree_prefix_u(local_mirror_tree, mirror.remote_path || '')
           system('git commit -v')
           msg "Pushing changes to remote branch #{branch}."
           git.push(remote_url, "HEAD:refs/heads/#{branch}")

@@ -95,7 +95,7 @@ describe 'Updating a mirror' do
         run_command("cp #{File.join(FIXTURE_PATH, 'shiny_skit1_mergeable', @file_name)} #{File.join(TMP_PATH, 'shiny', 'skit1', @file_name)}")
 
         in_dir(@repository_dir) do
-          run_command("git commit -a -m 'mergeable change'")
+          run_command('git commit -a -m "mergeable change"')
           run_command("#{BRAID_BIN} update skit1")
         end
 
@@ -118,12 +118,12 @@ describe 'Updating a mirror' do
 
         braid_output = nil
         in_dir(@repository_dir) do
-          run_command("git commit -a -m 'conflicting change'")
+          run_command('git commit -a -m "conflicting change"')
           braid_output = run_command("#{BRAID_BIN} update skit1")
         end
         expect(braid_output).to match(/Caught merge error\. Breaking\./)
 
-        run_command("grep -q '>>>>>>> #{target_revision}' #{File.join(TMP_PATH, 'shiny', 'skit1', @file_name)}")
+        run_command("grep -q \">>>>>>> #{target_revision}\" #{File.join(TMP_PATH, 'shiny', 'skit1', @file_name)}")
       end
     end
 
@@ -243,7 +243,7 @@ describe 'Updating a mirror' do
         run_command("cp #{File.join(FIXTURE_PATH, 'shiny_skit1_mergeable', @file_name)} #{File.join(TMP_PATH, 'shiny', 'skit1', @file_name)}")
 
         in_dir(@repository_dir) do
-          run_command("git commit -a -m 'mergeable change'")
+          run_command('git commit -a -m "mergeable change"')
           run_command("#{BRAID_BIN} update skit1")
         end
 
@@ -266,7 +266,7 @@ describe 'Updating a mirror' do
 
         braid_output = nil
         in_dir(@repository_dir) do
-          run_command("git commit -a -m 'conflicting change'")
+          run_command('git commit -a -m "conflicting change"')
           braid_output = run_command("#{BRAID_BIN} update skit1")
         end
         expect(braid_output).to match(/Caught merge error\. Breaking\./)
@@ -338,7 +338,7 @@ describe 'Updating a mirror' do
               run_command("cp #{File.join(FIXTURE_PATH, 'shiny_skit1_mergeable', @file_name)} #{File.join(TMP_PATH, 'shiny', 'skit1', @file_name)}")
 
               in_dir(@repository_dir) do
-                run_command("git commit -a -m 'mergeable change'")
+                run_command('git commit -a -m "mergeable change"')
                 run_command("#{BRAID_BIN} update skit1")
               end
 

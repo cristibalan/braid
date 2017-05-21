@@ -58,6 +58,8 @@ def in_dir(dir = TMP_PATH)
   yield
 end
 
+# Note: Do not use single quotes to quote spaces in arguments.  They do not work
+# on Windows.
 def run_command(command)
   output = `#{command}`
   raise "Error executing command: #{command}\nOutput: #{output}" unless $?.success?

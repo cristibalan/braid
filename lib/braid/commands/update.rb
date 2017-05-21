@@ -95,9 +95,12 @@ module Braid
           local_hash = git.rev_parse('HEAD')
           base_hash = generate_tree_hash(mirror, mirror.versioned_path(base_revision))
           remote_hash = generate_tree_hash(mirror, target_revision)
-          ENV["GITHEAD_#{local_hash}"] = 'HEAD'
-          ENV["GITHEAD_#{remote_hash}"] = target_revision
-          git.merge_trees(base_hash, local_hash, remote_hash)
+          Operations::with_modified_environment({
+            "GITHEAD_#{local_hash}" => 'HEAD',
+            "GITHEAD_#{remote_hash}" => target_revision
+          }) do
+            git.merge_trees(base_hash, local_hash, remote_hash)
+          end
         rescue Operations::MergeError => error
           in_error = true
           print error.conflicts_text

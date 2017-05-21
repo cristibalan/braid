@@ -33,8 +33,9 @@ describe 'Pushing to a mirror' do
         braid_output = nil
         commit_message = 'Make some changes'
         in_dir(@repository_dir) do
-          set_editor_message(commit_message)
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
+          with_editor_message(commit_message) do
+            braid_output = run_command("#{BRAID_BIN} push skit1")
+          end
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
         expect(braid_output).to match(/Make some changes/)
@@ -56,8 +57,9 @@ describe 'Pushing to a mirror' do
         commit_message = 'Make some changes'
         braid_output = nil
         in_dir(@repository_dir) do
-          set_editor_message(commit_message)
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
+          with_editor_message(commit_message) do
+            braid_output = run_command("#{BRAID_BIN} push skit1 --branch MyBranch")
+          end
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
         expect(braid_output).to match(/Make some changes/)
@@ -90,8 +92,9 @@ describe 'Pushing to a mirror' do
       it 'should halt before attempting to push changes' do
         braid_output = nil
         in_dir(@repository_dir) do
-          set_editor_message('Make some changes')
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
+          with_editor_message('Make some changes') do
+            braid_output = run_command("#{BRAID_BIN} push skit1")
+          end
         end
         expect(braid_output).to match(/Braid: Mirror is not up to date. Stopping./)
 
@@ -126,8 +129,9 @@ describe 'Pushing to a mirror' do
         braid_output = nil
         commit_message = 'Make some changes'
         in_dir(@repository_dir) do
-          set_editor_message(commit_message)
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1")
+          with_editor_message(commit_message) do
+            braid_output = run_command("#{BRAID_BIN} push skit1")
+          end
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
         expect(braid_output).to match(/Make some changes/)
@@ -176,8 +180,9 @@ describe 'Pushing to a mirror' do
         braid_output = nil
         commit_message = 'Make some changes'
         in_dir(@repository_dir) do
-          set_editor_message(commit_message)
-          braid_output = `#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1`
+          with_editor_message(commit_message) do
+            braid_output = `#{BRAID_BIN} push skit1`
+          end
         end
         expect(braid_output).to match(/Braid: Error: mirror is based off a tag. Can not push to a tag: skit1/)
 
@@ -189,8 +194,9 @@ describe 'Pushing to a mirror' do
         commit_message = 'Make some changes'
         braid_output = nil
         in_dir(@repository_dir) do
-          set_editor_message(commit_message)
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
+          with_editor_message(commit_message) do
+            braid_output = run_command("#{BRAID_BIN} push skit1 --branch MyBranch")
+          end
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
         expect(braid_output).to match(/Make some changes/)
@@ -225,8 +231,9 @@ describe 'Pushing to a mirror' do
       it 'should halt before attempting to push changes' do
         braid_output = nil
         in_dir(@repository_dir) do
-          set_editor_message('Make some changes')
-          braid_output = run_command("#{EDITOR_CMD_PREFIX} #{BRAID_BIN} push skit1 --branch MyBranch")
+          with_editor_message('Make some changes') do
+            braid_output = run_command("#{BRAID_BIN} push skit1 --branch MyBranch")
+          end
         end
         expect(braid_output).to match(/Braid: Mirror is not up to date. Stopping./)
 

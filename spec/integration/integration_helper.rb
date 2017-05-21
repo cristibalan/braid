@@ -6,12 +6,13 @@ require 'tempfile'
 require 'fileutils'
 require 'pathname'
 
+require File.dirname(__FILE__) + '/../../lib/braid/operations_lite'
+
 DEFAULT_NAME = 'Your Name'
 DEFAULT_EMAIL = 'you@example.com'
 
 TMP_PATH = File.join(Dir.tmpdir, 'braid_integration')
 EDITOR_CMD = "#{TMP_PATH}/editor"
-EDITOR_CMD_PREFIX = "export GIT_EDITOR=#{EDITOR_CMD};"
 BRAID_PATH = Pathname.new(File.dirname(__FILE__)).parent.parent.realpath
 FIXTURE_PATH = File.join(BRAID_PATH, 'spec', 'fixtures')
 FileUtils.rm_rf(TMP_PATH)
@@ -19,12 +20,15 @@ FileUtils.mkdir_p(TMP_PATH)
 
 BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
 
-def set_editor_message(message = 'Make some changes')
+def with_editor_message(message = 'Make some changes')
   File.write(EDITOR_CMD, <<CMD)
 #!/usr/bin/env ruby
 File.open(ARGV[0], 'w') { |file| file.write(#{message.inspect}) }
 CMD
   FileUtils.chmod 0755, EDITOR_CMD
+  Braid::Operations::with_modified_environment({'GIT_EDITOR' => EDITOR_CMD}) do
+    yield
+  end
 end
 
 def assert_no_diff(file1, file2)

@@ -110,35 +110,32 @@ module Braid
       def exec(cmd)
         cmd.strip!
 
-        previous_lang = ENV['LANG']
-        ENV['LANG']   = 'C'
+        Operations::with_modified_environment({'LANG' => 'C'}) do
+          out, err = nil
+          status, pid = 0
+          log(cmd)
 
-        out, err = nil
-        status, pid = 0
-        log(cmd)
-
-        if USE_OPEN3
-          status = nil
-          Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
-            # Under old jrubies this may sometimes throw an exception
-            stdin.close rescue nil
-            out = stdout.read
-            err = stderr.read
-            # Under earlier jrubies this is not correctly passed so add in check
-            status = wait_thread.value if wait_thread # Process::Status object returned.
+          if USE_OPEN3
+            status = nil
+            Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
+              # Under old jrubies this may sometimes throw an exception
+              stdin.close rescue nil
+              out = stdout.read
+              err = stderr.read
+              # Under earlier jrubies this is not correctly passed so add in check
+              status = wait_thread.value if wait_thread # Process::Status object returned.
+            end
+            # Handle earlier jrubies such as 1.6.7.2
+            status = $?.exitstatus if status.nil?
+          else
+            status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
+              out = stdout.read
+              err = stderr.read
+            end.exitstatus
           end
-          # Handle earlier jrubies such as 1.6.7.2
-          status = $?.exitstatus if status.nil?
-        else
-          status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-            out = stdout.read
-            err = stderr.read
-          end.exitstatus
-        end
 
-        [status, out, err]
-      ensure
-        ENV['LANG'] = previous_lang
+          [status, out, err]
+        end
       end
 
       def exec!(cmd)
@@ -305,12 +302,9 @@ module Braid
       # Execute a block using a temporary git index file, initially empty.
       def with_temporary_index
         Dir.mktmpdir('braid_index') do |dir|
-          orig_index_file = ENV['GIT_INDEX_FILE']
-          ENV['GIT_INDEX_FILE'] = File.join(dir, 'index')
-          begin
+          Operations::with_modified_environment(
+            {'GIT_INDEX_FILE' => File.join(dir, 'index')}) do
             yield
-          ensure
-            ENV['GIT_INDEX_FILE'] = orig_index_file
           end
         end
       end

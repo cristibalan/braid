@@ -37,6 +37,7 @@ module Braid
   end
 end
 
+require 'braid/operations_lite'
 require 'braid/operations'
 require 'braid/mirror'
 require 'braid/config'

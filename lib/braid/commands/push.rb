@@ -60,8 +60,9 @@ module Braid
           # worry about them being moved or deleted during the lifetime of this
           # temporary repository) and faster than fetching from them.  We don't
           # need git.repo_file_path because the temporary repository isn't using
-          # a linked worktree.
-          File.open('.git/objects/info/alternates', 'w') { |f|
+          # a linked worktree.  Git for Windows seems to want LF and not CRLF in
+          # the alternates file; hope that works for Cygwin Git, etc. too.
+          File.open('.git/objects/info/alternates', 'wb') { |f|
             f.puts(odb_paths)
           }
           git.fetch(remote_url, mirror.remote_ref)

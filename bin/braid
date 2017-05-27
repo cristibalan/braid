@@ -20,6 +20,19 @@ Main {
     You can then merge back or cherry-pick changes.
   TXT
 
+  # Duplicated from Braid::Command.run. :(
+  def die(msg)
+    puts "Braid: Error: #{msg}"
+    exit(1)
+  end
+
+  # The "main" library doesn't provide a way to do this??
+  def check_no_extra_args!
+    if @argv.length > 0
+      die 'Extra argument(s) passed to command.'
+    end
+  end
+
   mode(:add) {
     description <<-TXT
       Add a new mirror to be tracked.
@@ -43,6 +56,7 @@ Main {
     mixin :argument_url, :optional_local_path, :option_branch, :option_tag, :option_revision, :option_verbose, :option_path
 
     run {
+      check_no_extra_args!
       Braid.verbose = verbose
       Braid::Command.run(:add, url, {'path' => local_path, 'branch' => branch, 'tag' => tag, 'revision' => revision, 'remote_path' => path})
     }
@@ -68,6 +82,7 @@ Main {
     mixin :optional_local_path, :option_head, :option_revision, :option_tag, :option_branch, :option_verbose, :option_keep_remote
 
     run {
+      check_no_extra_args!
       options = {
         'branch' => branch,
         'tag' => tag,
@@ -96,6 +111,7 @@ Main {
     mixin :argument_local_path, :option_verbose, :option_keep_remote
 
     run {
+      check_no_extra_args!
       options = {
         :keep => keep
       }
@@ -107,11 +123,17 @@ Main {
   mode(:diff) {
     description <<-TXT
       Show diff of local changes to mirror.
+
+      Additional arguments for "git diff" may be passed.  "--" should be used to
+      ensure they are not parsed as Braid options.
     TXT
 
     mixin :optional_local_path, :option_verbose, :option_keep_remote
 
+    synopsis (Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
+
     run {
+      check_no_extra_args!
       options = {
         'keep' => keep
       }
@@ -128,6 +150,7 @@ Main {
     mixin :argument_local_path, :option_branch, :option_verbose, :option_keep_remote
 
     run {
+      check_no_extra_args!
       options = {
         'keep' => keep,
         'branch' => branch
@@ -145,6 +168,7 @@ Main {
     mixin :optional_local_path, :option_verbose, :option_force
 
     run {
+      check_no_extra_args!
       Braid.verbose = verbose
       Braid.force = force
       Braid::Command.run(:setup, local_path)
@@ -155,6 +179,7 @@ Main {
     description 'Show braid version.'
 
     run {
+      check_no_extra_args!
       puts "braid #{Braid::VERSION}"
     }
   }
@@ -165,6 +190,7 @@ Main {
     mixin :optional_local_path, :option_verbose
 
     run {
+      check_no_extra_args!
       Braid.verbose = verbose
       Braid::Command.run(:status, local_path)
     }

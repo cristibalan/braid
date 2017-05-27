@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/integration_helper'
 
-describe 'Running braid diff on a mirror' do
+describe 'Running braid diff with a mirror' do
   before do
     FileUtils.rm_rf(TMP_PATH)
     FileUtils.mkdir_p(TMP_PATH)
@@ -19,7 +19,7 @@ describe 'Running braid diff on a mirror' do
     end
 
     describe 'with no changes' do
-      it 'should emit no output when named in braid diff' do
+      it 'with the mirror specified should emit no output' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")
@@ -28,7 +28,7 @@ describe 'Running braid diff on a mirror' do
         expect(diff).to eq('')
       end
 
-      it 'should emit only banners when braid diff all' do
+      it 'without specifying a mirror should emit only banners' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff")
@@ -47,7 +47,7 @@ describe 'Running braid diff on a mirror' do
         end
       end
 
-      it 'should emit diff when named in braid diff' do
+      it 'with the mirror specified should emit diff' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")
@@ -70,7 +70,7 @@ index 9f75009..25a4b32 100644
 PATCH
       end
 
-      it 'should emit only banners when braid diff all' do
+      it 'without specifying a mirror should emit diff and banners' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff")
@@ -106,7 +106,7 @@ PATCH
     end
 
     describe 'with no changes' do
-      it 'should emit no output when named in braid diff' do
+      it 'with the mirror specified should emit no output' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")
@@ -115,7 +115,7 @@ PATCH
         expect(diff).to eq('')
       end
 
-      it 'should emit only banners when braid diff all' do
+      it 'without specifying a mirror should emit only banners' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff")
@@ -135,7 +135,7 @@ PATCH
         end
       end
 
-      it 'should emit diff when named in braid diff' do
+      it 'with the mirror specified should emit diff' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")
@@ -158,7 +158,7 @@ index 9f75009..25a4b32 100644
 PATCH
       end
 
-      it 'should emit only banners when braid diff all' do
+      it 'without specifying a mirror should emit diff and banners' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff")
@@ -194,7 +194,7 @@ PATCH
     end
 
     describe 'with no changes' do
-      it 'should emit no output when named in braid diff' do
+      it 'with the mirror specified should emit no output' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")
@@ -203,7 +203,7 @@ PATCH
         expect(diff).to eq('')
       end
 
-      it 'should emit only banners when braid diff all' do
+      it 'without specifying a mirror should emit only banners' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff")
@@ -222,7 +222,7 @@ PATCH
         end
       end
 
-      it 'should emit diff when named in braid diff' do
+      it 'with the mirror specified should emit diff' do
         diff = nil
         in_dir(@repository_dir) do
           diff = run_command("#{BRAID_BIN} diff skit1")

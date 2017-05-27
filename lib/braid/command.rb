@@ -8,6 +8,7 @@ module Braid
 
     def self.run(command, *args)
       verify_git_version!
+      check_working_dir!
 
       klass = Commands.const_get(command.to_s.capitalize)
       klass.new.run(*args)
@@ -64,6 +65,17 @@ module Braid
 
     def self.verify_git_version!
       git.require_version!(REQUIRED_GIT_VERSION)
+    end
+
+    def self.check_working_dir!
+      # If we aren't in a git repository at all, git.is_inside_worktree will
+      # propagate a "fatal: Not a git repository" ShellException.
+      unless git.is_inside_worktree
+        raise BraidError, 'Braid must run inside a git working tree.'
+      end
+      if git.relative_working_dir != ''
+        raise BraidError, 'Braid does not yet support running in a subdirectory of the working tree.'
+      end
     end
 
     def bail_on_local_changes!

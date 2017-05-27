@@ -170,6 +170,24 @@ module Braid
         end
       end
 
+      # If the current directory is not inside a git repository at all, this
+      # command will fail with "fatal: Not a git repository" and that will be
+      # propagated as a ShellExecutionError.  is_inside_worktree can return
+      # false when inside a bare repository and in certain other rare cases such
+      # as when the GIT_WORK_TREE environment variable is set.
+      def is_inside_worktree
+        invoke(:rev_parse, '--is-inside-work-tree') == 'true'
+      end
+
+      # Get the prefix of the current directory relative to the worktree.  Empty
+      # string if it's the root of the worktree, otherwise ends with a slash.
+      # In some cases in which the current directory is not inside a worktree at
+      # all, this will successfully return an empty string, so it may be
+      # desirable to check is_inside_worktree first.
+      def relative_working_dir
+        invoke(:rev_parse, '--show-prefix')
+      end
+
       def commit(message, *args)
         cmd = 'git commit --no-verify'
         if message # allow nil

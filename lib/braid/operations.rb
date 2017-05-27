@@ -144,6 +144,18 @@ module Braid
         [status, out, err]
       end
 
+      def system(cmd)
+        cmd.strip!
+
+        # Without this, "braid diff" output came out in the wrong order on Windows.
+        $stdout.flush
+        $stderr.flush
+        Operations::with_modified_environment({'LANG' => 'C'}) do
+          Kernel.system(cmd)
+          return $?
+        end
+      end
+
       def msg(str)
         puts "Braid: #{str}"
       end
@@ -327,6 +339,18 @@ module Braid
         end
       end
 
+      def make_tree_with_subtree(main_content, subtree_path, subtree_content)
+        with_temporary_index do
+          if main_content
+            read_tree_im(main_content)
+            rm_r_cached(subtree_path)
+          end
+          # Yes, if subtree_path == '', "git read-tree --prefix=/" works. :/
+          read_tree_prefix_i(subtree_content, subtree_path)
+          write_tree
+        end
+      end
+
       def config(args)
         invoke(:config, args) rescue nil
       end
@@ -352,6 +376,12 @@ module Braid
         cmd << " --src-prefix=a/#{prefix}/ --dst-prefix=b/#{prefix}/" if prefix
         status, out, err = exec!(cmd)
         out
+      end
+
+      def diff_to_stdout(*args)
+        # For now, ignore the exit code.  It can be 141 (SIGPIPE) if the user
+        # quits the pager before reading all the output.
+        system("git diff #{args.join(' ')}")
       end
 
       def status_clean?

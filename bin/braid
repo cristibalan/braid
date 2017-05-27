@@ -125,7 +125,9 @@ Main {
       Show diff of local changes to mirror.
 
       Additional arguments for "git diff" may be passed.  "--" should be used to
-      ensure they are not parsed as Braid options.
+      ensure they are not parsed as Braid options.  File paths to limit the diff are
+      relative to the downstream repository (for more convenient completion), even
+      though file paths in the diff are relative to the mirror.
     TXT
 
     mixin :optional_local_path, :option_verbose, :option_keep_remote
@@ -133,9 +135,12 @@ Main {
     synopsis (Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
 
     run {
-      check_no_extra_args!
+      if @argv.length > 0 && @argv[0] == '--'
+        @argv.shift
+      end
       options = {
-        'keep' => keep
+        'keep' => keep,
+        'git_diff_args' => @argv
       }
       Braid.verbose = verbose
       Braid::Command.run(:diff, local_path, options)

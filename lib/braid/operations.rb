@@ -144,6 +144,18 @@ module Braid
         [status, out, err]
       end
 
+      def system(cmd)
+        cmd.strip!
+
+        # Without this, "braid diff" output came out in the wrong order on Windows.
+        $stdout.flush
+        $stderr.flush
+        Operations::with_modified_environment({'LANG' => 'C'}) do
+          Kernel.system(cmd)
+          return $?
+        end
+      end
+
       def msg(str)
         puts "Braid: #{str}"
       end
@@ -168,6 +180,24 @@ module Braid
           # Git < 2.5 doesn't support linked worktrees anyway.
           File.join(invoke(:rev_parse, '--git-dir'), path)
         end
+      end
+
+      # If the current directory is not inside a git repository at all, this
+      # command will fail with "fatal: Not a git repository" and that will be
+      # propagated as a ShellExecutionError.  is_inside_worktree can return
+      # false when inside a bare repository and in certain other rare cases such
+      # as when the GIT_WORK_TREE environment variable is set.
+      def is_inside_worktree
+        invoke(:rev_parse, '--is-inside-work-tree') == 'true'
+      end
+
+      # Get the prefix of the current directory relative to the worktree.  Empty
+      # string if it's the root of the worktree, otherwise ends with a slash.
+      # In some cases in which the current directory is not inside a worktree at
+      # all, this will successfully return an empty string, so it may be
+      # desirable to check is_inside_worktree first.
+      def relative_working_dir
+        invoke(:rev_parse, '--show-prefix')
       end
 
       def commit(message, *args)
@@ -309,6 +339,18 @@ module Braid
         end
       end
 
+      def make_tree_with_subtree(main_content, subtree_path, subtree_content)
+        with_temporary_index do
+          if main_content
+            read_tree_im(main_content)
+            rm_r_cached(subtree_path)
+          end
+          # Yes, if subtree_path == '', "git read-tree --prefix=/" works. :/
+          read_tree_prefix_i(subtree_content, subtree_path)
+          write_tree
+        end
+      end
+
       def config(args)
         invoke(:config, args) rescue nil
       end
@@ -334,6 +376,12 @@ module Braid
         cmd << " --src-prefix=a/#{prefix}/ --dst-prefix=b/#{prefix}/" if prefix
         status, out, err = exec!(cmd)
         out
+      end
+
+      def diff_to_stdout(*args)
+        # For now, ignore the exit code.  It can be 141 (SIGPIPE) if the user
+        # quits the pager before reading all the output.
+        system("git diff #{args.join(' ')}")
       end
 
       def status_clean?

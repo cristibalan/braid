@@ -93,8 +93,8 @@ module Braid
         in_error = false
         begin
           local_hash = git.rev_parse('HEAD')
-          base_hash = generate_tree_hash(mirror, mirror.versioned_path(base_revision))
-          remote_hash = generate_tree_hash(mirror, target_revision)
+          base_hash = git.make_tree_with_subtree('HEAD', mirror.path, mirror.versioned_path(base_revision))
+          remote_hash = git.make_tree_with_subtree('HEAD', mirror.path, target_revision)
           Operations::with_modified_environment({
             "GITHEAD_#{local_hash}" => 'HEAD',
             "GITHEAD_#{remote_hash}" => target_revision

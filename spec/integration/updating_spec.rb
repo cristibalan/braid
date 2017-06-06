@@ -167,7 +167,7 @@ describe 'Updating a mirror' do
       @file_name = 'layouts/layout.liquid'
 
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts")
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts skit-layouts")
       end
 
       update_dir_from_fixture('skit1', 'skit1.1')
@@ -186,17 +186,17 @@ describe 'Updating a mirror' do
     context 'with no project-specific changes' do
       it 'should add the files and commit' do
         in_dir(@repository_dir) do
-          run_command("#{BRAID_BIN} update skit1")
+          run_command("#{BRAID_BIN} update skit-layouts")
         end
 
-        assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/layout.liquid")
+        assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit-layouts/layout.liquid")
 
         output = nil
         in_dir(@repository_dir) do
           output = run_command('git log --pretty=oneline').split("\n")
         end
         expect(output.length).to eq(3)
-        expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
+        expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit-layouts' to '[0-9a-f]{7}'$/)
 
         # No temporary commits should be added to the reflog.
         output = nil

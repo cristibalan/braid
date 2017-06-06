@@ -285,7 +285,7 @@ PATCH
   describe 'braided subdirectory into' do
     before do
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts")
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts skit-layouts")
       end
     end
 
@@ -293,7 +293,7 @@ PATCH
       it 'with the mirror specified should emit no output' do
         diff = nil
         in_dir(@repository_dir) do
-          diff = run_command("#{BRAID_BIN} diff skit1")
+          diff = run_command("#{BRAID_BIN} diff skit-layouts")
         end
 
         expect(diff).to eq('')
@@ -305,14 +305,14 @@ PATCH
           diff = run_command("#{BRAID_BIN} diff")
         end
 
-        expect(diff).to eq("=======================================================\nBraid: Diffing skit1\n=======================================================\n")
+        expect(diff).to eq("=======================================================\nBraid: Diffing skit-layouts\n=======================================================\n")
       end
     end
 
 
     describe 'with changes' do
       before do
-        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/.', "#{@repository_dir}/skit1")
+        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/.', "#{@repository_dir}/skit-layouts")
         in_dir(@repository_dir) do
           run_command('git add *')
           run_command('git commit -m "Some local changes"')
@@ -322,7 +322,7 @@ PATCH
       it 'with the mirror specified should emit diff' do
         diff = nil
         in_dir(@repository_dir) do
-          diff = run_command("#{BRAID_BIN} diff skit1")
+          diff = run_command("#{BRAID_BIN} diff skit-layouts")
         end
 
         expect(diff).to eq(<<PATCH)
@@ -350,7 +350,7 @@ PATCH
 
         expect(diff).to eq(<<PATCH)
 =======================================================
-Braid: Diffing skit1
+Braid: Diffing skit-layouts
 =======================================================
 diff --git a/layout.liquid b/layout.liquid
 index 9f75009..25a4b32 100644

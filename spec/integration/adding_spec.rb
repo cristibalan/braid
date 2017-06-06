@@ -43,15 +43,15 @@ describe 'Adding a mirror in a clean repository' do
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
 
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add --path layouts #{@vendor_repository_dir}")
+        run_command("#{BRAID_BIN} add --path layouts #{@vendor_repository_dir} skit-layouts")
       end
     end
 
     it 'should add the files and commit' do
-      assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit1/layout.liquid")
+      assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit-layouts/layout.liquid")
 
       in_dir(@repository_dir) do
-        assert_commit_subject(/Braid: Add mirror 'skit1' at '[0-9a-f]{7}'/)
+        assert_commit_subject(/Braid: Add mirror 'skit-layouts' at '[0-9a-f]{7}'/)
         assert_commit_author('Some body')
         assert_commit_email('somebody@example.com')
       end
@@ -59,11 +59,11 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit1']['revision']).not_to be_nil
-      expect(braids['skit1']['branch']).to eq('master')
-      expect(braids['skit1']['tag']).to be_nil
-      expect(braids['skit1']['path']).to eq('layouts')
+      expect(braids['skit-layouts']['url']).to eq(@vendor_repository_dir)
+      expect(braids['skit-layouts']['revision']).not_to be_nil
+      expect(braids['skit-layouts']['branch']).to eq('master')
+      expect(braids['skit-layouts']['tag']).to be_nil
+      expect(braids['skit-layouts']['path']).to eq('layouts')
     end
   end
 

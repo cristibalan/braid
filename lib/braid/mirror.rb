@@ -35,7 +35,7 @@ module Braid
       tag = options['tag']
       branch = options['branch'] || (tag.nil? ? 'master' : nil)
 
-      path = (options['path'] || extract_path_from_url(url)).sub(/\/$/, '')
+      path = (options['path'] || extract_path_from_url(url, options['remote_path'])).sub(/\/$/, '')
       raise PathRequired unless path
 
       remote_path = options['remote_path']
@@ -159,7 +159,11 @@ module Braid
       hash
     end
 
-    def self.extract_path_from_url(url)
+    def self.extract_path_from_url(url, remote_path)
+      if remote_path
+        return File.basename(remote_path)
+      end
+
       return nil unless url
       name = File.basename(url)
 

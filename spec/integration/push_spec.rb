@@ -110,14 +110,14 @@ describe 'Pushing to a mirror' do
       @file_name = 'layouts/layout.liquid'
 
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts")
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts skit-layouts")
       end
 
       in_dir(@vendor_repository_dir) do
         run_command('git config receive.denyCurrentBranch updateInstead')
       end
 
-      update_dir_from_fixture('shiny/skit1', 'skit1.1/layouts')
+      update_dir_from_fixture('shiny/skit-layouts', 'skit1.1/layouts')
       in_dir(@repository_dir) do
         run_command('git add *')
         run_command('git commit -m "Make some changes to vendored files"')
@@ -130,14 +130,14 @@ describe 'Pushing to a mirror' do
         commit_message = 'Make some changes'
         in_dir(@repository_dir) do
           with_editor_message(commit_message) do
-            braid_output = run_command("#{BRAID_BIN} push skit1")
+            braid_output = run_command("#{BRAID_BIN} push skit-layouts")
           end
         end
         expect(braid_output).to match(/Braid: Cloning mirror with local changes./)
         expect(braid_output).to match(/Make some changes/)
         expect(braid_output).to match(/Braid: Pushing changes to remote branch master./)
 
-        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit1/layout.liquid")
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@repository_dir}/skit-layouts/layout.liquid")
         assert_no_diff("#{FIXTURE_PATH}/skit1.1/#{@file_name}", "#{@vendor_repository_dir}/#{@file_name}")
 
         in_dir(@vendor_repository_dir) do

@@ -54,8 +54,13 @@ def assert_commit_email(value, commit_index = 0)
 end
 
 def in_dir(dir = TMP_PATH)
+  orig_wd = Dir.pwd
   Dir.chdir(dir)
-  yield
+  begin
+    yield
+  ensure
+    Dir.chdir(orig_wd)
+  end
 end
 
 # Note: Do not use single quotes to quote spaces in arguments.  They do not work

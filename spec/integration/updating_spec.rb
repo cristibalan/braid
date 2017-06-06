@@ -80,12 +80,18 @@ describe 'Updating a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-        output = run_command('git log --pretty=oneline').split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
         expect(output.length).to eq(3)
         expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
 
         # No temporary commits should be added to the reflog.
-        output = `git log -g --pretty=oneline`.split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = `git log -g --pretty=oneline`.split("\n")
+        end
         expect(output.length).to eq(3)
       end
     end
@@ -101,7 +107,10 @@ describe 'Updating a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/shiny_skit1.2_merged/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-        output = run_command('git log --pretty=oneline').split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
         expect(output.length).to eq(4) # plus 'mergeable change'
         expect(output[0]).to match(/Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/)
       end
@@ -182,12 +191,18 @@ describe 'Updating a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/layout.liquid")
 
-        output = run_command('git log --pretty=oneline').split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
         expect(output.length).to eq(3)
         expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
 
         # No temporary commits should be added to the reflog.
-        output = `git log -g --pretty=oneline`.split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = `git log -g --pretty=oneline`.split("\n")
+        end
         expect(output.length).to eq(3)
       end
     end
@@ -228,12 +243,18 @@ describe 'Updating a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-        output = run_command('git log --pretty=oneline').split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
         expect(output.length).to eq(3)
         expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
 
         # No temporary commits should be added to the reflog.
-        output = `git log -g --pretty=oneline`.split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = `git log -g --pretty=oneline`.split("\n")
+        end
         expect(output.length).to eq(3)
       end
     end
@@ -249,7 +270,10 @@ describe 'Updating a mirror' do
 
         assert_no_diff("#{FIXTURE_PATH}/shiny_skit1.2_merged/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-        output = run_command('git log --pretty=oneline').split("\n")
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
         expect(output.length).to eq(4) # plus 'mergeable change'
         expect(output[0]).to match(/Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/)
       end
@@ -324,12 +348,18 @@ describe 'Updating a mirror' do
 
             assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
-            output = run_command('git log --pretty=oneline').split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = run_command('git log --pretty=oneline').split("\n")
+            end
             expect(output.length).to eq(3)
             expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
 
             # No temporary commits should be added to the reflog.
-            output = `git log -g --pretty=oneline`.split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = `git log -g --pretty=oneline`.split("\n")
+            end
             expect(output.length).to eq(3)
           end
 
@@ -344,7 +374,10 @@ describe 'Updating a mirror' do
 
               assert_no_diff("#{FIXTURE_PATH}/shiny_skit1.2_merged/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-              output = run_command('git log --pretty=oneline').split("\n")
+              output = nil
+              in_dir(@repository_dir) do
+                output = run_command('git log --pretty=oneline').split("\n")
+              end
               expect(output.length).to eq(4) # plus 'mergeable change'
               expect(output[0]).to match(/Braid: Update mirror 'skit1' to '[0-9a-f]{7}'/)
             end
@@ -357,11 +390,17 @@ describe 'Updating a mirror' do
 
             assert_no_diff("#{FIXTURE_PATH}/skit1/#{@file_name}", "#{@repository_dir}/skit1/#{@file_name}")
 
-            output = run_command('git log --pretty=oneline').split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = run_command('git log --pretty=oneline').split("\n")
+            end
             expect(output.length).to eq(2)
 
             # No temporary commits should be added to the reflog.
-            output = `git log -g --pretty=oneline`.split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = `git log -g --pretty=oneline`.split("\n")
+            end
             expect(output.length).to eq(2)
           end
         end
@@ -387,12 +426,18 @@ describe 'Updating a mirror' do
 
             assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit1/layouts/layout.liquid")
 
-            output = run_command('git log --pretty=oneline').split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = run_command('git log --pretty=oneline').split("\n")
+            end
             expect(output.length).to eq(3)
             expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit1' to '[0-9a-f]{7}'$/)
 
             # No temporary commits should be added to the reflog.
-            output = `git log -g --pretty=oneline`.split("\n")
+            output = nil
+            in_dir(@repository_dir) do
+              output = `git log -g --pretty=oneline`.split("\n")
+            end
             expect(output.length).to eq(3)
           end
         end

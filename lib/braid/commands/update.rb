@@ -121,15 +121,6 @@ module Braid
         msg "Updated mirror to #{display_revision(mirror)}."
         clear_remote(mirror, options)
       end
-
-      def generate_tree_hash(mirror, revision)
-        git.with_temporary_index do
-          git.read_tree_im('HEAD')
-          git.rm_r_cached(mirror.path)
-          git.read_tree_prefix_i(revision, mirror.path)
-          git.write_tree
-        end
-      end
     end
   end
 end

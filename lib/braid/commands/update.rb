@@ -57,7 +57,6 @@ module Braid
           # Ignored as it means the revision matches expected
         end
         target_revision = determine_target_revision(mirror, new_revision)
-        current_revision = determine_target_revision(mirror, mirror.base_revision)
 
         from_desc =
           original_tag ? "tag '#{original_tag}'" :
@@ -77,7 +76,7 @@ module Braid
 
         if !switching &&
           (
-            (options['revision'] && was_locked && target_revision == current_revision) ||
+            (options['revision'] && was_locked && new_revision == mirror.base_revision) ||
             (options['revision'].nil? && !was_locked && mirror.merged?(git.rev_parse(new_revision)))
           )
           msg "Mirror '#{mirror.path}' is already up to date."
@@ -97,7 +96,7 @@ module Braid
           remote_hash = git.make_tree_with_subtree('HEAD', mirror.path, target_revision)
           Operations::with_modified_environment({
             "GITHEAD_#{local_hash}" => 'HEAD',
-            "GITHEAD_#{remote_hash}" => target_revision
+            "GITHEAD_#{remote_hash}" => new_revision
           }) do
             git.merge_trees(base_hash, local_hash, remote_hash)
           end

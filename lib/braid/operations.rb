@@ -247,21 +247,6 @@ module Braid
         true
       end
 
-      # Implies no commit.
-      def merge_ours(opt)
-        invoke(:merge, '--allow-unrelated-histories -s ours --no-commit', opt)
-        true
-      end
-
-      # Implies no commit.
-      def merge_subtree(opt)
-        # TODO which options are needed?
-        invoke(:merge, '-s subtree --no-commit --no-ff', opt)
-        true
-      rescue ShellExecutionError => error
-        raise MergeError, error.out
-      end
-
       # Merge three trees (local_treeish should match the current state of the
       # index) and update the index and working tree.
       #

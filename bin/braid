@@ -1,6 +1,18 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + '/../lib'))
+# Duplicated from Braid::Command.run. :(
+def die(msg)
+  puts "Braid: Error: #{msg}"
+  exit(1)
+end
+
+# If we assume Ruby >= 2.0, we can use __dir__.
+libdir = File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib')
+unless File.exists?(libdir)
+  # Don't silently fall back to a different globally installed copy of Braid!
+  die "Cannot find Braid's 'lib' directory."
+end
+$LOAD_PATH.unshift(libdir)
 require 'braid'
 
 require 'rubygems'
@@ -19,12 +31,6 @@ Main {
     All operations will be executed in the braid/track branch.
     You can then merge back or cherry-pick changes.
   TXT
-
-  # Duplicated from Braid::Command.run. :(
-  def die(msg)
-    puts "Braid: Error: #{msg}"
-    exit(1)
-  end
 
   # The "main" library doesn't provide a way to do this??
   def check_no_extra_args!

@@ -69,33 +69,6 @@ describe 'Braid::Mirror.new_from_options' do
 
 end
 
-describe 'Braid::Mirror#diff' do
-  before(:each) do
-    @mirror = build_mirror('revision' => 'a' * 40, 'url' => 'git://path')
-    @mirror.stubs(:base_revision).returns(@mirror.revision) # bypass rev_parse
-  end
-
-  def set_hashes(remote_hash, local_hash)
-    git.expects(:rev_parse).with("#{@mirror.revision}:").returns(remote_hash)
-    git.expects(:tree_hash).with(@mirror.path).returns(local_hash)
-  end
-
-  it 'should return an empty string when the hashes match' do
-    set_hashes('b' * 40, 'b' * 40)
-    git.expects(:fetch)
-    git.expects(:diff_tree).never
-    expect(@mirror.diff).to eq('')
-  end
-
-  it 'should generate a diff when the hashes do not match' do
-    set_hashes('b' * 40, 'c' * 40)
-    diff = "diff --git a/path b/path\n"
-    git.expects(:fetch)
-    git.expects(:diff_tree).with('b' * 40, 'c' * 40).returns(diff)
-    expect(@mirror.diff).to eq(diff)
-  end
-end
-
 describe 'Braid::Mirror#base_revision' do
   it 'should be inferred when no revision is set' do
     @mirror = build_mirror

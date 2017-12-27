@@ -47,13 +47,7 @@ describe 'Running braid diff with a mirror' do
         end
       end
 
-      it 'with the mirror specified should emit diff' do
-        diff = nil
-        in_dir(@repository_dir) do
-          diff = run_command("#{BRAID_BIN} diff skit1")
-        end
-
-        expect(diff).to eq(<<PATCH)
+      EXPECTED_DIFF=<<PATCH
 diff --git a/layouts/layout.liquid b/layouts/layout.liquid
 index 9f75009..25a4b32 100644
 --- a/layouts/layout.liquid
@@ -68,6 +62,14 @@ index 9f75009..25a4b32 100644
  
  <div id="wrapper">
 PATCH
+
+      it 'with the mirror specified should emit diff' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit1")
+        end
+
+        expect(diff).to eq(EXPECTED_DIFF)
       end
 
       it 'without specifying a mirror should emit diff and banners' do
@@ -76,24 +78,50 @@ PATCH
           diff = run_command("#{BRAID_BIN} diff")
         end
 
-        expect(diff).to eq(<<PATCH)
+        expect(diff).to eq(<<BANNER + EXPECTED_DIFF)
 =======================================================
 Braid: Diffing skit1
 =======================================================
-diff --git a/layouts/layout.liquid b/layouts/layout.liquid
-index 9f75009..25a4b32 100644
---- a/layouts/layout.liquid
-+++ b/layouts/layout.liquid
-@@ -22,7 +22,7 @@
- <![endif]-->
- </head>
- 
--<body class="fixed orange">
-+<body class="fixed green">
- <script type="text/javascript">loadPreferences()</script>
- 
- <div id="wrapper">
-PATCH
+BANNER
+      end
+
+      it 'in a new clone of the downstream repository should fetch the base revision and emit diff' do
+        diff = nil
+        CLONE_NAME = 'shiny-clone'
+        in_dir(TMP_PATH) do
+          run_command("git clone --quiet #{@repository_dir} #{CLONE_NAME}")
+        end
+        clone_dir = File.join(TMP_PATH, CLONE_NAME)
+        in_dir(clone_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit1")
+        end
+
+        expect(diff).to eq(EXPECTED_DIFF)
+      end
+
+      it 'after pruning the base revision from the repository should fetch it again and emit diff' do
+        # Note: It is not the intent of this test case to require that Braid
+        # leave objects from the mirror in the main repository after it exits.
+        # A design change to stop doing that would legitimately require this
+        # test case to be modified or dropped.
+        diff = nil
+        in_dir(@repository_dir) do
+          status_out = run_command("#{BRAID_BIN} status skit1")
+          base_revision = /^skit1 \(([0-9a-f]{40})\)/.match(status_out)[1]
+          # Make sure the base revision is in the repository as a sanity check.
+          run_command("git rev-parse --verify --quiet #{base_revision}^{commit}")
+          run_command("git gc --quiet --prune=all")
+          # Make sure it's gone now so we know we're actually testing Braid's fetch behavior.
+          `git rev-parse --verify --quiet #{base_revision}^{commit}`
+          raise "'git gc' did not delete the base revision from the repository." if $?.success?
+
+          diff = run_command("#{BRAID_BIN} diff skit1")
+
+          # The base revision should be present again.
+          run_command("git rev-parse --verify --quiet #{base_revision}^{commit}")
+        end
+
+        expect(diff).to eq(EXPECTED_DIFF)
       end
     end
 

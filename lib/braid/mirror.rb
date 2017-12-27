@@ -64,10 +64,25 @@ module Braid
     end
 
     def diff
-      fetch
+      fetch_base_revision_if_missing
       remote_hash = git.rev_parse(versioned_path(base_revision))
       local_hash  = git.tree_hash(path)
       remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ''
+    end
+
+    # Re-fetching the remote after deleting and re-adding it may be slow even if
+    # all objects are still present in the repository
+    # (https://github.com/cristibalan/braid/issues/71).  Mitigate this for
+    # `braid diff` and other commands that need the diff by skipping the fetch
+    # if the base revision is already present in the repository.
+    def fetch_base_revision_if_missing
+      begin
+        # Without ^{commit}, this will happily pass back an object hash even if
+        # the object isn't present.  See the git-rev-parse(1) man page.
+        git.rev_parse(base_revision + "^{commit}")
+      rescue Operations::UnknownRevision
+        fetch
+      end
     end
 
     def fetch

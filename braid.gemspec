@@ -25,8 +25,8 @@ Gem::Specification.new do |s|
   s.has_rdoc           = false
   s.rdoc_options       = %w(--line-numbers --inline-source --title braid --main)
 
+  s.required_ruby_version = '>= 2.2.0'
   s.add_dependency(%q<main>, ['>= 4.7.3'])
-  s.add_dependency(%q<open4>, ['>= 1.0.1']) unless defined?(JRUBY_VERSION)
 
   s.add_development_dependency(%q<rspec>, ['>= 3.4.4'])
   s.add_development_dependency(%q<mocha>, ['>= 0.9.11'])

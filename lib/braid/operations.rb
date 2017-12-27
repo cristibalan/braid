@@ -3,8 +3,7 @@ require 'rubygems'
 require 'tempfile'
 
 module Braid
-  USE_OPEN3 = defined?(JRUBY_VERSION) || Gem.win_platform?
-  require USE_OPEN3 ? 'open3' : 'open4'
+  require 'open3'
 
   module Operations
     class ShellExecutionError < BraidError
@@ -111,29 +110,8 @@ module Braid
         cmd.strip!
 
         Operations::with_modified_environment({'LANG' => 'C'}) do
-          out, err = nil
-          status, pid = 0
           log(cmd)
-
-          if USE_OPEN3
-            status = nil
-            Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thread|
-              # Under old jrubies this may sometimes throw an exception
-              stdin.close rescue nil
-              out = stdout.read
-              err = stderr.read
-              # Under earlier jrubies this is not correctly passed so add in check
-              status = wait_thread.value if wait_thread # Process::Status object returned.
-            end
-            # Handle earlier jrubies such as 1.6.7.2
-            status = $?.exitstatus if status.nil?
-          else
-            status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
-              out = stdout.read
-              err = stderr.read
-            end.exitstatus
-          end
-
+          out, err, status = Open3.capture3(cmd)
           [status, out, err]
         end
       end
@@ -400,33 +378,6 @@ module Braid
       def branch
         status, out, err = exec!("git branch | grep '*'")
         out[2..-1]
-      end
-
-      def apply(diff, *args)
-        status, err = nil, nil
-
-        command = "git apply --index --whitespace=nowarn #{args.join(' ')} -"
-
-        if USE_OPEN3
-          Open3.popen3(command) do |stdin, stdout, stderr, wait_thread|
-            stdin.puts(diff)
-            stdin.close
-            err = stderr.read
-            # Under earlier jrubies this is not correctly passed so add in check
-            status = wait_thread.value if wait_thread # Process::Status object returned.
-          end
-          # Handle earlier jrubies such as 1.6.7.2
-          status = $?.exitstatus if status.nil?
-        else
-          status = Open4.popen4(command) do |pid, stdin, stdout, stderr|
-            stdin.puts(diff)
-            stdin.close
-            err = stderr.read
-          end.exitstatus
-        end
-
-        raise ShellExecutionError, err unless status == 0
-        true
       end
 
       def clone(*args)

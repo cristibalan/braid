@@ -27,7 +27,11 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.2.0'
   s.add_dependency(%q<main>, ['>= 4.7.3'])
+  # XXX: Minimum version?
+  s.add_dependency(%q<json>)
 
   s.add_development_dependency(%q<rspec>, ['>= 3.4.4'])
   s.add_development_dependency(%q<mocha>, ['>= 0.9.11'])
+  s.add_development_dependency(%q<rake>)
+  s.add_development_dependency(%q<bundler>)
 end

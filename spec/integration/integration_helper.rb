@@ -83,6 +83,7 @@ def create_git_repo_from_fixture(fixture_name, options = {})
     run_command('git init')
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")
+    run_command('git config --local commit.gpgsign false')
     run_command('git add *')
     run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end

@@ -51,11 +51,13 @@ module Braid
         end
         user_name = git.config(%w(--local --get user.name))
         user_email = git.config(%w(--local --get user.email))
+        commit_gpgsign = git.config(%w(--local --get commit.gpgsign))
         Dir.chdir(clone_dir) do
           msg 'Cloning mirror with local changes.'
           git.init
           git.config(['--local', 'user.name', "\"#{user_name}\""]) if user_name
           git.config(['--local', 'user.email', "\"#{user_email}\""]) if user_email
+          git.config(['--local', 'commit.gpgsign', commit_gpgsign]) if commit_gpgsign
           # Adding other repositories as alternates is safe (we don't have to
           # worry about them being moved or deleted during the lifetime of this
           # temporary repository) and faster than fetching from them.  We don't

@@ -20,6 +20,12 @@ FileUtils.mkdir_p(TMP_PATH)
 
 BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
 
+# Must run in a git repository, though we expect the setting to be the same for
+# most repositories on a given OS.
+def filemode_enabled
+  run_command("git config core.filemode").strip == "true"
+end
+
 def with_editor_message(message = 'Make some changes')
   File.write(EDITOR_CMD, <<CMD)
 #!/usr/bin/env ruby
@@ -74,7 +80,7 @@ end
 def update_dir_from_fixture(dir, fixture = dir)
   to_dir = File.join(TMP_PATH, dir)
   FileUtils.mkdir_p(to_dir)
-  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + '/.', to_dir)
+  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + '/.', to_dir, {preserve: true})
 end
 
 def create_git_repo_from_fixture(fixture_name, options = {})

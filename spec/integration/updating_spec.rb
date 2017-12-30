@@ -208,6 +208,46 @@ describe 'Updating a mirror' do
     end
   end
 
+  describe 'from a git repository with a braid of a single file' do
+    before do
+      @repository_dir = create_git_repo_from_fixture('shiny')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
+      @file_name = 'layouts/layout.liquid'
+
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts/layout.liquid skit-layout.liquid")
+      end
+
+      update_dir_from_fixture('skit1', 'skit1.1x')
+      in_dir(@vendor_repository_dir) do
+        run_command('git add *')
+        run_command('git commit -m "change color and file mode"')
+      end
+    end
+
+    context 'with no project-specific changes' do
+      it 'should add the files and commit' do
+        in_dir(@repository_dir) do
+          run_command("#{BRAID_BIN} update skit-layout.liquid")
+        end
+
+        assert_no_diff("#{FIXTURE_PATH}/skit1.1x/#{@file_name}", "#{@repository_dir}/skit-layout.liquid")
+        in_dir(@repository_dir) do
+          if filemode_enabled
+            expect(File.stat("skit-layout.liquid").mode & 0100).to eq(0100)
+          end
+        end
+
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
+        expect(output.length).to eq(3)
+        expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit-layout.liquid' to '[0-9a-f]{7}'$/)
+      end
+    end
+  end
+
   describe 'from a git repository braided in as a tag' do
     before do
       @repository_dir = create_git_repo_from_fixture('shiny')

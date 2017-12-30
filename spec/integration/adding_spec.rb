@@ -67,6 +67,36 @@ describe 'Adding a mirror in a clean repository' do
     end
   end
 
+  describe 'from a single file in a git repository' do
+    before do
+      @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
+
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add --path layouts/layout.liquid #{@vendor_repository_dir} skit-layout.liquid")
+      end
+    end
+
+    it 'should add the file and commit' do
+      assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit-layout.liquid")
+
+      in_dir(@repository_dir) do
+        assert_commit_subject(/Braid: Add mirror 'skit-layout.liquid' at '[0-9a-f]{7}'/)
+        assert_commit_author('Some body')
+        assert_commit_email('somebody@example.com')
+      end
+    end
+
+    it 'should create .braids.json and add the mirror to it' do
+      braids = YAML::load_file("#{@repository_dir}/.braids.json")
+      expect(braids['skit-layout.liquid']['url']).to eq(@vendor_repository_dir)
+      expect(braids['skit-layout.liquid']['revision']).not_to be_nil
+      expect(braids['skit-layout.liquid']['branch']).to eq('master')
+      expect(braids['skit-layout.liquid']['tag']).to be_nil
+      expect(braids['skit-layout.liquid']['path']).to eq('layouts/layout.liquid')
+    end
+  end
+
   describe 'from a tag in a git repository' do
     before do
       @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')

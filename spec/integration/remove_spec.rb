@@ -56,4 +56,26 @@ describe 'Removing a mirror' do
       expect(braids['skit-layouts']).to be_nil
     end
   end
+
+  describe 'braiding a single file in' do
+    before do
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts/layout.liquid skit-layout.liquid")
+      end
+    end
+
+    it 'should remove the files and the remote' do
+
+      assert_no_diff("#{FIXTURE_PATH}/skit1/layouts/layout.liquid", "#{@repository_dir}/skit-layout.liquid")
+
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} remove skit-layout.liquid")
+      end
+
+      expect(File.exist?("#{@repository_dir}/skit-layout.liquid)")).to eq(false)
+
+      braids = YAML::load_file("#{@repository_dir}/.braids.json")
+      expect(braids['skit-layout.liquid']).to be_nil
+    end
+  end
 end

@@ -59,15 +59,68 @@ module Braid
       !!base_revision && git.merge_base(commit, base_revision) == commit
     end
 
-    def versioned_path(revision)
-      "#{revision}:#{self.remote_path}"
+    def upstream_item_for_revision(revision)
+      git.get_tree_item(revision, self.remote_path)
     end
 
+    # Return the arguments that should be passed to "git diff" to diff this
+    # mirror (including uncommitted changes by default), incorporating the given
+    # user-specified arguments.  Having the caller run "git diff" is convenient
+    # for now but violates encapsulation a little; we may have to reorganize the
+    # code in order to add features.
+    def diff_args(user_args = [])
+      upstream_item = upstream_item_for_revision(base_revision)
+
+      # We do not need to spend the time to copy the content outside the
+      # mirror from HEAD because --relative will exclude it anyway.  Rename
+      # detection seems to apply only to the files included in the diff, so we
+      # shouldn't have another bug like
+      # https://github.com/cristibalan/braid/issues/41.
+      base_tree = git.make_tree_with_item(nil, path, upstream_item)
+
+      # Note: --relative does a naive prefix comparison.  If we set (for
+      # example) `--relative=a/b`, that will match an unrelated file or
+      # directory name `a/bb`.  If the mirror is a directory, we can avoid this
+      # by adding a trailing slash to the prefix.
+      #
+      # If the mirror is a file, the only way we can avoid matching a path like
+      # `a/bb` is to pass a path argument to limit the diff.  This means if the
+      # user passes additional path arguments, we won't get the behavior we
+      # expect, which is the intersection of the user-specified paths with the
+      # mirror.  However, it's probably unreasonable for a user to pass path
+      # arguments when diffing a single-file mirror, so we ignore the issue.
+      #
+      # Note: This code doesn't handle various cases in which a directory at the
+      # root of a mirror turns into a file or vice versa.  If that happens,
+      # hopefully the user takes corrective action manually.
+      if upstream_item.is_a?(git.BlobWithMode)
+        # For a single-file mirror, we use the upstream basename for the
+        # upstream side of the diff and the downstream basename for the
+        # downstream side, like what `git diff` does when given two blobs as
+        # arguments.  Use --relative to strip away the entire downstream path
+        # before we add the basenames.
+        return [
+          "--relative=" + path,
+          "--src-prefix=a/" + File.basename(remote_path),
+          "--dst-prefix=b/" + File.basename(path),
+          base_tree,
+          # user_args may contain options, which must come before paths.
+          *user_args,
+          path
+        ]
+      else
+        return [
+          "--relative=" + path + "/",
+          base_tree,
+          *user_args
+        ]
+      end
+    end
+
+    # Precondition: the remote for this mirror is set up.
     def diff
       fetch_base_revision_if_missing
-      remote_hash = git.rev_parse(versioned_path(base_revision))
-      local_hash  = git.tree_hash(path)
-      remote_hash != local_hash ? git.diff_tree(remote_hash, local_hash) : ''
+      git.diff(diff_args)
     end
 
     # Re-fetching the remote after deleting and re-adding it may be slow even if

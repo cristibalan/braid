@@ -31,6 +31,7 @@ module Braid
       def show_diff(path, options = {})
         mirror = config.get!(path)
         setup_remote(mirror)
+        mirror.fetch_base_revision_if_missing
 
         # We do not need to spend the time to copy the content outside the
         # mirror from HEAD because --relative will exclude it anyway.  Rename

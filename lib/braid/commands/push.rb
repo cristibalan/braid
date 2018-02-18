@@ -80,5 +80,11 @@ module Braid
         clear_remote(mirror, options)
       end
     end
+
+    private
+
+    def config_mode
+      Config::MODE_READ_ONLY  # Surprisingly enough.
+    end
   end
 end

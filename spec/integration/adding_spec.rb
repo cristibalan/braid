@@ -29,11 +29,13 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit1']['revision']).not_to be_nil
-      expect(braids['skit1']['branch']).to eq('master')
-      expect(braids['skit1']['tag']).to be_nil
-      expect(braids['skit1']['path']).to be_nil
+      expect(braids['config_version']).to be_kind_of(Numeric)
+      mirror_obj = braids['mirrors']['skit1']
+      expect(mirror_obj['url']).to eq(@vendor_repository_dir)
+      expect(mirror_obj['revision']).not_to be_nil
+      expect(mirror_obj['branch']).to eq('master')
+      expect(mirror_obj['tag']).to be_nil
+      expect(mirror_obj['path']).to be_nil
     end
   end
 
@@ -59,11 +61,13 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit-layouts']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit-layouts']['revision']).not_to be_nil
-      expect(braids['skit-layouts']['branch']).to eq('master')
-      expect(braids['skit-layouts']['tag']).to be_nil
-      expect(braids['skit-layouts']['path']).to eq('layouts')
+      expect(braids['config_version']).to be_kind_of(Numeric)
+      mirror_obj = braids['mirrors']['skit-layouts']
+      expect(mirror_obj['url']).to eq(@vendor_repository_dir)
+      expect(mirror_obj['revision']).not_to be_nil
+      expect(mirror_obj['branch']).to eq('master')
+      expect(mirror_obj['tag']).to be_nil
+      expect(mirror_obj['path']).to eq('layouts')
     end
   end
 
@@ -89,11 +93,13 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit-layout.liquid']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit-layout.liquid']['revision']).not_to be_nil
-      expect(braids['skit-layout.liquid']['branch']).to eq('master')
-      expect(braids['skit-layout.liquid']['tag']).to be_nil
-      expect(braids['skit-layout.liquid']['path']).to eq('layouts/layout.liquid')
+      expect(braids['config_version']).to be_kind_of(Numeric)
+      mirror_obj = braids['mirrors']['skit-layout.liquid']
+      expect(mirror_obj['url']).to eq(@vendor_repository_dir)
+      expect(mirror_obj['revision']).not_to be_nil
+      expect(mirror_obj['branch']).to eq('master')
+      expect(mirror_obj['tag']).to be_nil
+      expect(mirror_obj['path']).to eq('layouts/layout.liquid')
     end
   end
 
@@ -122,11 +128,13 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit1']['revision']).not_to be_nil
-      expect(braids['skit1']['branch']).to be_nil
-      expect(braids['skit1']['tag']).to eq('v1')
-      expect(braids['skit1']['path']).to be_nil
+      expect(braids['config_version']).to be_kind_of(Numeric)
+      mirror_obj = braids['mirrors']['skit1']
+      expect(mirror_obj['url']).to eq(@vendor_repository_dir)
+      expect(mirror_obj['revision']).not_to be_nil
+      expect(mirror_obj['branch']).to be_nil
+      expect(mirror_obj['tag']).to eq('v1')
+      expect(mirror_obj['path']).to be_nil
     end
   end
 
@@ -156,11 +164,13 @@ describe 'Adding a mirror in a clean repository' do
 
     it 'should create .braids.json and add the mirror to it' do
       braids = YAML::load_file("#{@repository_dir}/.braids.json")
-      expect(braids['skit1']['url']).to eq(@vendor_repository_dir)
-      expect(braids['skit1']['revision']).not_to be_nil
-      expect(braids['skit1']['branch']).to be_nil
-      expect(braids['skit1']['tag']).to be_nil
-      expect(braids['skit1']['path']).to be_nil
+      expect(braids['config_version']).to be_kind_of(Numeric)
+      mirror_obj = braids['mirrors']['skit1']
+      expect(mirror_obj['url']).to eq(@vendor_repository_dir)
+      expect(mirror_obj['revision']).not_to be_nil
+      expect(mirror_obj['branch']).to be_nil
+      expect(mirror_obj['tag']).to be_nil
+      expect(mirror_obj['path']).to be_nil
     end
   end
 

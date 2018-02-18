@@ -37,8 +37,8 @@ CMD
   end
 end
 
-def assert_no_diff(file1, file2)
-  run_command("diff -U 3 #{file1} #{file2}")
+def assert_no_diff(file1, file2, extra_flags = "")
+  run_command("diff -U 3 #{extra_flags} #{file1} #{file2}")
 end
 
 def assert_commit_attribute(format_key, value, commit_index = 0)
@@ -77,6 +77,12 @@ def run_command(command)
   output
 end
 
+def run_command_expect_failure(command)
+  output = `#{command}`
+  raise "Expected command to fail but it succeeded: #{command}\nOutput: #{output}" if $?.success?
+  output
+end
+
 def update_dir_from_fixture(dir, fixture = dir)
   to_dir = File.join(TMP_PATH, dir)
   FileUtils.mkdir_p(to_dir)
@@ -95,7 +101,7 @@ def create_git_repo_from_fixture(fixture_name, options = {})
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")
     run_command('git config --local commit.gpgsign false')
-    run_command('git add *')
+    run_command('git add .')
     run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end
 

@@ -1,6 +1,9 @@
 module Braid
   class Mirror
-    ATTRIBUTES = %w(url branch revision tag path)
+    # Since Braid 1.1.0, the attributes are written to .braids.json in this
+    # canonical order.  For now, the order is chosen to match what Braid 1.0.22
+    # produced for newly added mirrors.
+    ATTRIBUTES = %w(url branch path tag revision)
 
     class UnknownType < BraidError
       def message
@@ -22,9 +25,44 @@ module Braid
 
     attr_reader :path, :attributes
 
-    def initialize(path, attributes = {})
+    def initialize(path, attributes = {}, breaking_change_cb = DUMMY_BREAKING_CHANGE_CB)
       @path       = path.sub(/\/$/, '')
-      @attributes = attributes
+      @attributes = attributes.dup
+
+      # Not that it's terribly important to check for such an old feature.  This
+      # is mainly to demonstrate the RemoveMirrorDueToBreakingChange mechanism
+      # in case we want to use it for something else in the future.
+      if !@attributes['type'].nil? && @attributes['type'] != 'git'
+        breaking_change_cb.call <<-DESC
+- Mirror '#{path}' is of a Subversion repository, which is no
+  longer supported.  The mirror will be removed from your configuration, leaving
+  the data in the tree.
+DESC
+        raise Config::RemoveMirrorDueToBreakingChange
+      end
+      @attributes.delete('type')
+
+      # Migrate revision locks from Braid < 1.0.18.  We no longer store the
+      # original branch or tag (the user has to specify it again when
+      # unlocking); we simply represent a locked revision by the absence of a
+      # branch or tag.
+      if @attributes['lock']
+        @attributes.delete('lock')
+        @attributes['branch'] = nil
+        @attributes['tag'] = nil
+      end
+
+      # Removal of support for full-history mirrors from Braid < 1.0.17 is a
+      # breaking change for users who wanted to use the imported history in some
+      # way.
+      if !@attributes['squashed'].nil? && @attributes['squashed'] != true
+        breaking_change_cb.call <<-DESC
+- Mirror '#{path}' is full-history, which is no longer supported.
+  It will be changed to squashed.  Upstream history already imported will remain
+  in your project's history and will have no effect on Braid.
+DESC
+      end
+      @attributes.delete('squashed')
     end
 
     def self.new_from_options(url, options = {})
@@ -182,6 +220,11 @@ module Braid
     end
 
     private
+
+    DUMMY_BREAKING_CHANGE_CB = lambda { |desc|
+      raise InternalError, "Instantiated a mirror using an unsupported " +
+        "feature outside of configuration loading."
+    }
 
     def method_missing(name, *args)
       if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }

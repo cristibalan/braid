@@ -1,0 +1,8 @@
+--- !ruby/object:Hash
+skit1: !ruby/object:Hash
+  branch: master
+  remote: master/braid/skit1
+  revision: 6d3aeac08f9f4f9689d367fc771f5f1c90496176
+  squashed: true
+  type: git
+  url: file:///path/to/braid/spec/fixtures/skit1/.git

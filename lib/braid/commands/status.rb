@@ -5,7 +5,7 @@ module Braid
         path ? status_one(path, options) : status_all(options)
       end
 
-      protected
+      private
 
       def status_all(options = {})
         print "\n"
@@ -40,6 +40,10 @@ module Braid
         end
         print "\n"
         clear_remote(mirror, options)
+      end
+
+      def config_mode
+        Config::MODE_READ_ONLY
       end
     end
   end

@@ -5,7 +5,7 @@ module Braid
         path ? diff_one(path, options) : diff_all(options)
       end
 
-      protected
+      private
 
       def diff_all(options = {})
         # We don't want "git diff" to invoke the pager once for each mirror.
@@ -38,6 +38,10 @@ module Braid
         git.diff_to_stdout(*mirror.diff_args(*options['git_diff_args']))
 
         clear_remote(mirror, options)
+      end
+
+      def config_mode
+        Config::MODE_READ_ONLY
       end
     end
   end

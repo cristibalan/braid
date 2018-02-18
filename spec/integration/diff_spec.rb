@@ -112,8 +112,7 @@ BANNER
           run_command("git rev-parse --verify --quiet #{base_revision}^{commit}")
           run_command("git gc --quiet --prune=all")
           # Make sure it's gone now so we know we're actually testing Braid's fetch behavior.
-          `git rev-parse --verify --quiet #{base_revision}^{commit}`
-          raise "'git gc' did not delete the base revision from the repository." if $?.success?
+          run_command_expect_failure("git rev-parse --verify --quiet #{base_revision}^{commit}")
 
           diff = run_command("#{BRAID_BIN} diff skit1")
 

@@ -247,21 +247,6 @@ module Braid
         true
       end
 
-      # Implies no commit.
-      def merge_ours(opt)
-        invoke(:merge, '--allow-unrelated-histories -s ours --no-commit', opt)
-        true
-      end
-
-      # Implies no commit.
-      def merge_subtree(opt)
-        # TODO which options are needed?
-        invoke(:merge, '-s subtree --no-commit --no-ff', opt)
-        true
-      rescue ShellExecutionError => error
-        raise MergeError, error.out
-      end
-
       # Merge three trees (local_treeish should match the current state of the
       # index) and update the index and working tree.
       #
@@ -282,17 +267,56 @@ module Braid
         invoke('ls-files', prefix)
       end
 
-      # Read tree into the index and working tree.
-      def read_tree_prefix_u(treeish, prefix)
-        invoke(:read_tree, "--prefix=#{prefix}/ -u", treeish)
-        true
+      class BlobWithMode
+        def initialize(hash, mode)
+          @hash = hash
+          @mode = mode
+        end
+        attr_reader :hash, :mode
+      end
+      # Allow the class to be referenced as `git.BlobWithMode`.
+      def BlobWithMode
+        Git::BlobWithMode
       end
 
-      # Read tree into the index, regardless of the state of the working tree.
-      # Most useful with a temporary index file.
-      def read_tree_prefix_i(treeish, prefix)
-        invoke(:read_tree, "--prefix=#{prefix}/ -i", treeish)
-        true
+      # Get the item at the given path in the given tree.  If it's a tree, just
+      # return its hash; if it's a blob, return a BlobWithMode object.  (This is
+      # how we remember the mode for single-file mirrors.)
+      def get_tree_item(tree, path)
+        if path.nil? || path == ''
+          tree
+        else
+          m = /^([^ ]*) ([^ ]*) ([^\t]*)\t.*$/.match(invoke(:ls_tree, tree, path))
+          mode = m[1]
+          type = m[2]
+          hash = m[3]
+          if type == "tree"
+            hash
+          elsif type == "blob"
+            return BlobWithMode.new(hash, mode)
+          else
+            raise ShellExecutionError, "Tree item is not a tree or a blob"
+          end
+        end
+      end
+
+      # Add the item (as returned by get_tree_item) to the index at the given
+      # path.  If update_worktree is true, then update the worktree, otherwise
+      # disregard the state of the worktree (most useful with a temporary index
+      # file).
+      def add_item_to_index(item, path, update_worktree)
+        if item.is_a?(BlobWithMode)
+          # Our minimum git version is 1.6.0 and the new --cacheinfo syntax
+          # wasn't added until 2.0.0.
+          invoke(:update_index, "--add", "--cacheinfo", item.mode, item.hash, path)
+          if update_worktree
+            # XXX If this fails, we've already updated the index.
+            invoke(:checkout_index, path)
+          end
+        else
+          # Yes, if path == '', "git read-tree --prefix=/" works. :/
+          invoke(:read_tree, "--prefix=#{path}/", update_worktree ? "-u" : "-i", item)
+        end
       end
 
       # Read tree into the root of the index.  This may not be the preferred way
@@ -317,14 +341,13 @@ module Braid
         end
       end
 
-      def make_tree_with_subtree(main_content, subtree_path, subtree_content)
+      def make_tree_with_item(main_content, item_path, item)
         with_temporary_index do
           if main_content
             read_tree_im(main_content)
-            rm_r_cached(subtree_path)
+            rm_r_cached(item_path)
           end
-          # Yes, if subtree_path == '', "git read-tree --prefix=/" works. :/
-          read_tree_prefix_i(subtree_content, subtree_path)
+          add_item_to_index(item, item_path, false)
           write_tree
         end
       end
@@ -347,13 +370,6 @@ module Braid
       def tree_hash(path, treeish = 'HEAD')
         out = invoke(:ls_tree, treeish, '-d', path)
         out.split[2]
-      end
-
-      def diff_tree(src_tree, dst_tree, prefix = nil)
-        cmd = "git diff-tree -p --binary #{src_tree} #{dst_tree}"
-        cmd << " --src-prefix=a/#{prefix}/ --dst-prefix=b/#{prefix}/" if prefix
-        status, out, err = exec!(cmd)
-        out
       end
 
       def diff_to_stdout(*args)

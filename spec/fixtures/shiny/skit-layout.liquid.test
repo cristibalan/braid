@@ -1,0 +1,2 @@
+This file exists to test that `braid diff skit-layout.liquid` correctly limits
+the diff to the single file and doesn't do a naive path prefix match.

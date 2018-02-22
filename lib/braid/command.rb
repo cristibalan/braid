@@ -10,7 +10,7 @@ module Braid
       verify_git_version!
       check_working_dir!
 
-      klass = Commands.const_get(command.to_s.capitalize)
+      klass = Commands.const_get(command.to_s)
       klass.new.run(*args)
 
     rescue BraidError => error
@@ -32,7 +32,7 @@ module Braid
     end
 
     def config
-      @config ||= Config.new
+      @config ||= Config.new({'mode' => config_mode})
     end
 
     def verbose?
@@ -45,11 +45,15 @@ module Braid
 
     private
 
+    def config_mode
+      Config::MODE_MAY_WRITE
+    end
+
     def setup_remote(mirror)
       existing_force = Braid.force
       begin
         Braid.force = true
-        Command.run(:setup, mirror.path)
+        Command.run(:Setup, mirror.path)
       ensure
         Braid.force = existing_force
       end
@@ -132,10 +136,6 @@ module Braid
 
         new_revision
       end
-    end
-
-    def determine_target_revision(mirror, new_revision)
-      git.rev_parse(mirror.versioned_path(new_revision))
     end
   end
 end

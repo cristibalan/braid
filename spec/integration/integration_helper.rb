@@ -20,6 +20,12 @@ FileUtils.mkdir_p(TMP_PATH)
 
 BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
 
+# Must run in a git repository, though we expect the setting to be the same for
+# most repositories on a given OS.
+def filemode_enabled
+  run_command("git config core.filemode").strip == "true"
+end
+
 def with_editor_message(message = 'Make some changes')
   File.write(EDITOR_CMD, <<CMD)
 #!/usr/bin/env ruby
@@ -31,8 +37,8 @@ CMD
   end
 end
 
-def assert_no_diff(file1, file2)
-  run_command("diff -U 3 #{file1} #{file2}")
+def assert_no_diff(file1, file2, extra_flags = "")
+  run_command("diff -U 3 #{extra_flags} #{file1} #{file2}")
 end
 
 def assert_commit_attribute(format_key, value, commit_index = 0)
@@ -54,8 +60,13 @@ def assert_commit_email(value, commit_index = 0)
 end
 
 def in_dir(dir = TMP_PATH)
+  orig_wd = Dir.pwd
   Dir.chdir(dir)
-  yield
+  begin
+    yield
+  ensure
+    Dir.chdir(orig_wd)
+  end
 end
 
 # Note: Do not use single quotes to quote spaces in arguments.  They do not work
@@ -66,10 +77,16 @@ def run_command(command)
   output
 end
 
+def run_command_expect_failure(command)
+  output = `#{command}`
+  raise "Expected command to fail but it succeeded: #{command}\nOutput: #{output}" if $?.success?
+  output
+end
+
 def update_dir_from_fixture(dir, fixture = dir)
   to_dir = File.join(TMP_PATH, dir)
   FileUtils.mkdir_p(to_dir)
-  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + '/.', to_dir)
+  FileUtils.cp_r(File.join(FIXTURE_PATH, fixture) + '/.', to_dir, {preserve: true})
 end
 
 def create_git_repo_from_fixture(fixture_name, options = {})
@@ -84,7 +101,7 @@ def create_git_repo_from_fixture(fixture_name, options = {})
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")
     run_command('git config --local commit.gpgsign false')
-    run_command('git add *')
+    run_command('git add .')
     run_command("git commit -m \"initial commit of #{fixture_name}\"")
   end
 

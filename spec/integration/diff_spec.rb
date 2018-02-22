@@ -112,8 +112,7 @@ BANNER
           run_command("git rev-parse --verify --quiet #{base_revision}^{commit}")
           run_command("git gc --quiet --prune=all")
           # Make sure it's gone now so we know we're actually testing Braid's fetch behavior.
-          `git rev-parse --verify --quiet #{base_revision}^{commit}`
-          raise "'git gc' did not delete the base revision from the repository." if $?.success?
+          run_command_expect_failure("git rev-parse --verify --quiet #{base_revision}^{commit}")
 
           diff = run_command("#{BRAID_BIN} diff skit1")
 
@@ -285,7 +284,7 @@ PATCH
   describe 'braided subdirectory into' do
     before do
       in_dir(@repository_dir) do
-        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts")
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts skit-layouts")
       end
     end
 
@@ -293,7 +292,7 @@ PATCH
       it 'with the mirror specified should emit no output' do
         diff = nil
         in_dir(@repository_dir) do
-          diff = run_command("#{BRAID_BIN} diff skit1")
+          diff = run_command("#{BRAID_BIN} diff skit-layouts")
         end
 
         expect(diff).to eq('')
@@ -305,14 +304,14 @@ PATCH
           diff = run_command("#{BRAID_BIN} diff")
         end
 
-        expect(diff).to eq("=======================================================\nBraid: Diffing skit1\n=======================================================\n")
+        expect(diff).to eq("=======================================================\nBraid: Diffing skit-layouts\n=======================================================\n")
       end
     end
 
 
     describe 'with changes' do
       before do
-        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/.', "#{@repository_dir}/skit1")
+        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/.', "#{@repository_dir}/skit-layouts")
         in_dir(@repository_dir) do
           run_command('git add *')
           run_command('git commit -m "Some local changes"')
@@ -322,7 +321,7 @@ PATCH
       it 'with the mirror specified should emit diff' do
         diff = nil
         in_dir(@repository_dir) do
-          diff = run_command("#{BRAID_BIN} diff skit1")
+          diff = run_command("#{BRAID_BIN} diff skit-layouts")
         end
 
         expect(diff).to eq(<<PATCH)
@@ -350,12 +349,177 @@ PATCH
 
         expect(diff).to eq(<<PATCH)
 =======================================================
-Braid: Diffing skit1
+Braid: Diffing skit-layouts
 =======================================================
 diff --git a/layout.liquid b/layout.liquid
 index 9f75009..25a4b32 100644
 --- a/layout.liquid
 +++ b/layout.liquid
+@@ -22,7 +22,7 @@
+ <![endif]-->
+ </head>
+ 
+-<body class="fixed orange">
++<body class="fixed green">
+ <script type="text/javascript">loadPreferences()</script>
+ 
+ <div id="wrapper">
+PATCH
+      end
+    end
+  end
+
+  describe 'braided from a single file' do
+    before do
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add #{@vendor_repository_dir} --path layouts/layout.liquid skit-layout.liquid")
+      end
+    end
+
+    describe 'with no changes' do
+      it 'with the mirror specified should emit no output' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit-layout.liquid")
+        end
+
+        expect(diff).to eq('')
+      end
+
+      it 'without specifying a mirror should emit only banners' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff")
+        end
+
+        expect(diff).to eq("=======================================================\nBraid: Diffing skit-layout.liquid\n=======================================================\n")
+      end
+    end
+
+
+    describe 'with changes' do
+      before do
+        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/layout.liquid', "#{@repository_dir}/skit-layout.liquid",
+          {preserve: true})
+        in_dir(@repository_dir) do
+          run_command('git add *')
+          run_command('git commit -m "Some local changes"')
+        end
+      end
+
+      it 'with the mirror specified should emit diff' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit-layout.liquid")
+        end
+
+        expect(diff).to eq(<<PATCH)
+diff --git a/layout.liquid b/skit-layout.liquid
+index 9f75009..25a4b32 100644
+--- a/layout.liquid
++++ b/skit-layout.liquid
+@@ -22,7 +22,7 @@
+ <![endif]-->
+ </head>
+ 
+-<body class="fixed orange">
++<body class="fixed green">
+ <script type="text/javascript">loadPreferences()</script>
+ 
+ <div id="wrapper">
+PATCH
+      end
+
+      it 'without specifying a mirror should emit diff and banners' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff")
+        end
+
+        expect(diff).to eq(<<PATCH)
+=======================================================
+Braid: Diffing skit-layout.liquid
+=======================================================
+diff --git a/layout.liquid b/skit-layout.liquid
+index 9f75009..25a4b32 100644
+--- a/layout.liquid
++++ b/skit-layout.liquid
+@@ -22,7 +22,7 @@
+ <![endif]-->
+ </head>
+ 
+-<body class="fixed orange">
++<body class="fixed green">
+ <script type="text/javascript">loadPreferences()</script>
+ 
+ <div id="wrapper">
+PATCH
+      end
+    end
+
+    describe 'with changes including a mode change' do
+      before do
+        in_dir(@repository_dir) do
+          @filemode_enabled = filemode_enabled
+        end
+        FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1x') + '/layouts/layout.liquid', "#{@repository_dir}/skit-layout.liquid",
+          {preserve: true})
+        in_dir(@repository_dir) do
+          run_command('git add *')
+          run_command('git commit -m "Some local changes"')
+        end
+      end
+
+      it 'with the mirror specified should emit diff' do
+        # Right way to do this?  See
+        # https://github.com/cucumber/aruba/issues/301 .  It's unclear what
+        # we'd have to do to get the information in time to use :unless.  If
+        # we don't do that, a success seems less bad than a known
+        # failure ("pending").
+        next unless @filemode_enabled
+
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit-layout.liquid")
+        end
+
+        expect(diff).to eq(<<PATCH)
+diff --git a/layout.liquid b/skit-layout.liquid
+old mode 100644
+new mode 100755
+index 9f75009..25a4b32
+--- a/layout.liquid
++++ b/skit-layout.liquid
+@@ -22,7 +22,7 @@
+ <![endif]-->
+ </head>
+ 
+-<body class="fixed orange">
++<body class="fixed green">
+ <script type="text/javascript">loadPreferences()</script>
+ 
+ <div id="wrapper">
+PATCH
+      end
+
+      it 'without specifying a mirror should emit diff and banners' do
+        next unless @filemode_enabled
+
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff")
+        end
+
+        expect(diff).to eq(<<PATCH)
+=======================================================
+Braid: Diffing skit-layout.liquid
+=======================================================
+diff --git a/layout.liquid b/skit-layout.liquid
+old mode 100644
+new mode 100755
+index 9f75009..25a4b32
+--- a/layout.liquid
++++ b/skit-layout.liquid
 @@ -22,7 +22,7 @@
  <![endif]-->
  </head>

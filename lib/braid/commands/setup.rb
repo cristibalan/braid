@@ -5,7 +5,7 @@ module Braid
         path ? setup_one(path) : setup_all
       end
 
-      protected
+      private
 
       def setup_all
         msg 'Setting up all mirrors.'
@@ -30,6 +30,10 @@ module Braid
         msg "Setup: Creating remote for '#{mirror.path}'." if verbose?
         url = use_local_cache? ? git_cache.path(mirror.url) : mirror.url
         git.remote_add(mirror.remote, url)
+      end
+
+      def config_mode
+        Config::MODE_READ_ONLY
       end
     end
   end

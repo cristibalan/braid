@@ -1,0 +1,10 @@
+{
+  "skit1": {
+    "url": "file:///path/to/braid/spec/fixtures/skit1",
+    "remote": "master/braid/skit1",
+    "branch": "master",
+    "squashed": true,
+    "revision": "6d3aeac08f9f4f9689d367fc771f5f1c90496176",
+    "lock": "6d3aeac08f9f4f9689d367fc771f5f1c90496176"
+  }
+}

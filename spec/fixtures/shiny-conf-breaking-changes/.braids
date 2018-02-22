@@ -1,0 +1,14 @@
+--- !ruby/object:Hash
+Spoon-Knife: !ruby/object:Hash
+  remote: master/braid/Spoon-Knife
+  revision: 18
+  squashed: true
+  type: svn
+  url: https://github.com/octocat/Spoon-Knife.git/trunk
+skit1: !ruby/object:Hash
+  branch: master
+  remote: master/braid/skit1
+  revision: 6d3aeac08f9f4f9689d367fc771f5f1c90496176
+  squashed: false
+  type: git
+  url: file:///path/to/braid/spec/fixtures/skit1/.git

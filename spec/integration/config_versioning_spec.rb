@@ -12,7 +12,8 @@ describe 'Config versioning:' do
   # for Windows recommended settings.
   # https://github.com/cristibalan/braid/issues/77
   def assert_no_diff_in_braids(file1, file2)
-    assert_no_diff(file1, file2, '--ignore-trailing-space')
+    # --ignore-trailing-space is not present in the platform diff command under osx so only use it when needed
+    assert_no_diff(file1, file2, Gem.win_platform? ? '--ignore-trailing-space' : '')
   end
 
   describe 'read-only command' do

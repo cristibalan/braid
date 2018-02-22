@@ -144,6 +144,54 @@ Go back to tracking a particular branch.
 
     braid diff vendor/rails
 
+## Braid version compatibility
+
+Since Braid has been regularly changing the configuration format and adding new
+features that some projects may choose to rely on, and somewhat less often
+making breaking changes in how the configuration is handled, problems can arise
+if different developers work on the same project using different versions of
+Braid.  Since version 1.1.0, Braid refuses to operate if it detects potentially
+problematic version skew.  If this happens, Braid will tell you what you can do.
+If you'd like an overview of what to expect, read on.
+
+Roughly speaking, the `.braids.json` configuration file contains a configuration
+version number that corresponds to a range of compatible Braid minor versions
+(`x.y`). "Patch" upgrades to Braid (i.e., `x.y.z` -> `x.y.(z+1)`) will never
+(intentionally!) have configuration compatibility implications and are always
+recommended as they may fix critical bugs.
+
+If you use a Braid version too old for your configuration file, Braid will
+direct you to the [configuration version history page](config_versions.md) with
+instructions to upgrade Braid.  If you use a Braid version too new, Braid will
+tell you how you can upgrade your configuration file or find a compatible older
+Braid version to use.  (As an exception, a newer version of Braid can run
+read-only commands on an older configuration file without upgrading it if there
+are no breaking changes.)  If you upgrade your configuration file, then other
+developers on the project may need to upgrade Braid.  Braid does not support
+downgrading a configuration file, though you can revert the commit that upgraded
+it if you haven't made any subsequent changes to the configuration.
+
+If you work on multiple projects, you may need to install multiple versions of
+Braid and manually run the correct version for each project.  Fortunately, the
+RubyGems system makes this reasonably straightforward.
+
+Another approach is to standardize the Braid version for a project by listing
+Braid in a `Gemfile` (either checking in `Gemfile.lock` or using a version
+constraint in the `Gemfile`) and run the project's version of Braid via
+[Bundler](http://bundler.io/) with `bundle exec braid`.  Even non-Ruby projects
+can do this if it's acceptable to have a `Gemfile` and `Gemfile.lock`.  Ruby
+projects that don't want Braid to interact with their other gems can potentially
+put the `Gemfile` in a subdirectory and provide a wrapper script for `bundle`
+that sets the `BUNDLE_GEMFILE` environment variable.  We do not yet have enough
+experience with this approach to make a firm recommendation for or against it.
+
+This is the best design we could find to prevent surprises and adequately
+support normal development processes while minimizing the additional maintenance
+cost of the version compatibility mechanism.  We want to have a scheme in place
+that is robust enough to make it reasonable to encourage serious adoption of
+Braid, yet we don't want to spend extra work adding conveniences until there's
+evidence of sufficient demand for them.
+
 ## Contributing
 
 We appreciate any patches, error reports and usage ideas you may have. Please

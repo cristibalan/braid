@@ -21,10 +21,10 @@ module Braid
           setup_remote(mirror)
           mirror.fetch
 
-          new_revision    = validate_new_revision(mirror, options['revision'])
-          target_revision = determine_target_revision(mirror, new_revision)
+          new_revision = validate_new_revision(mirror, options['revision'])
+          target_item = mirror.upstream_item_for_revision(new_revision)
 
-          git.read_tree_prefix_u(target_revision, mirror.path)
+          git.add_item_to_index(target_item, mirror.path, true)
 
           mirror.revision = new_revision
           config.update(mirror)

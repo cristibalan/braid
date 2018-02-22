@@ -56,8 +56,6 @@ module Braid
         rescue InvalidRevision
           # Ignored as it means the revision matches expected
         end
-        target_revision = determine_target_revision(mirror, new_revision)
-        current_revision = determine_target_revision(mirror, mirror.base_revision)
 
         from_desc =
           original_tag ? "tag '#{original_tag}'" :
@@ -77,7 +75,7 @@ module Braid
 
         if !switching &&
           (
-            (options['revision'] && was_locked && target_revision == current_revision) ||
+            (options['revision'] && was_locked && new_revision == mirror.base_revision) ||
             (options['revision'].nil? && !was_locked && mirror.merged?(git.rev_parse(new_revision)))
           )
           msg "Mirror '#{mirror.path}' is already up to date."
@@ -93,11 +91,13 @@ module Braid
         in_error = false
         begin
           local_hash = git.rev_parse('HEAD')
-          base_hash = git.make_tree_with_subtree('HEAD', mirror.path, mirror.versioned_path(base_revision))
-          remote_hash = git.make_tree_with_subtree('HEAD', mirror.path, target_revision)
+          base_hash = git.make_tree_with_item('HEAD', mirror.path,
+            mirror.upstream_item_for_revision(base_revision))
+          remote_hash = git.make_tree_with_item('HEAD', mirror.path,
+            mirror.upstream_item_for_revision(new_revision))
           Operations::with_modified_environment({
             "GITHEAD_#{local_hash}" => 'HEAD',
-            "GITHEAD_#{remote_hash}" => target_revision
+            "GITHEAD_#{remote_hash}" => new_revision
           }) do
             git.merge_trees(base_hash, local_hash, remote_hash)
           end
@@ -120,15 +120,6 @@ module Braid
         git.commit(commit_message)
         msg "Updated mirror to #{display_revision(mirror)}."
         clear_remote(mirror, options)
-      end
-
-      def generate_tree_hash(mirror, revision)
-        git.with_temporary_index do
-          git.read_tree_im('HEAD')
-          git.rm_r_cached(mirror.path)
-          git.read_tree_prefix_i(revision, mirror.path)
-          git.write_tree
-        end
       end
     end
   end

@@ -33,7 +33,7 @@ module Braid
           clear_remote(mirror, options)
           return
         end
-        local_mirror_tree = git.rev_parse("HEAD:#{mirror.path}")
+        local_mirror_item = git.get_tree_item('HEAD', mirror.path)
 
         odb_paths = [File.expand_path(git.repo_file_path('objects'))]
         if File.exist?(mirror.cached_url)
@@ -70,9 +70,7 @@ module Braid
           git.fetch(remote_url, mirror.remote_ref)
           git.checkout(base_revision)
           git.rm_r(mirror.remote_path || '.')
-          # Yes, when mirror.remote_path is unset, "git read-tree --prefix=/"
-          # seems to work. :/
-          git.read_tree_prefix_u(local_mirror_tree, mirror.remote_path || '')
+          git.add_item_to_index(local_mirror_item, mirror.remote_path || '', true)
           system('git commit -v')
           msg "Pushing changes to remote branch #{branch}."
           git.push(remote_url, "HEAD:refs/heads/#{branch}")
@@ -81,6 +79,12 @@ module Braid
 
         clear_remote(mirror, options)
       end
+    end
+
+    private
+
+    def config_mode
+      Config::MODE_READ_ONLY  # Surprisingly enough.
     end
   end
 end

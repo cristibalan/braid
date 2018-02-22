@@ -35,6 +35,12 @@ module Braid
       value if value != self.class.name
     end
   end
+
+  class InternalError < BraidError
+    def message
+      "internal error: #{super}"
+    end
+  end
 end
 
 require 'braid/operations_lite'
@@ -49,3 +55,4 @@ require 'braid/commands/remove'
 require 'braid/commands/setup'
 require 'braid/commands/update'
 require 'braid/commands/status'
+require 'braid/commands/upgrade_config'

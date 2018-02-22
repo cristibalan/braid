@@ -64,7 +64,7 @@ Main {
     run {
       check_no_extra_args!
       Braid.verbose = verbose
-      Braid::Command.run(:add, url, {'path' => local_path, 'branch' => branch, 'tag' => tag, 'revision' => revision, 'remote_path' => path})
+      Braid::Command.run(:Add, url, {'path' => local_path, 'branch' => branch, 'tag' => tag, 'revision' => revision, 'remote_path' => path})
     }
   }
 
@@ -97,7 +97,7 @@ Main {
         'keep' => keep
       }
       Braid.verbose = verbose
-      Braid::Command.run(:update, local_path, options)
+      Braid::Command.run(:Update, local_path, options)
     }
   }
 
@@ -122,7 +122,7 @@ Main {
         :keep => keep
       }
       Braid.verbose = verbose
-      Braid::Command.run(:remove, local_path, options)
+      Braid::Command.run(:Remove, local_path, options)
     }
   }
 
@@ -149,7 +149,7 @@ Main {
         'git_diff_args' => @argv
       }
       Braid.verbose = verbose
-      Braid::Command.run(:diff, local_path, options)
+      Braid::Command.run(:Diff, local_path, options)
     }
   }
 
@@ -167,7 +167,7 @@ Main {
         'branch' => branch
       }
       Braid.verbose = verbose
-      Braid::Command.run(:push, local_path, options)
+      Braid::Command.run(:Push, local_path, options)
     }
   }
 
@@ -182,7 +182,7 @@ Main {
       check_no_extra_args!
       Braid.verbose = verbose
       Braid.force = force
-      Braid::Command.run(:setup, local_path)
+      Braid::Command.run(:Setup, local_path)
     }
   }
 
@@ -203,7 +203,44 @@ Main {
     run {
       check_no_extra_args!
       Braid.verbose = verbose
-      Braid::Command.run(:status, local_path)
+      Braid::Command.run(:Status, local_path)
+    }
+  }
+
+  mode('upgrade-config') {
+    description <<-DESC
+      Upgrade your project's Braid configuration to the latest configuration version.
+      Other commands will notify you when you need to do this.  This may make older
+      versions of Braid unable to read the configuration and may introduce breaking
+      changes in how the configuration is handled by Braid.  An upgrade that
+      introduces breaking changes will not be performed without the
+      --allow-breaking-changes option.
+    DESC
+
+    mixin :option_verbose
+
+    option('dry-run') {
+      optional
+      desc 'Explain the consequences of the upgrade without performing it.'
+      attr :dry_run
+    }
+
+    option('allow-breaking-changes') {
+      optional
+      desc <<-DESC
+        Perform the upgrade even if it involves breaking changes.
+      DESC
+      attr :allow_breaking_changes
+    }
+
+    run {
+      check_no_extra_args!
+      options = {
+        'dry_run' => dry_run,
+        'allow_breaking_changes' => allow_breaking_changes
+      }
+      Braid.verbose = verbose
+      Braid::Command.run(:UpgradeConfig, options)
     }
   }
 

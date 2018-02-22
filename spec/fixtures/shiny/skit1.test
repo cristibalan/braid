@@ -1,0 +1,2 @@
+This file exists to test that `braid diff skit1` correctly limits the diff to
+the single directory and doesn't do a naive path prefix match.

@@ -234,7 +234,7 @@ describe 'Updating a mirror' do
         assert_no_diff("#{FIXTURE_PATH}/skit1.1x/#{@file_name}", "#{@repository_dir}/skit-layout.liquid")
         in_dir(@repository_dir) do
           if filemode_enabled
-            expect(File.stat("skit-layout.liquid").mode & 0100).to eq(0100)
+            expect(File.stat('skit-layout.liquid').mode & 0100).to eq(0100)
           end
         end
 

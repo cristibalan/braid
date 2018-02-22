@@ -10,7 +10,7 @@ module Braid
       def diff_all(options = {})
         # We don't want "git diff" to invoke the pager once for each mirror.
         # TODO: Invoke the default pager once for the entire output.
-        Operations::with_modified_environment({"GIT_PAGER" => ''}) do
+        Operations::with_modified_environment({ 'GIT_PAGER' => ''}) do
           config.mirrors.each do |path|
             separator
             msg "Diffing #{path}\n"

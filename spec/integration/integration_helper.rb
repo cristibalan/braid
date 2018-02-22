@@ -23,7 +23,7 @@ BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + Fi
 # Must run in a git repository, though we expect the setting to be the same for
 # most repositories on a given OS.
 def filemode_enabled
-  run_command("git config core.filemode").strip == "true"
+  run_command('git config core.filemode').strip == 'true'
 end
 
 def with_editor_message(message = 'Make some changes')
@@ -37,7 +37,7 @@ CMD
   end
 end
 
-def assert_no_diff(file1, file2, extra_flags = "")
+def assert_no_diff(file1, file2, extra_flags = '')
   run_command("diff -U 3 #{extra_flags} #{file1} #{file2}")
 end
 

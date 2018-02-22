@@ -12,12 +12,12 @@ describe 'Config versioning:' do
   # for Windows recommended settings.
   # https://github.com/cristibalan/braid/issues/77
   def assert_no_diff_in_braids(file1, file2)
-    assert_no_diff(file1, file2, "--ignore-trailing-space")
+    assert_no_diff(file1, file2, '--ignore-trailing-space')
   end
 
   describe 'read-only command' do
 
-    it "from future config version should fail" do
+    it 'from future config version should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-future')
 
       in_dir(@repository_dir) do
@@ -26,13 +26,13 @@ describe 'Config versioning:' do
       end
     end
 
-    it "from old config version with no breaking changes should work" do
+    it 'from old config version with no breaking changes should work' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-yaml')
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
 
       vendor_revision = nil
       in_dir(@vendor_repository_dir) do
-        vendor_revision = run_command("git rev-parse HEAD")
+        vendor_revision = run_command('git rev-parse HEAD')
       end
 
       in_dir(@repository_dir) do
@@ -54,7 +54,7 @@ describe 'Config versioning:' do
       end
     end
 
-    it "from old config version with breaking changes should fail" do
+    it 'from old config version with breaking changes should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-breaking-changes')
 
       in_dir(@repository_dir) do
@@ -67,7 +67,7 @@ describe 'Config versioning:' do
 
   describe 'write command' do
 
-    it "from future config version should fail" do
+    it 'from future config version should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-future')
 
       in_dir(@repository_dir) do
@@ -76,7 +76,7 @@ describe 'Config versioning:' do
       end
     end
 
-    it "from old config version with no breaking changes should fail" do
+    it 'from old config version with no breaking changes should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-yaml')
 
       in_dir(@repository_dir) do
@@ -85,7 +85,7 @@ describe 'Config versioning:' do
       end
     end
 
-    it "from old config version with breaking changes should fail" do
+    it 'from old config version with breaking changes should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-breaking-changes')
 
       in_dir(@repository_dir) do
@@ -98,38 +98,38 @@ describe 'Config versioning:' do
 
   describe '"braid upgrade-config"' do
 
-    it "from Braid 0.7.1 (.braids YAML) should produce the expected configuration" do
+    it 'from Braid 0.7.1 (.braids YAML) should produce the expected configuration' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-yaml')
 
       in_dir(@repository_dir) do
         output = run_command("#{BRAID_BIN} upgrade-config")
         # Check this on one of the test cases.
         expect(output).to match(/Configuration upgrade complete\./)
-        expect(File.exists?(".braids")).to eq(false)
-        assert_no_diff_in_braids(".braids.json", "expected.braids.json")
+        expect(File.exists?('.braids')).to eq(false)
+        assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
 
-    it "from Braid 1.0.0 (.braids JSON) should produce the expected configuration" do
+    it 'from Braid 1.0.0 (.braids JSON) should produce the expected configuration' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-json-old-name')
 
       in_dir(@repository_dir) do
         run_command("#{BRAID_BIN} upgrade-config")
-        expect(File.exists?(".braids")).to eq(false)
-        assert_no_diff_in_braids(".braids.json", "expected.braids.json")
+        expect(File.exists?('.braids')).to eq(false)
+        assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
 
-    it "from Braid 1.0.9 (.braids.json) with old-style lock should produce the expected configuration" do
+    it 'from Braid 1.0.9 (.braids.json) with old-style lock should produce the expected configuration' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-1.0.9-lock')
 
       in_dir(@repository_dir) do
         run_command("#{BRAID_BIN} upgrade-config")
-        assert_no_diff_in_braids(".braids.json", "expected.braids.json")
+        assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
 
-    it "from Braid 1.0.9 (.braids.json) with old-style lock with --dry-run should print info without performing the upgrade" do
+    it 'from Braid 1.0.9 (.braids.json) with old-style lock with --dry-run should print info without performing the upgrade' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-1.0.9-lock')
 
       in_dir(@repository_dir) do
@@ -138,11 +138,11 @@ describe 'Config versioning:' do
         expect(output).not_to match(/The following breaking changes/)
         # Instructions should not include --allow-breaking-changes if it isn't necessary.
         expect(output).to match(/Run 'braid upgrade-config'/)
-        assert_no_diff_in_braids(".braids.json", "#{FIXTURE_PATH}/shiny-conf-1.0.9-lock/.braids.json")
+        assert_no_diff_in_braids('.braids.json', "#{FIXTURE_PATH}/shiny-conf-1.0.9-lock/.braids.json")
       end
     end
 
-    it "with breaking changes and --dry-run should print info without performing the upgrade" do
+    it 'with breaking changes and --dry-run should print info without performing the upgrade' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-breaking-changes')
 
       in_dir(@repository_dir) do
@@ -151,12 +151,12 @@ describe 'Config versioning:' do
         expect(output).to match(/Spoon-Knife.*Subversion/)
         expect(output).to match(/skit1.*full-history/)
         expect(output).to match(/Run 'braid upgrade-config --allow-breaking-changes'/)
-        assert_no_diff(".braids", "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
-        expect(File.exists?(".braids.json")).to eq(false)
+        assert_no_diff('.braids', "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
+        expect(File.exists?('.braids.json')).to eq(false)
       end
     end
 
-    it "with breaking changes should fail" do
+    it 'with breaking changes should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-breaking-changes')
 
       in_dir(@repository_dir) do
@@ -166,12 +166,12 @@ describe 'Config versioning:' do
         expect(output).to match(/skit1.*full-history/)
         expect(output).to match(/You must pass --allow-breaking-changes/)
         # `braid upgrade-config` should not have changed any files.
-        assert_no_diff(".braids", "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
-        expect(File.exists?(".braids.json")).to eq(false)
+        assert_no_diff('.braids', "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
+        expect(File.exists?('.braids.json')).to eq(false)
       end
     end
 
-    it "with breaking changes and --allow-breaking-changes should produce the expected configuration" do
+    it 'with breaking changes and --allow-breaking-changes should produce the expected configuration' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-breaking-changes')
 
       in_dir(@repository_dir) do
@@ -180,12 +180,12 @@ describe 'Config versioning:' do
         expect(output).to match(/Spoon-Knife.*Subversion/)
         expect(output).to match(/skit1.*full-history/)
         expect(output).to match(/Configuration upgrade complete\./)
-        expect(File.exists?(".braids")).to eq(false)
-        assert_no_diff_in_braids(".braids.json", "expected.braids.json")
+        expect(File.exists?('.braids')).to eq(false)
+        assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
 
-    it "from future config version should fail" do
+    it 'from future config version should fail' do
       @repository_dir = create_git_repo_from_fixture('shiny-conf-future')
 
       in_dir(@repository_dir) do
@@ -194,7 +194,7 @@ describe 'Config versioning:' do
       end
     end
 
-    it "from current config version should do nothing and print expected message" do
+    it 'from current config version should do nothing and print expected message' do
       # Generate a current-version configuration by adding a mirror.
       @repository_dir = create_git_repo_from_fixture('shiny')
       @vendor_repository_dir = create_git_repo_from_fixture('skit1')
@@ -206,13 +206,13 @@ describe 'Config versioning:' do
       end
     end
 
-    it "with no Braid configuration should do nothing and print expected message" do
+    it 'with no Braid configuration should do nothing and print expected message' do
       @repository_dir = create_git_repo_from_fixture('shiny')
 
       in_dir(@repository_dir) do
         output = run_command("#{BRAID_BIN} upgrade-config")
         expect(output).to match(/has no Braid configuration file/)
-        expect(File.exists?(".braids.json")).to eq(false)
+        expect(File.exists?('.braids.json')).to eq(false)
       end
     end
 

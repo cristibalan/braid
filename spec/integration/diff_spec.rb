@@ -110,7 +110,7 @@ BANNER
           base_revision = /^skit1 \(([0-9a-f]{40})\)/.match(status_out)[1]
           # Make sure the base revision is in the repository as a sanity check.
           run_command("git rev-parse --verify --quiet #{base_revision}^{commit}")
-          run_command("git gc --quiet --prune=all")
+          run_command('git gc --quiet --prune=all')
           # Make sure it's gone now so we know we're actually testing Braid's fetch behavior.
           run_command_expect_failure("git rev-parse --verify --quiet #{base_revision}^{commit}")
 

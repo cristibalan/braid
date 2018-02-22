@@ -290,12 +290,12 @@ module Braid
           mode = m[1]
           type = m[2]
           hash = m[3]
-          if type == "tree"
+          if type == 'tree'
             hash
-          elsif type == "blob"
+          elsif type == 'blob'
             return BlobWithMode.new(hash, mode)
           else
-            raise ShellExecutionError, "Tree item is not a tree or a blob"
+            raise ShellExecutionError, 'Tree item is not a tree or a blob'
           end
         end
       end
@@ -308,14 +308,14 @@ module Braid
         if item.is_a?(BlobWithMode)
           # Our minimum git version is 1.6.0 and the new --cacheinfo syntax
           # wasn't added until 2.0.0.
-          invoke(:update_index, "--add", "--cacheinfo", item.mode, item.hash, path)
+          invoke(:update_index, '--add', '--cacheinfo', item.mode, item.hash, path)
           if update_worktree
             # XXX If this fails, we've already updated the index.
             invoke(:checkout_index, path)
           end
         else
           # Yes, if path == '', "git read-tree --prefix=/" works. :/
-          invoke(:read_tree, "--prefix=#{path}/", update_worktree ? "-u" : "-i", item)
+          invoke(:read_tree, "--prefix=#{path}/", update_worktree ? '-u' : '-i', item)
         end
       end
 

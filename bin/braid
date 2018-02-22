@@ -207,7 +207,7 @@ Main {
     }
   }
 
-  mode("upgrade-config") {
+  mode('upgrade-config') {
     description <<-DESC
       Upgrade your project's Braid configuration to the latest configuration version.
       Other commands will notify you when you need to do this.  This may make older
@@ -219,13 +219,13 @@ Main {
 
     mixin :option_verbose
 
-    option("dry-run") {
+    option('dry-run') {
       optional
       desc 'Explain the consequences of the upgrade without performing it.'
       attr :dry_run
     }
 
-    option("allow-breaking-changes") {
+    option('allow-breaking-changes') {
       optional
       desc <<-DESC
         Perform the upgrade even if it involves breaking changes.

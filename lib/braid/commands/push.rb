@@ -33,7 +33,7 @@ module Braid
           clear_remote(mirror, options)
           return
         end
-        local_mirror_item = git.get_tree_item("HEAD", mirror.path)
+        local_mirror_item = git.get_tree_item('HEAD', mirror.path)
 
         odb_paths = [File.expand_path(git.repo_file_path('objects'))]
         if File.exist?(mirror.cached_url)

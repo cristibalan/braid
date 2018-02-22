@@ -138,9 +138,9 @@ DESC
         # arguments.  Use --relative to strip away the entire downstream path
         # before we add the basenames.
         return [
-          "--relative=" + path,
-          "--src-prefix=a/" + File.basename(remote_path),
-          "--dst-prefix=b/" + File.basename(path),
+          '--relative=' + path,
+          '--src-prefix=a/' + File.basename(remote_path),
+          '--dst-prefix=b/' + File.basename(path),
           base_tree,
           # user_args may contain options, which must come before paths.
           *user_args,
@@ -148,7 +148,7 @@ DESC
         ]
       else
         return [
-          "--relative=" + path + "/",
+          '--relative=' + path + '/',
           base_tree,
           *user_args
         ]
@@ -170,7 +170,7 @@ DESC
       begin
         # Without ^{commit}, this will happily pass back an object hash even if
         # the object isn't present.  See the git-rev-parse(1) man page.
-        git.rev_parse(base_revision + "^{commit}")
+        git.rev_parse(base_revision + '^{commit}')
       rescue Operations::UnknownRevision
         fetch
       end
@@ -222,8 +222,8 @@ DESC
     private
 
     DUMMY_BREAKING_CHANGE_CB = lambda { |desc|
-      raise InternalError, "Instantiated a mirror using an unsupported " +
-        "feature outside of configuration loading."
+      raise InternalError, 'Instantiated a mirror using an unsupported ' +
+        'feature outside of configuration loading.'
     }
 
     def method_missing(name, *args)

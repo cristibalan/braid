@@ -42,13 +42,13 @@ MSG
 Run 'braid upgrade-config#{config.breaking_change_descs.empty? ? '' : ' --allow-breaking-changes'}' to perform the upgrade.
 MSG
         elsif !config.breaking_change_descs.empty? && !options['allow_breaking_changes']
-          raise BraidError, "You must pass --allow-breaking-changes to accept the breaking changes."
+          raise BraidError, 'You must pass --allow-breaking-changes to accept the breaking changes.'
         else
           config.write_db
           add_config_file
-          had_changes = git.commit("Upgrade configuration")
-          raise InternalError, "upgrade-config had no changes??" unless had_changes
-          msg "Configuration upgrade complete."
+          had_changes = git.commit('Upgrade configuration')
+          raise InternalError, 'upgrade-config had no changes??' unless had_changes
+          msg 'Configuration upgrade complete.'
         end
       end
     end

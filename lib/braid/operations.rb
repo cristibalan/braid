@@ -223,14 +223,6 @@ module Braid
         raise UnknownRevision, opt
       end
 
-      # git rev-list -1 opt
-      def rev_list_1(opt)
-        opt.insert(0, '-1 ')
-        invoke(:rev_list, opt)
-      rescue ShellExecutionError
-        raise UnknownRevision, opt
-      end
-
       # Implies tracking.
       def remote_add(remote, path)
         invoke(:remote, 'add', remote, path)

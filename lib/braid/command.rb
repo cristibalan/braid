@@ -114,13 +114,18 @@ module Braid
       if mirror.tag
         if use_local_cache?
           Dir.chdir git_cache.path(mirror.url) do
-            git.rev_parse(mirror.local_ref)
+            # Dereference the tag to a commit since we want the `revision`
+            # attribute of a mirror to always be a commit object.  This is also
+            # currently needed because we don't fetch annotated tags into the
+            # downstream repository, although we might change that in the
+            # future.
+            git.rev_parse(mirror.local_ref + "^{commit}")
           end
         else
           raise BraidError, 'unable to retrieve tag version when cache disabled.'
         end
       else
-        git.rev_parse(mirror.local_ref)
+        git.rev_parse(mirror.local_ref + "^{commit}")
       end
     end
 
@@ -128,7 +133,7 @@ module Braid
       if revision.nil?
         determine_repository_revision(mirror)
       else
-        new_revision = git.rev_parse(revision)
+        new_revision = git.rev_parse(revision + "^{commit}")
 
         if new_revision == mirror.revision
           raise InvalidRevision, 'mirror is already at requested revision'

@@ -216,7 +216,7 @@ DESC
     end
 
     def remote
-      "#{branch || tag || 'revision'}/braid/#{path}"
+      "#{branch || tag || 'revision'}/braid/#{path}".gsub(/\/\./, '/_')
     end
 
     private

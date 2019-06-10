@@ -67,6 +67,12 @@ describe 'Braid::Mirror.new_from_options' do
     expect(@mirror.remote).to eq('v1/braid/mytool')
   end
 
+  it 'should strip first dot from remote path for dot files and folders' do
+    new_from_options('http://path.git', 'path' => '.dotfolder/.dotfile.ext')
+    expect(@mirror.path).to eq('.dotfolder/.dotfile.ext')
+    expect(@mirror.remote).to eq('master/braid/_dotfolder/_dotfile.ext')
+  end
+
 end
 
 describe 'Braid::Mirror#base_revision' do

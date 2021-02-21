@@ -1,0 +1,88 @@
+{
+  "title": "schema for .braids.json config file",
+  "type": "object",
+  "properties": {
+    "config_version": {
+      "const": 1,
+      "description": "upcounting integer number which describes the version of the config file",
+      "$comment": "So far, only version 1 is defined. (Version \"0\" is a mess and not worth writing a schema for.) When we have more than one defined version, we can look into the best way to make the rest of the schema dependent on the version."
+    },
+    "mirrors": {
+      "type": "object",
+      "description": "container for all added vendor repository mirrors",
+      "patternProperties": {
+        ".*": {
+          "allOf": [
+            {
+              "type": "object",
+              "description": "local path where the vendor repository is added, relative to the .braids.json file",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "remote url of the vendor repository"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "subdirectory or single file path of the vendor repository which will be added only"
+                },
+                "branch": {
+                  "type": "string",
+                  "description": "branch name of the vendor repository to track"
+                },
+                "tag": {
+                  "type": "string",
+                  "description": "tag of the vendor repository to track"
+                },
+                "revision": {
+                  "type": "string",
+                  "description": "current revision of the vendor repository"
+                }
+              },
+              "required": [
+                "url",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "$comment": "At most one of \"branch\" and \"tag\". Technique from https://stackoverflow.com/a/33358676 .",
+              "oneOf": [
+                {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "branch"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "tag"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "branch"
+                  ]
+                },
+                {
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "config_version",
+    "mirrors"
+  ],
+  "additionalProperties": false
+}

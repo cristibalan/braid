@@ -3,7 +3,10 @@
   "type": "object",
   "properties": {
     "config_version": {
-      "const": 1,
+      "type": "number",
+      "enum": [
+        1
+      ],
       "description": "configuration format version (see https://cristibalan.github.io/braid/#braid-version-compatibility)",
       "$comment": "So far, only version 1 is defined. (Version \"0\" is a mess and not worth writing a schema for.) When we have more than one defined version, we can look into the best way to make the rest of the schema dependent on the version."
     },

@@ -1,0 +1,91 @@
+{
+  "title": "schema for .braids.json configuration file",
+  "type": "object",
+  "properties": {
+    "config_version": {
+      "type": "number",
+      "enum": [
+        1
+      ],
+      "description": "configuration format version (see https://cristibalan.github.io/braid/#braid-version-compatibility)",
+      "$comment": "So far, only version 1 is defined. (Version \"0\" is a mess and not worth writing a schema for.) When we have more than one defined version, we can look into the best way to make the rest of the schema dependent on the version."
+    },
+    "mirrors": {
+      "type": "object",
+      "description": "container for all added vendor repository mirrors",
+      "patternProperties": {
+        ".*": {
+          "allOf": [
+            {
+              "type": "object",
+              "description": "local path where the vendor content is placed, relative to the .braids.json file",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "remote URL of the vendor repository"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "path to a subdirectory or single file in the vendor tree (instead of the whole tree) to place at the specified local path"
+                },
+                "branch": {
+                  "type": "string",
+                  "description": "branch name of the vendor repository to track"
+                },
+                "tag": {
+                  "type": "string",
+                  "description": "tag name of the vendor repository to track"
+                },
+                "revision": {
+                  "type": "string",
+                  "description": "commit ID of the vendor repository currently used by the mirror"
+                }
+              },
+              "required": [
+                "url",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "$comment": "At most one of \"branch\" and \"tag\". Technique from https://stackoverflow.com/a/33358676 .",
+              "oneOf": [
+                {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "branch"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "tag"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "branch"
+                  ]
+                },
+                {
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "config_version",
+    "mirrors"
+  ],
+  "additionalProperties": false
+}

@@ -6,6 +6,22 @@
 Braid is a simple tool to help track vendor branches in a
 [Git](http://git-scm.com/) repository.
 
+## Fork motivation
+
+I tried to resolve an issue I had with **braid push**, because of Git LFS enabled on my repository.
+Also I want to keep my global Git configuration, having **git-lfs smuge** & **filter-process** on 
+
+    [filter "lfs"]
+        clean = git-lfs clean -- %f
+        smudge = git-lfs smudge -- %f
+        process = git-lfs filter-process
+        required = true
+
+The error I got was like that:
+
+    $ git-lfs.exe filter-process
+    Error downloading object: fileName : Smudge error: Error downloading fileName: batch request: missing protocol: ""
+
 ## Motivation
 
 Vendoring allows you take the source code of an external library and ensure it's

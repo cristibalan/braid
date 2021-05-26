@@ -58,6 +58,8 @@ module Braid
           git.config(['--local', 'user.name', "\"#{user_name}\""]) if user_name
           git.config(['--local', 'user.email', "\"#{user_email}\""]) if user_email
           git.config(['--local', 'commit.gpgsign', commit_gpgsign]) if commit_gpgsign
+		  git.config(['--local', 'filter.lfs.smudge', "\"git-lfs smudge --skip %f\"" ])
+          git.config(['--local', 'filter.lfs.process', "\"git-lfs filter-process --skip\""])
           # Adding other repositories as alternates is safe (we don't have to
           # worry about them being moved or deleted during the lifetime of this
           # temporary repository) and faster than fetching from them.  We don't

@@ -425,7 +425,7 @@ module Braid
           end
         else
           FileUtils.mkdir_p(local_cache_dir)
-          git.clone('--mirror', url, dir)
+          git.clone('--mirror', '--filter=blob:none', url, dir)
         end
       end
 

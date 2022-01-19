@@ -166,7 +166,7 @@ describe 'Pushing to a mirror' do
       end
 
       FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1x') + '/layouts/layout.liquid', "#{@repository_dir}/skit-layout.liquid",
-        {preserve: true})
+        preserve: true)
       in_dir(@repository_dir) do
         run_command('git add *')
         run_command('git commit -m "Make some changes to vendored files"')

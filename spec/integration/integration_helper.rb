@@ -20,6 +20,12 @@ FileUtils.mkdir_p(TMP_PATH)
 
 BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
 
+# Use a separate, clean cache for each test case (because TMP_PATH is deleted
+# and recreated for each test case).  We don't want to mess with the user's real
+# cache, and this ensures that previous cache contents can't affect the behavior
+# of the tests.
+ENV['BRAID_LOCAL_CACHE_DIR'] = File.join(TMP_PATH, 'braid-cache')
+
 # Must run in a git repository, though we expect the setting to be the same for
 # most repositories on a given OS.
 def filemode_enabled

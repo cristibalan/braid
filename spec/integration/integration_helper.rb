@@ -89,6 +89,14 @@ def run_command_expect_failure(command)
   output
 end
 
+# Rough equivalent of git.require_version within Braid, but without pulling in a
+# bunch of dependencies from Braid::Operations.  This small amount of code
+# duplication seems like a lesser evil than sorting out all the dependencies.
+def git_require_version(required)
+  actual = run_command('git --version').sub(/^.* version/, '').strip
+  Gem::Version.new(actual) >= Gem::Version.new(required)
+end
+
 def update_dir_from_fixture(dir, fixture = dir)
   to_dir = File.join(TMP_PATH, dir)
   FileUtils.mkdir_p(to_dir)

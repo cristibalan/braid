@@ -144,6 +144,17 @@ Go back to tracking a particular branch.
 
     braid diff vendor/rails
 
+## Supported environments
+
+As of this writing (2022-01-20), we try to keep Braid working at least on Linux
+and Windows with recent versions of its dependencies (Git, Ruby, gems, etc.).
+Your mileage on other operating systems or with other versions of dependencies
+may vary.  We don't have a procedure in place to systematically test Braid in
+multiple environments; typically, Braid developers just run the test suite on
+their own systems with whatever is installed.  So breakages may sometimes occur.
+If you run into an environment-related problem, please report it and we'll fix
+it if feasible.  Contributions to improve testing of Braid would be welcome.
+
 ## Braid version compatibility
 
 Since Braid has been regularly changing the configuration format and adding new

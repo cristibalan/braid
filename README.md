@@ -146,8 +146,8 @@ Go back to tracking a particular branch.
 
 ## Supported environments
 
-As of this writing (2022-01-20), we try to keep Braid working at least on Linux
-and Windows with recent versions of its dependencies (Git, Ruby, gems, etc.).
+As of this writing (2022-01-20), we try to keep Braid working at least on Linux,
+OSX and Windows with recent versions of its dependencies (Git, Ruby, gems, etc.).
 Your mileage on other operating systems or with other versions of dependencies
 may vary.  We don't have a procedure in place to systematically test Braid in
 multiple environments; typically, Braid developers just run the test suite on

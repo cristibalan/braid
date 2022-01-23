@@ -400,7 +400,7 @@ PATCH
     describe 'with changes' do
       before do
         FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1') + '/layouts/layout.liquid', "#{@repository_dir}/skit-layout.liquid",
-          {preserve: true})
+          preserve: true)
         in_dir(@repository_dir) do
           run_command('git add *')
           run_command('git commit -m "Some local changes"')
@@ -463,7 +463,7 @@ PATCH
           @filemode_enabled = filemode_enabled
         end
         FileUtils.cp_r(File.join(FIXTURE_PATH, 'skit1.1x') + '/layouts/layout.liquid', "#{@repository_dir}/skit-layout.liquid",
-          {preserve: true})
+          preserve: true)
         in_dir(@repository_dir) do
           run_command('git add *')
           run_command('git commit -m "Some local changes"')

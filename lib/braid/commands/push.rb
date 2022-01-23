@@ -68,9 +68,45 @@ module Braid
             f.puts(odb_paths)
           }
           git.fetch(remote_url, mirror.remote_ref)
-          git.checkout(base_revision)
-          git.rm_r(mirror.remote_path || '.')
-          git.add_item_to_index(local_mirror_item, mirror.remote_path || '', true)
+          new_tree = git.make_tree_with_item(base_revision,
+            mirror.remote_path || '', local_mirror_item)
+          if git.require_version('2.27')
+            # Skip checking files out into the working tree by turning on sparse
+            # checkout with an empty list of include patterns (which is an error
+            # before Git 2.27).  This improves performance and avoids problems
+            # with filters that are enabled globally but aren't set up properly
+            # in the temporary repository (e.g., potentially, Git LFS).
+            #
+            # It's not ideal to rely on an edge case of an advanced Git feature,
+            # but the alternatives aren't great either.  We want to run `git
+            # commit` interactively for the user; we can't just call
+            # git.make_tree_with_item + `git commit-tree`.  And if we populate
+            # the index and not the working tree without using sparse checkout,
+            # then `git commit` will show all files as deleted under "Changes
+            # not staged for commit", which is distracting.
+            #
+            # Manipulating index entries that are excluded by sparse checkout is
+            # extremely dicey: depending on the Git version, `git checkout` and
+            # `git rm` may leave them unchanged and not perform the operation we
+            # requested.  So it's safest to generate the new tree before we
+            # enable sparse checkout.  After enabling sparse checkout (if our
+            # copy of Git indeed supports it), `git read-tree -u` is one
+            # operation that should be safe: the index update is unconditional,
+            # and the working tree update honors sparse checkout.
+            #
+            # TODO: Audit Braid for operations that could be broken by use of
+            # sparse checkout by the user (rather than internal to `braid
+            # push`)?
+            git.config(['--local', 'core.sparsecheckout', 'true'])
+            File.open('.git/info/sparse-checkout', 'wb') { |f|
+              # Leave the file empty.
+            }
+          end
+          # Update HEAD the same way git.checkout(base_revision) would, but
+          # don't populate the index or working tree (to save us the trouble of
+          # emptying them again before the git.read_tree).
+          git.update_ref('--no-deref', 'HEAD', base_revision)
+          git.read_tree('-mu', new_tree)
           system('git commit -v')
           msg "Pushing changes to remote branch #{branch}."
           git.push(remote_url, "HEAD:refs/heads/#{branch}")

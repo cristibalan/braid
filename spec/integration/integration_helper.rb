@@ -111,6 +111,9 @@ def create_git_repo_from_fixture(fixture_name, options = {})
   update_dir_from_fixture(directory, fixture_name)
 
   in_dir(git_repo) do
+    # Avoid a warning emitted by because we use the old default default branch name
+    run_command('git config --global init.defaultBranch master')
+
     run_command('git init')
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")

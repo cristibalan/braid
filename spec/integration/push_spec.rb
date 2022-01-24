@@ -342,6 +342,9 @@ describe 'Pushing to a mirror' do
       # the filter until after that step. :/
       @vendor_repository_dir = create_git_repo_from_fixture('skit1_with_filter')
 
+      # Avoid a warning emitted by because we use the old default default branch name
+      run_command('git config --global init.defaultBranch master')
+
       # Configure the broken filter globally.  Here, `false` is the command that
       # always exits 1.
       run_command('git config --global filter.broken.clean false')

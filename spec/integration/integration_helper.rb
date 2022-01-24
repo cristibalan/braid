@@ -111,10 +111,13 @@ def create_git_repo_from_fixture(fixture_name, options = {})
   update_dir_from_fixture(directory, fixture_name)
 
   in_dir(git_repo) do
-    # Avoid a warning emitted by because we use the old default default branch name
-    run_command('git config --global init.defaultBranch master')
-
-    run_command('git init')
+    # If we don't specify the initial branch name, Git >= 2.30 warns that the
+    # default of `master` is subject to change.  We're still using `master` for
+    # now, so avoid the warning by specifying it explicitly.  Git >= 2.28 honors
+    # init.defaultBranch, while older versions of Git ignore it and are
+    # hard-coded to use `master`.  (Using the `--initial-branch=master` option
+    # would cause an error on Git < 2.28, so we don't do that.)
+    run_command('git -c init.defaultBranch=master init')
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")
     run_command('git config --local commit.gpgsign false')

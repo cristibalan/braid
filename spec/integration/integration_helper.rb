@@ -89,6 +89,14 @@ def run_command_expect_failure(command)
   output
 end
 
+# Rough equivalent of git.require_version within Braid, but without pulling in a
+# bunch of dependencies from Braid::Operations.  This small amount of code
+# duplication seems like a lesser evil than sorting out all the dependencies.
+def git_require_version(required)
+  actual = run_command('git --version').sub(/^.* version/, '').strip
+  Gem::Version.new(actual) >= Gem::Version.new(required)
+end
+
 def update_dir_from_fixture(dir, fixture = dir)
   to_dir = File.join(TMP_PATH, dir)
   FileUtils.mkdir_p(to_dir)
@@ -103,6 +111,9 @@ def create_git_repo_from_fixture(fixture_name, options = {})
   update_dir_from_fixture(directory, fixture_name)
 
   in_dir(git_repo) do
+    # Avoid a warning emitted by because we use the old default default branch name
+    run_command('git config --global init.defaultBranch master')
+
     run_command('git init')
     run_command("git config --local user.email \"#{email}\"")
     run_command("git config --local user.name \"#{name}\"")

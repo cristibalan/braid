@@ -66,25 +66,11 @@ module Braid
       end
 
       def require_version(required)
-        required = required.split('.')
-        actual   = version.split('.')
-
-        actual.each_with_index do |actual_piece, idx|
-          required_piece = required[idx]
-
-          return true unless required_piece
-
-          case (actual_piece <=> required_piece)
-            when -1
-              return false
-            when 1
-              return true
-            when 0
-              next
-          end
-        end
-
-        return actual.length >= required.length
+        # Gem::Version is intended for Ruby gem versions, but various web sites
+        # suggest it as a convenient way of comparing version strings in
+        # general.  None of the fine points of its semantics compared to those
+        # of Git version numbers seem likely to cause a problem for Braid.
+        Gem::Version.new(version) >= Gem::Version.new(required)
       end
 
       def require_version!(required)
@@ -343,7 +329,10 @@ module Braid
 
       def make_tree_with_item(main_content, item_path, item)
         with_temporary_index do
-          if main_content
+          # If item_path is '', then rm_r_cached will fail.  But in that case,
+          # we can skip loading the main content because it would be deleted
+          # anyway.
+          if main_content && item_path != ''
             read_tree_im(main_content)
             rm_r_cached(item_path)
           end

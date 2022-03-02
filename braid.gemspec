@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version            = Braid::VERSION
   s.platform           = Gem::Platform::RUBY
 
-  s.authors            = ['Cristi Balan', 'Norbert Crombach', 'Peter Donald']
-  s.email              = %q{evil@che.lu norbert.crombach@primetheory.org peter@realityforge.org}
+  s.authors            = ['Cristi Balan', 'Norbert Crombach', 'Peter Donald', 'Matt McCutchen']
+  s.email              = %q{evil@che.lu norbert.crombach@primetheory.org peter@realityforge.org matt@mattmccutchen.net}
 
   s.homepage           = %q{https://github.com/cristibalan/braid}
   s.summary            = %q{A simple tool for tracking vendor branches in git.}

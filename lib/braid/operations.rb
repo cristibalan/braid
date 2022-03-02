@@ -62,7 +62,7 @@ module Braid
       # hax!
       def version
         status, out, err = exec!("#{self.class.command} --version")
-        out.sub(/^.* version/, '').strip
+        out.sub(/^.* version/, '').strip.sub(/ .*$/, '').strip
       end
 
       def require_version(required)

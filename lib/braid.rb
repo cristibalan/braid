@@ -1,6 +1,11 @@
+# typed: strict
+
+require 'braid/sorbet/setup'
 require 'braid/version'
 
 module Braid
+  extend T::Sig
+
   OLD_CONFIG_FILE      = '.braids'
   CONFIG_FILE          = '.braids.json'
 
@@ -16,31 +21,48 @@ module Braid
   # distributions.
   REQUIRED_GIT_VERSION = '2.3.0'
 
+  # TODO (typing): Should we initialize this to non-nil?  (Ditto with @force
+  # below.)
+  @verbose = T.let(nil, T.nilable(T::Boolean))
+
+  sig {returns(T::Boolean)}
   def self.verbose
     !!@verbose
   end
 
+  # TODO (typing): One would think `new_value` shouldn't be nilable, but
+  # apparently `bin/braid` passes nil sometimes. Is that easy to fix?
+  # (Ditto with `self.force=` below.)
+  sig {params(new_value: T.nilable(T::Boolean)).void}
   def self.verbose=(new_value)
     @verbose = !!new_value
   end
 
+  @force = T.let(nil, T.nilable(T::Boolean))
+
+  sig {returns(T::Boolean)}
   def self.force
     !!@force
   end
 
+  sig {params(new_value: T.nilable(T::Boolean)).void}
   def self.force=(new_value)
     @force = !!new_value
   end
 
+  sig {returns(T::Boolean)}
   def self.use_local_cache
     [nil, 'true', '1'].include?(ENV['BRAID_USE_LOCAL_CACHE'])
   end
 
+  sig {returns(String)}
   def self.local_cache_dir
     File.expand_path(ENV['BRAID_LOCAL_CACHE_DIR'] || "#{ENV['HOME']}/.braid/cache")
   end
 
   class BraidError < StandardError
+    extend T::Sig
+    sig {returns(String)}
     def message
       value = super
       value if value != self.class.name
@@ -48,6 +70,7 @@ module Braid
   end
 
   class InternalError < BraidError
+    sig {returns(String)}
     def message
       "internal error: #{super}"
     end

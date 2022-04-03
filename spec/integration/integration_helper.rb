@@ -6,6 +6,13 @@ require 'tempfile'
 require 'fileutils'
 require 'pathname'
 
+# Note: BRAID_USE_SORBET_RUNTIME affects any typed code in the integration test
+# process (as of this writing, only `operations_lite`) as well as the Braid
+# subprocesses that it spawns.
+unless ENV['BRAID_USE_SORBET_RUNTIME']
+  ENV['BRAID_USE_SORBET_RUNTIME'] = '1'
+end
+
 require File.dirname(__FILE__) + '/../../lib/braid/operations_lite'
 
 DEFAULT_NAME = 'Your Name'

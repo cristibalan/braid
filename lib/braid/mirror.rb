@@ -1,21 +1,27 @@
+# typed: strict
 module Braid
   class Mirror
+    extend T::Sig
+
     # Since Braid 1.1.0, the attributes are written to .braids.json in this
     # canonical order.  For now, the order is chosen to match what Braid 1.0.22
     # produced for newly added mirrors.
-    ATTRIBUTES = %w(url branch path tag revision)
+    ATTRIBUTES = T.let(%w(url branch path tag revision), T::Array[String])
 
     class UnknownType < BraidError
+      sig {returns(String)}
       def message
         "unknown type: #{super}"
       end
     end
     class PathRequired < BraidError
+      sig {returns(String)}
       def message
         'path is required'
       end
     end
     class NoTagAndBranch < BraidError
+      sig {returns(String)}
       def message
         'can not specify both tag and branch configuration'
       end
@@ -23,11 +29,19 @@ module Braid
 
     include Operations::VersionControl
 
-    attr_reader :path, :attributes
+    sig {returns(String)}
+    attr_reader :path
 
+    # It's going to take significant refactoring to be able to give this a type.
+    sig {returns(T::Hash[String, TODO_TYPE])}
+    attr_reader :attributes
+
+    BREAKING_CHANGE_CB = T.type_alias { T.proc.params(arg0: String).void }
+
+    sig {params(path: String, attributes: T::Hash[String, TODO_TYPE], breaking_change_cb: BREAKING_CHANGE_CB).void}
     def initialize(path, attributes = {}, breaking_change_cb = DUMMY_BREAKING_CHANGE_CB)
-      @path       = path.sub(/\/$/, '')
-      @attributes = attributes.dup
+      @path       = T.let(path.sub(/\/$/, ''), String)
+      @attributes = T.let(attributes.dup, T::Hash[String, TODO_TYPE])
 
       # Not that it's terribly important to check for such an old feature.  This
       # is mainly to demonstrate the RemoveMirrorDueToBreakingChange mechanism
@@ -65,6 +79,7 @@ DESC
       @attributes.delete('squashed')
     end
 
+    sig {params(url: String, options: TODO_TYPE).returns(Mirror)}
     def self.new_from_options(url, options = {})
       url    = url.sub(/\/$/, '')
 
@@ -82,14 +97,17 @@ DESC
       self.new(path, attributes)
     end
 
+    sig {params(comparison: Mirror).returns(T::Boolean)}
     def ==(comparison)
       path == comparison.path && attributes == comparison.attributes
     end
 
+    sig {returns(T::Boolean)}
     def locked?
       branch.nil? && tag.nil?
     end
 
+    sig {params(commit: String).returns(T::Boolean)}
     def merged?(commit)
       # tip from spearce in #git:
       # `test z$(git merge-base A B) = z$(git rev-parse --verify A)`
@@ -97,6 +115,9 @@ DESC
       !!base_revision && git.merge_base(commit, base_revision) == commit
     end
 
+    # We'll probably call the return type something like
+    # Braid::Operations::Git::TreeItem.
+    sig {params(revision: String).returns(TODO_TYPE)}
     def upstream_item_for_revision(revision)
       git.get_tree_item(revision, self.remote_path)
     end
@@ -106,6 +127,17 @@ DESC
     # user-specified arguments.  Having the caller run "git diff" is convenient
     # for now but violates encapsulation a little; we may have to reorganize the
     # code in order to add features.
+    #
+    # FIXME: One call site in `braid diff` uses the `*` operator on the argument
+    # (i.e., `diff_args(*my_user_args)`), which gives a "wrong number of
+    # arguments" error if there's more than one argument.  We don't have a test
+    # case with more than one argument.  We do have a test case with one
+    # argument, but unfortunately, it didn't expose the bug because in Ruby, `*`
+    # of a non-list is a no-op, not an error.  However, when I specified the
+    # type of `user_args` as `T::Array[String]`, that test raised a runtime type
+    # check error, finally exposing the bug.  Fix the bug and then update the
+    # annotation here.  (The fix is trivial, but it needs a new test case...)
+    sig {params(user_args: TODO_TYPE).returns(T::Array[String])}
     def diff_args(user_args = [])
       upstream_item = upstream_item_for_revision(base_revision)
 
@@ -139,7 +171,7 @@ DESC
         # before we add the basenames.
         return [
           '--relative=' + path,
-          '--src-prefix=a/' + File.basename(remote_path),
+          '--src-prefix=a/' + File.basename(T.must(remote_path)),
           '--dst-prefix=b/' + File.basename(path),
           base_tree,
           # user_args may contain options, which must come before paths.
@@ -156,6 +188,7 @@ DESC
     end
 
     # Precondition: the remote for this mirror is set up.
+    sig {returns(String)}
     def diff
       fetch_base_revision_if_missing
       git.diff(diff_args)
@@ -166,6 +199,7 @@ DESC
     # (https://github.com/cristibalan/braid/issues/71).  Mitigate this for
     # `braid diff` and other commands that need the diff by skipping the fetch
     # if the base revision is already present in the repository.
+    sig {void}
     def fetch_base_revision_if_missing
       begin
         # Without ^{commit}, this will happily pass back an object hash even if
@@ -176,56 +210,79 @@ DESC
       end
     end
 
+    sig {void}
     def fetch
       git_cache.fetch(url) if cached?
       git.fetch(remote)
     end
 
+    sig {returns(T::Boolean)}
     def cached?
       git.remote_url(remote) == cached_url
     end
 
+    sig {returns(String)}
     def base_revision
-      if revision
+      # Avoid a Sorbet "unreachable code" error.
+      # TODO (typing): Is the revision expected to be non-nil nowadays?  Can we
+      # just remove the `inferred_revision` code path now?
+      nilable_revision = T.let(revision, T.nilable(String))
+      if nilable_revision
         git.rev_parse(revision)
       else
         inferred_revision
       end
     end
 
+    sig {returns(String)}
     def local_ref
       return "#{self.remote}/#{self.branch}" unless self.branch.nil?
       return "tags/#{self.tag}" unless self.tag.nil?
       self.revision
     end
 
+    # FIXME: The return value is bogus if this mirror has neither a branch nor a
+    # tag.  It looks like this leads to a real bug affecting `braid push` when
+    # `--branch` is specified.  File the bug or just fix it.
+    sig {returns(String)}
     def remote_ref
       self.branch.nil? ? "+refs/tags/#{self.tag}" : "+refs/heads/#{self.branch}"
     end
 
+    sig {returns(T.nilable(String))}
     def remote_path
       self.attributes['path']
     end
 
+    sig {params(remote_path: T.nilable(String)).void}
     def remote_path=(remote_path)
       self.attributes['path'] = remote_path
     end
 
+    sig {returns(String)}
     def cached_url
       git_cache.path(url)
     end
 
+    sig {returns(String)}
     def remote
       "#{branch || tag || 'revision'}/braid/#{path}".gsub(/\/\./, '/_')
     end
 
     private
 
-    DUMMY_BREAKING_CHANGE_CB = lambda { |desc|
+    DUMMY_BREAKING_CHANGE_CB = T.let(lambda { |desc|
       raise InternalError, 'Instantiated a mirror using an unsupported ' +
         'feature outside of configuration loading.'
-    }
+    }, BREAKING_CHANGE_CB)
 
+    # `method_missing` simulates `foo` and `foo=` methods to read and write all
+    # the attributes listed in `ATTRIBUTES` except for `path` (the remote path),
+    # which is overridden by the `attr_reader :path` for the local path.  We
+    # have separate `remote_path` and `remote_path=` methods to access the
+    # remote path.
+    # TODO (typing): Is it feasible to specify the type any more precisely?
+    sig {params(name: Symbol, args: T.untyped).returns(T.untyped)}
     def method_missing(name, *args)
       if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }
         if $2
@@ -238,12 +295,13 @@ DESC
       end
     end
 
+    sig {returns(String)}
     def inferred_revision
       local_commits = git.rev_list('HEAD', "-- #{path}").split("\n")
       remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split('commit ').map do |chunk|
         chunk.split("\n", 2).map { |value| value.strip }
       end
-      hash          = nil
+      hash          = T.let(nil, T.nilable(String))
       local_commits.each do |local_commit|
         local_tree = git.tree_hash(path, local_commit)
         match = remote_hashes.find { |_, remote_tree| local_tree == remote_tree }
@@ -255,12 +313,16 @@ DESC
       hash
     end
 
+    # TODO (typing): Return should not be nilable
+    sig {params(url: String, remote_path: T.nilable(String)).returns(T.nilable(String))}
     def self.extract_path_from_url(url, remote_path)
       if remote_path
         return File.basename(remote_path)
       end
 
-      return nil unless url
+      # Avoid a Sorbet "unreachable code" error.
+      # TODO (typing): Fix this properly.  Probably just remove this line?
+      return nil unless T.let(url, T.nilable(String))
       name = File.basename(url)
 
       if File.extname(name) == '.git'

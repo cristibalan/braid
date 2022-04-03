@@ -2,6 +2,10 @@ require 'rubygems'
 require 'rspec'
 require 'mocha/api'
 
+unless ENV['BRAID_USE_SORBET_RUNTIME']
+  ENV['BRAID_USE_SORBET_RUNTIME'] = '1'
+end
+
 require File.dirname(__FILE__) + '/../lib/braid'
 
 def new_from_options(url, options = {})

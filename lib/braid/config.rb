@@ -49,6 +49,9 @@ require 'yaml/store'
 module Braid
   class Config
 
+    # TODO (typing): Migrate to T::Enum?
+    ConfigMode = T.type_alias { Integer }
+
     MODE_UPGRADE = 1
     MODE_READ_ONLY = 2
     MODE_MAY_WRITE = 3

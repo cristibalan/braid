@@ -61,7 +61,7 @@ module Braid
 
       # hax!
       def version
-        status, out, err = exec!("#{self.class.command} --version")
+        _, out, _ = exec!("#{self.class.command} --version")
         out.sub(/^.* version/, '').strip.sub(/ .*$/, '').strip
       end
 
@@ -368,7 +368,7 @@ module Braid
       end
 
       def status_clean?
-        status, out, err = exec('git status')
+        _, out, _ = exec('git status')
         !out.split("\n").grep(/nothing to commit/).empty?
       end
 
@@ -381,7 +381,7 @@ module Braid
       end
 
       def branch
-        status, out, err = exec!("git branch | grep '*'")
+        _, out, _ = exec!("git branch | grep '*'")
         out[2..-1]
       end
 

@@ -166,6 +166,7 @@ module Braid
 
       def commit(message, *args)
         cmd = 'git commit --no-verify'
+        message_file = nil
         if message # allow nil
           message_file = Tempfile.new('braid_commit')
           message_file.print("Braid: #{message}")

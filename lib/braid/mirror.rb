@@ -295,7 +295,7 @@ DESC
       end
     end
 
-    sig {returns(String)}
+    sig {returns(T.nilable(String))}
     def inferred_revision
       local_commits = git.rev_list('HEAD', "-- #{path}").split("\n")
       remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split('commit ').map do |chunk|

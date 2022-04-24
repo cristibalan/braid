@@ -238,7 +238,8 @@ DESC
     def local_ref
       return "#{self.remote}/#{self.branch}" unless self.branch.nil?
       return "tags/#{self.tag}" unless self.tag.nil?
-      self.revision
+      # TODO (typing): Remove this `T.must` if we make `revision` non-nilable.
+      T.must(self.revision)
     end
 
     # FIXME: The return value is bogus if this mirror has neither a branch nor a
@@ -249,6 +250,37 @@ DESC
       self.branch.nil? ? "+refs/tags/#{self.tag}" : "+refs/heads/#{self.branch}"
     end
 
+    # Accessors for all the attributes listed in `ATTRIBUTES` and stored in
+    # `self.attributes`.  Most of the accessors use the same names as the
+    # underlying attributes.  The exception is the `path` attribute, whose
+    # accessor is named `remote_path` to avoid a conflict with the `path`
+    # accessor for the local path.
+    #
+    # TODO: Can we reduce this boilerplate and still type the accessors
+    # statically?  If we move the config attributes to instance variables of the
+    # Mirror object, then we can use `attr_accessor`, but we'd have to somehow
+    # accommodate existing call sites that access `self.attributes` as a whole.
+
+    sig {returns(String)}
+    def url
+      self.attributes['url']
+    end
+
+    sig {params(new_value: String).void}
+    def url=(new_value)
+      self.attributes['url'] = new_value
+    end
+
+    sig {returns(T.nilable(String))}
+    def branch
+      self.attributes['branch']
+    end
+
+    sig {params(new_value: T.nilable(String)).void}
+    def branch=(new_value)
+      self.attributes['branch'] = new_value
+    end
+
     sig {returns(T.nilable(String))}
     def remote_path
       self.attributes['path']
@@ -257,6 +289,28 @@ DESC
     sig {params(remote_path: T.nilable(String)).void}
     def remote_path=(remote_path)
       self.attributes['path'] = remote_path
+    end
+
+    sig {returns(T.nilable(String))}
+    def tag
+      self.attributes['tag']
+    end
+
+    sig {params(new_value: T.nilable(String)).void}
+    def tag=(new_value)
+      self.attributes['tag'] = new_value
+    end
+
+    # The revision may be nil in the middle of `braid add`.
+    # TODO (typing): Look into restructuring `braid add` to avoid this?
+    sig {returns(T.nilable(String))}
+    def revision
+      self.attributes['revision']
+    end
+
+    sig {params(new_value: String).void}
+    def revision=(new_value)
+      self.attributes['revision'] = new_value
     end
 
     sig {returns(String)}
@@ -275,25 +329,6 @@ DESC
       raise InternalError, 'Instantiated a mirror using an unsupported ' +
         'feature outside of configuration loading.'
     }, BREAKING_CHANGE_CB)
-
-    # `method_missing` simulates `foo` and `foo=` methods to read and write all
-    # the attributes listed in `ATTRIBUTES` except for `path` (the remote path),
-    # which is overridden by the `attr_reader :path` for the local path.  We
-    # have separate `remote_path` and `remote_path=` methods to access the
-    # remote path.
-    # TODO (typing): Is it feasible to specify the type any more precisely?
-    sig {params(name: Symbol, args: T.untyped).returns(T.untyped)}
-    def method_missing(name, *args)
-      if ATTRIBUTES.find { |attribute| name.to_s =~ /^(#{attribute})(=)?$/ }
-        if $2
-          attributes[$1] = args[0]
-        else
-          attributes[$1]
-        end
-      else
-        raise NameError, "unknown attribute `#{name}'"
-      end
-    end
 
     sig {returns(T.nilable(String))}
     def inferred_revision

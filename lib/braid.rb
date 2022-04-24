@@ -21,9 +21,7 @@ module Braid
   # distributions.
   REQUIRED_GIT_VERSION = '2.3.0'
 
-  # TODO (typing): Should we initialize this to non-nil?  (Ditto with @force
-  # below.)
-  @verbose = T.let(nil, T.nilable(T::Boolean))
+  @verbose = T.let(false, T::Boolean)
 
   sig {returns(T::Boolean)}
   def self.verbose
@@ -38,7 +36,7 @@ module Braid
     @verbose = !!new_value
   end
 
-  @force = T.let(nil, T.nilable(T::Boolean))
+  @force = T.let(false, T::Boolean)
 
   sig {returns(T::Boolean)}
   def self.force

@@ -7,7 +7,7 @@
 env_use_sorbet_runtime = ENV['BRAID_USE_SORBET_RUNTIME']
 if env_use_sorbet_runtime == '1'
   require 'sorbet-runtime'
-elsif env_use_sorbet_runtime.nil? || env_use_sorbet_runtime == '0'
+elsif [nil, '0'].include?(env_use_sorbet_runtime)
   require 'braid/sorbet/fake_runtime'
 else
   puts <<-MSG

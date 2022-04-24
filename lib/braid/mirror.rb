@@ -36,9 +36,9 @@ module Braid
     sig {returns(T::Hash[String, TODO_TYPE])}
     attr_reader :attributes
 
-    BREAKING_CHANGE_CB = T.type_alias { T.proc.params(arg0: String).void }
+    BreakingChangeCallback = T.type_alias { T.proc.params(arg0: String).void }
 
-    sig {params(path: String, attributes: T::Hash[String, TODO_TYPE], breaking_change_cb: BREAKING_CHANGE_CB).void}
+    sig {params(path: String, attributes: T::Hash[String, TODO_TYPE], breaking_change_cb: BreakingChangeCallback).void}
     def initialize(path, attributes = {}, breaking_change_cb = DUMMY_BREAKING_CHANGE_CB)
       @path       = T.let(path.sub(/\/$/, ''), String)
       @attributes = T.let(attributes.dup, T::Hash[String, TODO_TYPE])
@@ -328,7 +328,7 @@ DESC
     DUMMY_BREAKING_CHANGE_CB = T.let(lambda { |desc|
       raise InternalError, 'Instantiated a mirror using an unsupported ' +
         'feature outside of configuration loading.'
-    }, BREAKING_CHANGE_CB)
+    }, BreakingChangeCallback)
 
     sig {returns(T.nilable(String))}
     def inferred_revision

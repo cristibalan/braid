@@ -301,8 +301,10 @@ module Braid
             invoke(:checkout_index, path)
           end
         else
-          # Yes, if path == '', "git read-tree --prefix=/" works. :/
-          invoke(:read_tree, "--prefix=#{path}/", update_worktree ? '-u' : '-i', item)
+          # According to
+          # https://lore.kernel.org/git/e48a281a4d3db0a04c0609fcb8658e4fcc797210.1646166271.git.gitgitgadget@gmail.com/,
+          # `--prefix=` is valid if the path is empty.
+          res = invoke(:read_tree, "--prefix=#{path}", update_worktree ? '-u' : '-i', item)
         end
       end
 

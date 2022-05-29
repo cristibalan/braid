@@ -6,6 +6,7 @@
 .idea
 coverage
 nbproject
+bin
 pkg
 pkg/*
 rdoc

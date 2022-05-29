@@ -1,3 +1,5 @@
+require_relative 'lib/braid/check_gem'
+
 require 'bundler'
 Bundler::GemHelper.install_tasks
 

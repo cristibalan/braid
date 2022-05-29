@@ -1,3 +1,4 @@
+require_relative '../../lib/braid/check_gem'
 require 'rubygems'
 require 'rspec'
 require 'mocha/api'
@@ -25,7 +26,10 @@ FIXTURE_PATH = File.join(BRAID_PATH, 'spec', 'fixtures')
 FileUtils.rm_rf(TMP_PATH)
 FileUtils.mkdir_p(TMP_PATH)
 
-BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'bin', 'braid')
+# It's OK to run `exe/braid` directly here because we checked that we're already
+# running under Bundler.  That way, we avoid requiring the user to generate the
+# `bin/braid` binstub if they don't want to.
+BRAID_BIN = ((defined?(JRUBY_VERSION) || Gem.win_platform?) ? 'ruby ' : '') + File.join(BRAID_PATH, 'exe', 'braid')
 
 # Use a separate, clean cache for each test case (because TMP_PATH is deleted
 # and recreated for each test case).  We don't want to mess with the user's real

@@ -1,3 +1,4 @@
+require_relative '../lib/braid/check_gem'
 require 'rubygems'
 require 'rspec'
 require 'mocha/api'

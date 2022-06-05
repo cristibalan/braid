@@ -224,6 +224,31 @@ index 9f75009..25a4b32 100644
 PATCH
       end
 
+      # A simple test of `braid diff` with more than one extra argument, which
+      # previously caused a crash.
+      it 'with the mirror specified and -R --cached should show only the staged uncommitted changes in reverse' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} diff skit1 -- -R --cached")
+        end
+
+        expect(diff).to eq(<<PATCH)
+diff --git b/layouts/layout.liquid a/layouts/layout.liquid
+index 25a4b32..9f75009 100644
+--- b/layouts/layout.liquid
++++ a/layouts/layout.liquid
+@@ -22,7 +22,7 @@
+ <![endif]-->
+ </head>
+ 
+-<body class="fixed green">
++<body class="fixed orange">
+ <script type="text/javascript">loadPreferences()</script>
+ 
+ <div id="wrapper">
+PATCH
+      end
+
       it 'without specifying a mirror and with --cached should show only the staged uncommitted changes with a banner' do
         diff = nil
         in_dir(@repository_dir) do

@@ -66,9 +66,7 @@ group :development do
   # which users may prefer due to its `--conservative` option (for which Bundler
   # doesn't seem to have an analogue), so we use a plain Ruby `if` instead.
   #
-  # TODO for realityforge: Please add the correct logic for your macOS test
-  # system here. :)
-  if RUBY_PLATFORM == 'x86_64-linux' then
+  if %w(arm64-darwin21 x86_64-linux).include?(RUBY_PLATFORM)
     # Note: `sorbet-static` is the OS-dependent component, while `sorbet` is a
     # plain-Ruby wrapper with some additional functionality we need.
     gem 'sorbet', SORBET_VERSION_SPEC

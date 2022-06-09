@@ -231,7 +231,7 @@ MSG
           return data if data
         end
       end
-      return nil
+      nil
     end
 
     def write_mirror(mirror)

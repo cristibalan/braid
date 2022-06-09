@@ -1,6 +1,8 @@
+# typed: true
 require 'yaml'
 require 'json'
 require 'yaml/store'
+require 'braid/sorbet/setup'
 
 # Some info about the configuration versioning design:
 # https://github.com/cristibalan/braid/issues/66#issuecomment-354211311
@@ -48,6 +50,7 @@ require 'yaml/store'
 
 module Braid
   class Config
+    extend T::Sig
 
     # TODO (typing): Migrate to T::Enum?
     ConfigMode = T.type_alias { Integer }
@@ -59,11 +62,13 @@ module Braid
     CURRENT_CONFIG_VERSION = 1
 
     class PathAlreadyInUse < BraidError
+      sig {returns(String)}
       def message
         "path already in use: #{super}"
       end
     end
     class MirrorDoesNotExist < BraidError
+      sig {returns(String)}
       def message
         "mirror does not exist: #{super}"
       end
@@ -73,9 +78,15 @@ module Braid
     end
 
     # For upgrade-config command only.  XXX: Ideally would be immutable.
-    attr_reader :config_version, :config_existed, :breaking_change_descs
+    sig {returns(Integer)}
+    attr_reader :config_version
+    sig {returns(T::Boolean)}
+    attr_reader :config_existed
+    sig {returns(T::Array[String])}
+    attr_reader :breaking_change_descs
 
     # options: config_file, old_config_files, mode
+    sig {params(options: T.untyped).void}
     def initialize(options = {})
       @config_file     = options['config_file']      || CONFIG_FILE
       old_config_files = options['old_config_files'] || [OLD_CONFIG_FILE]
@@ -153,6 +164,7 @@ MSG
 
     end
 
+    sig {params(url: String, options: TODO_TYPE).returns(Mirror)}
     def add_from_options(url, options)
       mirror = Mirror.new_from_options(url, options)
 
@@ -160,33 +172,39 @@ MSG
       mirror
     end
 
+    sig {returns(T::Array[Mirror])}
     def mirrors
       @db.keys
     end
 
+    sig {params(path: String).returns(T.nilable(Mirror))}
     def get(path)
       key = path.to_s.sub(/\/$/, '')
       attributes = @db[key]
       attributes ? Mirror.new(path, attributes) : nil
     end
 
+    sig {params(path: String).returns(Mirror)}
     def get!(path)
       mirror = get(path)
       raise MirrorDoesNotExist, path unless mirror
       mirror
     end
 
+    sig {params(mirror: Mirror).void}
     def add(mirror)
       raise PathAlreadyInUse, mirror.path if get(mirror.path)
       write_mirror(mirror)
       write_db
     end
 
+    sig {params(mirror: Mirror).void}
     def remove(mirror)
       @db.delete(mirror.path)
       write_db
     end
 
+    sig {params(mirror: Mirror).void}
     def update(mirror)
       raise MirrorDoesNotExist, mirror.path unless get(mirror.path)
       write_mirror(mirror)
@@ -194,6 +212,7 @@ MSG
     end
 
     # Public for upgrade-config command only.
+    sig {void}
     def write_db
       new_db = {}
       @db.keys.sort.each do |key|
@@ -214,11 +233,12 @@ MSG
 
     private
 
+    sig {params(config_file: String, old_config_files: T::Array[String]).returns(TODO_TYPE)}
     def load_config(config_file, old_config_files)
       (old_config_files + [config_file]).each do |file|
         next unless File.exist?(file)
         begin
-          store = YAML::Store.new(file)
+          store = T.let(YAML::Store, T.untyped).new(file)
           data = {}
           store.transaction(true) do
             store.roots.each do |path|
@@ -234,10 +254,12 @@ MSG
       nil
     end
 
+    sig {params(mirror: Mirror).void}
     def write_mirror(mirror)
       @db[mirror.path] = clean_attributes(mirror.attributes)
     end
 
+    sig {params(hash: T::Hash[String, TODO_TYPE]).returns(T::Hash[String, TODO_TYPE])}
     def clean_attributes(hash)
       hash.reject { |_, v| v.nil? }
     end

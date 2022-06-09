@@ -239,7 +239,7 @@ MSG
     end
 
     def clean_attributes(hash)
-      hash.reject { |k, v| v.nil? }
+      hash.reject { |_, v| v.nil? }
     end
   end
 end

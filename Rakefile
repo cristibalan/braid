@@ -16,13 +16,13 @@ require 'rubygems'
 begin
   srb_path = Gem.bin_path('sorbet', 'srb')
   desc 'Typecheck with Sorbet'
-  task :srb do |task|
+  task :srb do
     system(srb_path, 'tc', exception: true)
   end
   task :default => [:srb]
 rescue Gem::Exception
   desc 'Typecheck with Sorbet (unavailable)'
-  task :srb do |task|
+  task :srb do
     raise StandardError, 'The Sorbet static analyzer is not available.'
   end
   # Don't add a dependency from :default to :srb .

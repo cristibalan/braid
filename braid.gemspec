@@ -13,8 +13,6 @@ Gem::Specification.new do |s|
   s.summary            = %q{A simple tool for tracking vendor branches in git.}
   s.description        = %q{A simple tool for tracking vendor branches in git.}
 
-  s.rubyforge_project  = %q{braid}
-
   # Recommendations on the web vary as to how to generate the `files` list.
   # Bundler's template for new gems
   # (https://github.com/rubygems/rubygems/blob/1e4eda741d732ca1bd7031aef0a16c7348adf7a5/bundler/lib/bundler/templates/newgem/newgem.gemspec.tt#L25-L31)

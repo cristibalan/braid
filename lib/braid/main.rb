@@ -123,7 +123,7 @@ Main {
 
     mixin :optional_local_path, :option_verbose, :option_keep_remote
 
-    synopsis (Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
+    synopsis(Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
 
     run {
       if @argv.length > 0 && @argv[0] == '--'

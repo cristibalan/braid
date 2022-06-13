@@ -163,7 +163,7 @@ MSG
 
     end
 
-    sig {params(url: String, options: TODO_TYPE).returns(Mirror)}
+    sig {params(url: String, options: T.untyped).returns(Mirror)}
     def add_from_options(url, options)
       mirror = Mirror.new_from_options(url, options)
 
@@ -232,7 +232,7 @@ MSG
 
     private
 
-    sig {params(config_file: String, old_config_files: T::Array[String]).returns(TODO_TYPE)}
+    sig {params(config_file: String, old_config_files: T::Array[String]).returns(T.untyped)}
     def load_config(config_file, old_config_files)
       (old_config_files + [config_file]).each do |file|
         next unless File.exist?(file)
@@ -258,7 +258,7 @@ MSG
       @db[mirror.path] = clean_attributes(mirror.attributes)
     end
 
-    sig {params(hash: T::Hash[String, TODO_TYPE]).returns(T::Hash[String, TODO_TYPE])}
+    sig {params(hash: T::Hash[String, T.untyped]).returns(T::Hash[String, T.untyped])}
     def clean_attributes(hash)
       hash.reject { |_, v| v.nil? }
     end

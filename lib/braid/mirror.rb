@@ -33,15 +33,15 @@ module Braid
     attr_reader :path
 
     # It's going to take significant refactoring to be able to give this a type.
-    sig {returns(T::Hash[String, TODO_TYPE])}
+    sig {returns(T::Hash[String, T.untyped])}
     attr_reader :attributes
 
     BreakingChangeCallback = T.type_alias { T.proc.params(arg0: String).void }
 
-    sig {params(path: String, attributes: T::Hash[String, TODO_TYPE], breaking_change_cb: BreakingChangeCallback).void}
+    sig {params(path: String, attributes: T::Hash[String, T.untyped], breaking_change_cb: BreakingChangeCallback).void}
     def initialize(path, attributes = {}, breaking_change_cb = DUMMY_BREAKING_CHANGE_CB)
       @path       = T.let(path.sub(/\/$/, ''), String)
-      @attributes = T.let(attributes.dup, T::Hash[String, TODO_TYPE])
+      @attributes = T.let(attributes.dup, T::Hash[String, T.untyped])
 
       # Not that it's terribly important to check for such an old feature.  This
       # is mainly to demonstrate the RemoveMirrorDueToBreakingChange mechanism
@@ -79,7 +79,7 @@ DESC
       @attributes.delete('squashed')
     end
 
-    sig {params(url: String, options: TODO_TYPE).returns(Mirror)}
+    sig {params(url: String, options: T.untyped).returns(Mirror)}
     def self.new_from_options(url, options = {})
       url    = url.sub(/\/$/, '')
 
@@ -117,7 +117,7 @@ DESC
 
     # We'll probably call the return type something like
     # Braid::Operations::Git::TreeItem.
-    sig {params(revision: String).returns(TODO_TYPE)}
+    sig {params(revision: String).returns(T.untyped)}
     def upstream_item_for_revision(revision)
       git.get_tree_item(revision, self.remote_path)
     end
@@ -137,7 +137,7 @@ DESC
     # type of `user_args` as `T::Array[String]`, that test raised a runtime type
     # check error, finally exposing the bug.  Fix the bug and then update the
     # annotation here.  (The fix is trivial, but it needs a new test case...)
-    sig {params(user_args: TODO_TYPE).returns(T::Array[String])}
+    sig {params(user_args: T.untyped).returns(T::Array[String])}
     def diff_args(user_args = [])
       upstream_item = upstream_item_for_revision(base_revision)
 

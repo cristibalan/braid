@@ -16,8 +16,3 @@ value #{env_use_sorbet_runtime.inspect}; it must be "1", "0", or unset.
 MSG
   exit(1)
 end
-
-module Braid
-  # A placeholder type to use where we haven't yet figured out the right type.
-  TODO_TYPE = T.type_alias {T.untyped}
-end

@@ -2,7 +2,6 @@
 require 'yaml'
 require 'json'
 require 'yaml/store'
-require 'braid/sorbet/setup'
 
 # Some info about the configuration versioning design:
 # https://github.com/cristibalan/braid/issues/66#issuecomment-354211311

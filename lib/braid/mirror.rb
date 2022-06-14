@@ -127,17 +127,7 @@ DESC
     # user-specified arguments.  Having the caller run "git diff" is convenient
     # for now but violates encapsulation a little; we may have to reorganize the
     # code in order to add features.
-    #
-    # FIXME: One call site in `braid diff` uses the `*` operator on the argument
-    # (i.e., `diff_args(*my_user_args)`), which gives a "wrong number of
-    # arguments" error if there's more than one argument.  We don't have a test
-    # case with more than one argument.  We do have a test case with one
-    # argument, but unfortunately, it didn't expose the bug because in Ruby, `*`
-    # of a non-list is a no-op, not an error.  However, when I specified the
-    # type of `user_args` as `T::Array[String]`, that test raised a runtime type
-    # check error, finally exposing the bug.  Fix the bug and then update the
-    # annotation here.  (The fix is trivial, but it needs a new test case...)
-    sig {params(user_args: T.untyped).returns(T::Array[String])}
+    sig {params(user_args: T::Array[String]).returns(T::Array[String])}
     def diff_args(user_args = [])
       upstream_item = upstream_item_for_revision(base_revision)
 

@@ -61,7 +61,7 @@ module Braid
 
       # hax!
       def version
-        status, out, err = exec!("#{self.class.command} --version")
+        _, out, _ = exec!("#{self.class.command} --version")
         out.sub(/^.* version/, '').strip.sub(/ .*$/, '').strip
       end
 
@@ -166,6 +166,7 @@ module Braid
 
       def commit(message, *args)
         cmd = 'git commit --no-verify'
+        message_file = nil
         if message # allow nil
           message_file = Tempfile.new('braid_commit')
           message_file.print("Braid: #{message}")
@@ -303,7 +304,7 @@ module Braid
           # According to
           # https://lore.kernel.org/git/e48a281a4d3db0a04c0609fcb8658e4fcc797210.1646166271.git.gitgitgadget@gmail.com/,
           # `--prefix=` is valid if the path is empty.
-          res = invoke(:read_tree, "--prefix=#{path}", update_worktree ? '-u' : '-i', item)
+          invoke(:read_tree, "--prefix=#{path}", update_worktree ? '-u' : '-i', item)
         end
       end
 
@@ -370,7 +371,7 @@ module Braid
       end
 
       def status_clean?
-        status, out, err = exec('git status')
+        _, out, _ = exec('git status')
         !out.split("\n").grep(/nothing to commit/).empty?
       end
 
@@ -383,7 +384,7 @@ module Braid
       end
 
       def branch
-        status, out, err = exec!("git branch | grep '*'")
+        _, out, _ = exec!("git branch | grep '*'")
         out[2..-1]
       end
 

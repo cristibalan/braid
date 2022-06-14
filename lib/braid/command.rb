@@ -1,5 +1,8 @@
+# typed: true
 module Braid
   class Command
+    extend T::Sig
+
     class InvalidRevision < BraidError
     end
 
@@ -23,10 +26,12 @@ module Braid
       exit(1)
     end
 
+    sig {params(str: String).void}
     def self.msg(str)
       puts "Braid: #{str}"
     end
 
+    sig {params(str: String).void}
     def msg(str)
       self.class.msg(str)
     end
@@ -35,16 +40,19 @@ module Braid
       @config ||= Config.new({'mode' => config_mode})
     end
 
+    sig {returns(T::Boolean)}
     def verbose?
       Braid.verbose
     end
 
+    sig {returns(T::Boolean)}
     def force?
       Braid.force
     end
 
     private
 
+    sig {returns(Config::ConfigMode)}
     def config_mode
       Config::MODE_MAY_WRITE
     end
@@ -63,14 +71,17 @@ module Braid
       git.remote_rm(mirror.remote) unless options['keep']
     end
 
+    sig {returns(T::Boolean)}
     def use_local_cache?
       Braid.use_local_cache
     end
 
+    sig {void}
     def self.verify_git_version!
       git.require_version!(REQUIRED_GIT_VERSION)
     end
 
+    sig {void}
     def self.check_working_dir!
       # If we aren't in a git repository at all, git.is_inside_worktree will
       # propagate a "fatal: Not a git repository" ShellException.
@@ -82,6 +93,7 @@ module Braid
       end
     end
 
+    sig {void}
     def bail_on_local_changes!
       git.ensure_clean!
     end
@@ -100,6 +112,7 @@ module Braid
       end
     end
 
+    sig {void}
     def add_config_file
       git.rm(OLD_CONFIG_FILE) if File.exist?(OLD_CONFIG_FILE)
       git.add(CONFIG_FILE)

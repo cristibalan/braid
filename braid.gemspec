@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path('../lib', __FILE__)
-require 'braid/version'
+require_relative 'lib/braid/version'
 
 Gem::Specification.new do |s|
   s.name               = %q{braid}
@@ -13,8 +12,6 @@ Gem::Specification.new do |s|
   s.homepage           = %q{https://github.com/cristibalan/braid}
   s.summary            = %q{A simple tool for tracking vendor branches in git.}
   s.description        = %q{A simple tool for tracking vendor branches in git.}
-
-  s.rubyforge_project  = %q{braid}
 
   # Recommendations on the web vary as to how to generate the `files` list.
   # Bundler's template for new gems
@@ -31,7 +28,8 @@ Gem::Specification.new do |s|
   #
   # Ship only the files that are used at runtime, plus required legal notices.
   # Users who want other files should use the source repository.
-  s.files              = ['LICENSE', 'bin/braid'] + Dir['lib/**/*.rb']
+  s.files              = ['LICENSE', 'exe/braid'] + Dir['lib/**/*.rb']
+  s.bindir             = 'exe'
   s.executables        = ['braid']
   s.require_paths      = %w(lib)
 

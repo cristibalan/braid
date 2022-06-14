@@ -1,18 +1,3 @@
-#!/usr/bin/env ruby
-
-# Duplicated from Braid::Command.run. :(
-def die(msg)
-  puts "Braid: Error: #{msg}"
-  exit(1)
-end
-
-# If we assume Ruby >= 2.0, we can use __dir__.
-libdir = File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib')
-unless File.exists?(libdir)
-  # Don't silently fall back to a different globally installed copy of Braid!
-  die "Cannot find Braid's 'lib' directory."
-end
-$LOAD_PATH.unshift(libdir)
 require 'braid'
 
 require 'rubygems'
@@ -138,7 +123,7 @@ Main {
 
     mixin :optional_local_path, :option_verbose, :option_keep_remote
 
-    synopsis (Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
+    synopsis(Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
 
     run {
       if @argv.length > 0 && @argv[0] == '--'

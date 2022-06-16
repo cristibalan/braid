@@ -20,7 +20,8 @@ Main {
   # The "main" library doesn't provide a way to do this??
   def check_no_extra_args!
     if @argv.length > 0
-      die 'Extra argument(s) passed to command.'
+      Braid::Command.handle_error(
+        Braid::BraidError.new('Extra argument(s) passed to command.'))
     end
   end
 

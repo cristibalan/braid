@@ -17,6 +17,11 @@ module Braid
       klass.new.run(*args)
 
     rescue BraidError => error
+      handle_error(error)
+    end
+
+    sig {params(error: BraidError).returns(T.noreturn)}
+    def self.handle_error(error)
       case error
         when Operations::ShellExecutionError
           msg "Shell error: #{error.message}"

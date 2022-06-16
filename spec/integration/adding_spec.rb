@@ -226,5 +226,14 @@ describe 'Adding a mirror in a clean repository' do
 
       expect(output).to match(/^Braid: Error: Can not add mirror specifying both a revision and a tag$/)
     end
+
+    it 'should generate an error if too many arguments are given' do
+      output = nil
+      in_dir(@repository_dir) do
+        output = `#{BRAID_BIN} add #{@vendor_repository_dir} skit1 extra`
+      end
+
+      expect(output).to eq("Braid: Error: Extra argument(s) passed to command.\n")
+    end
   end
 end

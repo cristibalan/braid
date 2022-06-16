@@ -52,6 +52,9 @@ module Braid
     def self.untyped
       FAKE_TYPE
     end
+    def self.noreturn
+      FAKE_TYPE
+    end
     Boolean = FAKE_TYPE
     module Array
       def self.[](type)

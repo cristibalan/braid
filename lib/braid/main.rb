@@ -1,13 +1,24 @@
+# typed: true
+
 require 'braid'
 
 require 'rubygems'
 require 'main'
 
+# This is needed for `T` below to resolve to `Braid::T` when using the fake
+# Sorbet runtime.  TODO: Indent the contents and accept the large diff?
+module Braid
+
 Home = File.expand_path(ENV['HOME'] || '~')
 
 # mostly blantantly stolen from ara's punch script
 # main kicks ass!
-Main {
+T.unsafe(Main).run {
+  # `Main` is somewhat mind-bending and I'm unsure what the type of `self`
+  # actually is here, but whatever it is, we don't have a type declaration for
+  # it.
+  T.bind(self, T.untyped)
+
   description <<-TXT
     braid is a simple tool to help track git repositories inside a git repository.
 
@@ -124,7 +135,7 @@ Main {
 
     mixin :optional_local_path, :option_verbose, :option_keep_remote
 
-    synopsis(Main::Usage.default_synopsis(self) + ' [-- git_diff_arg*]')
+    synopsis(T.unsafe(Main::Usage).default_synopsis(self) + ' [-- git_diff_arg*]')
 
     run {
       if @argv.length > 0 && @argv[0] == '--'
@@ -319,3 +330,5 @@ Main {
 
   run { help! }
 }
+
+end

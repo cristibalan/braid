@@ -1,3 +1,4 @@
+# typed: true
 module Braid
   module Commands
     class Status < Command

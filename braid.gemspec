@@ -44,4 +44,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency(%q<mocha>, ['>= 0.9.11'])
   s.add_development_dependency(%q<rake>)
   s.add_development_dependency(%q<bundler>)
+  # Helpful for Braid developers to run `bundle exec irb` for manual testing of
+  # Braid internals.
+  s.add_development_dependency(%q<irb>)
 end

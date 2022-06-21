@@ -36,6 +36,10 @@ module Braid
     def self.must(value)
       value
     end
+    def self.unsafe(value)
+      value
+    end
+    def self.bind(value, type); end
 
     class FakeType
       include Singleton

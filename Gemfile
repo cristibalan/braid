@@ -11,7 +11,7 @@ gemspec
 # may be able to rely on it to pin the version instead.  Feel free to upgrade
 # Sorbet if you can fix any new type errors and the IDE features still seem to
 # work.
-SORBET_VERSION_SPEC = '= 0.5.9837'
+SORBET_VERSION_SPEC = '= 0.5.10101'
 
 # We want developers on OSes supported by `sorbet-static` to be able to get in
 # their bundle, but we also need to be able to run the test suite on OSes

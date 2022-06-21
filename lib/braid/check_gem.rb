@@ -1,3 +1,10 @@
+# Since this file can't safely depend on the Sorbet runtime, it isn't prudent to
+# try to commit to `typed: true` even if the file currently passes type checking
+# without needing any references to `T`.  Like `exe/braid`, this file doesn't
+# have much code worth type checking.
+#
+# typed: false
+
 # Braid has several entry points that run code from Ruby gems (either Braid
 # itself or dependencies such as Sorbet) and expect to get the correct versions
 # (either the same copy of Braid or versions of dependencies consistent with the

@@ -1,3 +1,5 @@
+# typed: true
+
 require 'singleton'
 require 'rubygems'
 require 'tempfile'
@@ -56,7 +58,7 @@ module Braid
       include Singleton
 
       def self.command;
-        name.split('::').last.downcase;
+        T.unsafe(name).split('::').last.downcase;
       end
 
       # hax!
@@ -89,6 +91,9 @@ module Braid
       end
 
       def method_missing(name, *args)
+        # We have to use this rather than `T.unsafe` because `invoke` is
+        # private.  See https://sorbet.org/docs/type-assertions#tbind.
+        T.bind(self, T.untyped)
         invoke(name, *args)
       end
 
@@ -273,7 +278,7 @@ module Braid
         if path.nil? || path == ''
           tree
         else
-          m = /^([^ ]*) ([^ ]*) ([^\t]*)\t.*$/.match(invoke(:ls_tree, tree, path))
+          m = T.must(/^([^ ]*) ([^ ]*) ([^\t]*)\t.*$/.match(invoke(:ls_tree, tree, path)))
           mode = m[1]
           type = m[2]
           hash = m[3]
@@ -390,6 +395,7 @@ module Braid
 
       def clone(*args)
         # overrides builtin
+        T.bind(self, T.untyped)  # Ditto the comment in `method_missing`.
         invoke(:clone, *args)
       end
 
@@ -407,11 +413,11 @@ module Braid
         dir = path(url)
 
         # remove local cache if it was created with --no-checkout
-        if File.exists?("#{dir}/.git")
+        if File.exist?("#{dir}/.git")
           FileUtils.rm_r(dir)
         end
 
-        if File.exists?(dir)
+        if File.exist?(dir)
           Dir.chdir(dir) do
             git.fetch
           end

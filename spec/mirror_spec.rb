@@ -1,11 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Braid::Mirror.new_from_options' do
-  it 'should default branch to master' do
-    new_from_options('git://path')
-    expect(@mirror.branch).to eq('master')
-  end
-
   it 'should default mirror to last path part, ignoring trailing .git' do
     new_from_options('http://path.git')
     expect(@mirror.path).to eq('path')
@@ -14,11 +9,6 @@ describe 'Braid::Mirror.new_from_options' do
   it 'should strip trailing slash from specified path' do
     new_from_options('http://path.git', 'path' => 'vendor/tools/mytool/')
     expect(@mirror.path).to eq('vendor/tools/mytool')
-  end
-
-  it 'should define local_ref correctly when default branch specified' do
-    new_from_options('http://mytool.git')
-    expect(@mirror.local_ref).to eq('master/braid/mytool/master')
   end
 
   it 'should define local_ref correctly when explicit branch specified' do
@@ -37,11 +27,6 @@ describe 'Braid::Mirror.new_from_options' do
     }.to raise_error(Braid::Mirror::NoTagAndBranch)
   end
 
-  it 'should define remote_ref correctly when default branch specified' do
-    new_from_options('http://mytool.git')
-    expect(@mirror.remote_ref).to eq('+refs/heads/master')
-  end
-
   it 'should define remote_ref correctly when explicit branch specified' do
     new_from_options('http://mytool.git', 'branch' => 'mybranch')
     expect(@mirror.remote_ref).to eq('+refs/heads/mybranch')
@@ -50,11 +35,6 @@ describe 'Braid::Mirror.new_from_options' do
   it 'should define remote_ref correctly when explicit tag specified' do
     new_from_options('http://mytool.git', 'tag' => 'v1')
     expect(@mirror.remote_ref).to eq('+refs/tags/v1')
-  end
-
-  it 'should define remote correctly when default branch specified' do
-    new_from_options('http://mytool.git')
-    expect(@mirror.remote).to eq('master/braid/mytool')
   end
 
   it 'should define remote correctly when explicit branch specified' do
@@ -68,7 +48,7 @@ describe 'Braid::Mirror.new_from_options' do
   end
 
   it 'should strip first dot from remote path for dot files and folders' do
-    new_from_options('http://path.git', 'path' => '.dotfolder/.dotfile.ext')
+    new_from_options('http://path.git', 'branch' => 'master', 'path' => '.dotfolder/.dotfile.ext')
     expect(@mirror.path).to eq('.dotfolder/.dotfile.ext')
     expect(@mirror.remote).to eq('master/braid/_dotfolder/_dotfile.ext')
   end

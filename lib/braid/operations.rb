@@ -143,12 +143,7 @@ module Braid
       # 'MERGE_MSG'), taking into account worktree configuration.  The returned
       # path may be absolute or relative to the current working directory.
       def repo_file_path(path)
-        if require_version('2.5')  # support for --git-path
-          invoke(:rev_parse, '--git-path', path)
-        else
-          # Git < 2.5 doesn't support linked worktrees anyway.
-          File.join(invoke(:rev_parse, '--git-dir'), path)
-        end
+        invoke(:rev_parse, '--git-path', path)
       end
 
       # If the current directory is not inside a git repository at all, this
@@ -298,9 +293,7 @@ module Braid
       # file).
       def add_item_to_index(item, path, update_worktree)
         if item.is_a?(BlobWithMode)
-          # Our minimum git version is 1.6.0 and the new --cacheinfo syntax
-          # wasn't added until 2.0.0.
-          invoke(:update_index, '--add', '--cacheinfo', item.mode, item.hash, path)
+          invoke(:update_index, '--add', '--cacheinfo', "#{item.mode},#{item.hash},#{path}")
           if update_worktree
             # XXX If this fails, we've already updated the index.
             invoke(:checkout_index, path)

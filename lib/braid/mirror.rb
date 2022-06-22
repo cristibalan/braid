@@ -86,7 +86,7 @@ DESC
       raise NoTagAndBranch if options['tag'] && options['branch']
 
       tag = options['tag']
-      branch = options['branch'] || (tag.nil? ? 'master' : nil)
+      branch = options['branch']
 
       path = (options['path'] || extract_path_from_url(url, options['remote_path'])).sub(/\/$/, '')
       raise PathRequired unless path

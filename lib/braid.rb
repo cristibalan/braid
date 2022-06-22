@@ -12,14 +12,13 @@ module Braid
   # See the background in the "Supported environments" section of README.md.
   #
   # The newest Git feature that Braid is currently known to rely on is
-  # `receive.denyCurrentBranch = updateInstead` (in
-  # spec/integration/push_spec.rb), which was added in Git 2.3.0 (in 2015).  It
+  # `git ls-remote --symref`, which was added in Git 2.8.0 (in 2016).  It
   # doesn't seem worth even a small amount of work to remove that dependency and
   # support even older versions of Git.  So set that as the declared requirement
   # for now.  In general, a reasonable approach might be to try to support the
   # oldest version of Git in current "long-term support" versions of popular OS
   # distributions.
-  REQUIRED_GIT_VERSION = '2.3.0'
+  REQUIRED_GIT_VERSION = '2.8.0'
 
   @verbose = T.let(false, T::Boolean)
 

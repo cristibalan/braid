@@ -55,7 +55,7 @@ CMD
 end
 
 def assert_no_diff(file1, file2, extra_flags = '')
-  run_command("diff -U 3 #{extra_flags} #{file1} #{file2}")
+  run_command("diff -U 3 #{extra_flags} \"#{file1}\" \"#{file2}\"")
 end
 
 def assert_commit_attribute(format_key, value, commit_index = 0)

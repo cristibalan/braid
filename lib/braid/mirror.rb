@@ -107,7 +107,7 @@ DESC
       branch.nil? && tag.nil?
     end
 
-    sig {params(commit: String).returns(T::Boolean)}
+    sig {params(commit: Operations::Git::ObjectExpr).returns(T::Boolean)}
     def merged?(commit)
       # tip from spearce in #git:
       # `test z$(git merge-base A B) = z$(git rev-parse --verify A)`
@@ -115,9 +115,7 @@ DESC
       !!base_revision && git.merge_base(commit, base_revision) == commit
     end
 
-    # We'll probably call the return type something like
-    # Braid::Operations::Git::TreeItem.
-    sig {params(revision: String).returns(T.untyped)}
+    sig {params(revision: String).returns(Operations::Git::TreeItem)}
     def upstream_item_for_revision(revision)
       git.get_tree_item(revision, self.remote_path)
     end
@@ -211,16 +209,28 @@ DESC
       git.remote_url(remote) == cached_url
     end
 
-    sig {returns(String)}
+    sig {returns(Operations::Git::ObjectID)}
     def base_revision
-      # Avoid a Sorbet "unreachable code" error.
-      # TODO (typing): Is the revision expected to be non-nil nowadays?  Can we
-      # just remove the `inferred_revision` code path now?
-      nilable_revision = T.let(revision, T.nilable(String))
-      if nilable_revision
-        git.rev_parse(revision)
+      # TODO (typing): We think `revision` should always be non-nil here these
+      # days and we can completely drop the `inferred_revision` code, but we're
+      # waiting for a better time to actually make this runtime behavior change
+      # and accept any risk of breakage
+      # (https://github.com/cristibalan/braid/pull/105/files#r857150464).
+      #
+      # Temporary variable
+      # (https://sorbet.org/docs/flow-sensitive#limitations-of-flow-sensitivity)
+      revision1 = revision
+      if revision1
+        git.rev_parse(revision1)
       else
-        inferred_revision
+        # NOTE: Given that `inferred_revision` does appear to return nil on one
+        # code path, using this `T.must` and giving `base_revision` a
+        # non-nilable return type presents a theoretical risk of leading us to
+        # make changes to callers that break things at runtime.  But we judge
+        # this a lesser evil than making the return type nilable and changing
+        # all callers to type-check successfully with that when we hope to
+        # revert the change soon anyway.
+        T.must(inferred_revision)
       end
     end
 
@@ -310,7 +320,12 @@ DESC
 
     sig {returns(String)}
     def remote
-      "#{branch || tag || 'revision'}/braid/#{path}".gsub(/\/\./, '/_')
+      # Ensure that we replace any characters in the mirror path that might be
+      # problematic in a Git ref name.  Theoretically, this may introduce
+      # collisions between mirrors, but we don't expect that to be much of a
+      # problem because Braid doesn't keep remotes by default after a command
+      # exits.
+      "#{branch || tag || 'revision'}_braid_#{path}".gsub(/[^-A-Za-z0-9]/, '_')
     end
 
     private
@@ -322,8 +337,8 @@ DESC
 
     sig {returns(T.nilable(String))}
     def inferred_revision
-      local_commits = git.rev_list('HEAD', "-- #{path}").split("\n")
-      remote_hashes = git.rev_list("--pretty=format:\"%T\"", remote).split('commit ').map do |chunk|
+      local_commits = git.rev_list(['HEAD', "-- #{path}"]).split("\n")
+      remote_hashes = git.rev_list(["--pretty=format:%T", remote]).split('commit ').map do |chunk|
         chunk.split("\n", 2).map { |value| value.strip }
       end
       hash          = T.let(nil, T.nilable(String))

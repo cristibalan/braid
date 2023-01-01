@@ -41,6 +41,7 @@ module Braid
       self.class.msg(str)
     end
 
+    sig {returns(Config)}
     def config
       @config ||= Config.new({'mode' => config_mode})
     end

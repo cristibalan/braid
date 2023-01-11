@@ -36,7 +36,7 @@ module Braid
 
         # XXX: Warn if the user specifies file paths that are outside the
         # mirror?  Currently, they just won't match anything.
-        git.diff_to_stdout(*mirror.diff_args(options['git_diff_args']))
+        git.diff_to_stdout(mirror.diff_args(options['git_diff_args']))
 
         clear_remote(mirror, options)
       end

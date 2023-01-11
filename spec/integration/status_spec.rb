@@ -4,12 +4,12 @@ describe 'Running braid status on a mirror' do
   before do
     FileUtils.rm_rf(TMP_PATH)
     FileUtils.mkdir_p(TMP_PATH)
-    @repository_dir = create_git_repo_from_fixture('shiny')
-    @vendor_repository_dir = create_git_repo_from_fixture('skit1')
   end
 
   describe 'braided directly in' do
     before do
+      @repository_dir = create_git_repo_from_fixture('shiny')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
       in_dir(@repository_dir) do
         run_command("#{BRAID_BIN} add #{@vendor_repository_dir}")
       end
@@ -59,6 +59,8 @@ describe 'Running braid status on a mirror' do
 
   describe 'braided into branch in' do
     before do
+      @repository_dir = create_git_repo_from_fixture('shiny')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
       in_dir(@vendor_repository_dir) do
         run_command('git checkout -bbranch1 2>&1')
       end
@@ -111,6 +113,8 @@ describe 'Running braid status on a mirror' do
 
   describe 'braided directly in as tag' do
     before do
+      @repository_dir = create_git_repo_from_fixture('shiny')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1')
       in_dir(@vendor_repository_dir) do
         run_command('git tag v1')
       end
@@ -159,6 +163,28 @@ describe 'Running braid status on a mirror' do
         end
 
         expect(output).to match(/^skit1 \([0-9a-f]{40}\) \[TAG=v1\] \(Remote Modified\)$/)
+      end
+    end
+  end
+
+  # See the comment in adding_spec.rb regarding tests with paths containing
+  # spaces.
+  describe 'braided from a subdirectory with paths containing spaces' do
+    before do
+      @repository_dir = create_git_repo_from_fixture('shiny', :directory => 'shiny with spaces')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1_with_space', :directory => 'skit with spaces')
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add --path \"lay outs\" \"#{@vendor_repository_dir}\" \"skit lay outs\"")
+      end
+    end
+    describe 'with no changes' do
+      it 'should only emit version when neither modified' do
+        diff = nil
+        in_dir(@repository_dir) do
+          diff = run_command("#{BRAID_BIN} status \"skit lay outs\"")
+        end
+
+        expect(diff).to match(/^skit lay outs \([0-9a-f]{40}\) \[BRANCH=master\]$/)
       end
     end
   end

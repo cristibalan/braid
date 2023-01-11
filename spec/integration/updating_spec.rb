@@ -208,6 +208,56 @@ describe 'Updating a mirror' do
     end
   end
 
+  # See the comment in adding_spec.rb regarding tests with paths containing
+  # spaces.
+  describe 'from a git repository with a braid into subdirectory with paths containing spaces' do
+    before do
+      @repository_dir = create_git_repo_from_fixture('shiny', :directory => 'shiny with spaces')
+      @vendor_repository_dir = create_git_repo_from_fixture('skit1_with_space', :directory => 'skit with spaces')
+      @file_name = 'layouts/layout.liquid'
+
+      in_dir(@repository_dir) do
+        run_command("#{BRAID_BIN} add --path \"lay outs\" \"#{@vendor_repository_dir}\" \"skit lay outs\"")
+      end
+
+      update_dir_from_fixture("skit with spaces/lay outs", 'skit1.1/layouts')
+      in_dir(@vendor_repository_dir) do
+        run_command('git add *')
+        run_command('git commit -m "change default color"')
+      end
+
+      update_dir_from_fixture("skit with spaces/lay outs", 'skit1.2/layouts')
+      in_dir(@vendor_repository_dir) do
+        run_command('git add *')
+        run_command('git commit -m "add a happy note"')
+      end
+    end
+
+    context 'with no project-specific changes' do
+      it 'should add the files and commit' do
+        in_dir(@repository_dir) do
+          run_command("#{BRAID_BIN} update \"skit lay outs\"")
+        end
+
+        assert_no_diff("#{FIXTURE_PATH}/skit1.2/#{@file_name}", "#{@repository_dir}/skit lay outs/layout.liquid")
+
+        output = nil
+        in_dir(@repository_dir) do
+          output = run_command('git log --pretty=oneline').split("\n")
+        end
+        expect(output.length).to eq(3)
+        expect(output[0]).to match(/^[0-9a-f]{40} Braid: Update mirror 'skit lay outs' to '[0-9a-f]{7}'$/)
+
+        # No temporary commits should be added to the reflog.
+        output = nil
+        in_dir(@repository_dir) do
+          output = `git log -g --pretty=oneline`.split("\n")
+        end
+        expect(output.length).to eq(3)
+      end
+    end
+  end
+
   describe 'from a git repository with a braid of a single file' do
     before do
       @repository_dir = create_git_repo_from_fixture('shiny')

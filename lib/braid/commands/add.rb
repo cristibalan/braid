@@ -20,7 +20,7 @@ module Braid
         # as `refs/remotes/origin/HEAD` in the unusual case where the repository
         # contains its own remote-tracking branches), but it reduces the data we
         # have to scan a bit.
-        git.ls_remote('--symref', url, 'HEAD').split("\n").each do |line|
+        git.ls_remote(['--symref', url, 'HEAD']).split("\n").each do |line|
           m = /^ref: (.*)\tHEAD$/.match(line)
           head_targets.push(m[1]) if m
         end

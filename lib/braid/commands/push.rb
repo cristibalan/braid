@@ -44,7 +44,8 @@ module Braid
         end
         clone_dir = Dir.tmpdir + "/braid_push.#{$$}"
         Dir.mkdir(clone_dir)
-        remote_url = git.remote_url(mirror.remote)
+        # TODO (typing): Remove this `T.must` somehow?
+        remote_url = T.must(git.remote_url(mirror.remote))
         if remote_url == mirror.cached_url
           remote_url = mirror.url
         elsif File.directory?(remote_url)
@@ -68,7 +69,7 @@ module Braid
           File.open('.git/objects/info/alternates', 'wb') { |f|
             f.puts(odb_paths)
           }
-          git.fetch(remote_url, mirror.remote_ref)
+          git.fetch(remote_url, [mirror.remote_ref])
           new_tree = git.make_tree_with_item(base_revision,
             mirror.remote_path || '', local_mirror_item)
           if git.require_version('2.27')
@@ -106,11 +107,11 @@ module Braid
           # Update HEAD the same way git.checkout(base_revision) would, but
           # don't populate the index or working tree (to save us the trouble of
           # emptying them again before the git.read_tree).
-          git.update_ref('--no-deref', 'HEAD', base_revision)
-          git.read_tree('-mu', new_tree)
+          git.update_ref(['--no-deref', 'HEAD', base_revision])
+          git.read_tree_um(new_tree)
           system('git commit -v')
           msg "Pushing changes to remote branch #{branch}."
-          git.push(remote_url, "HEAD:refs/heads/#{branch}")
+          git.push([remote_url, "HEAD:refs/heads/#{branch}"])
         end
         FileUtils.rm_r(clone_dir)
 

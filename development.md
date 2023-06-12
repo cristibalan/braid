@@ -17,31 +17,47 @@ IDE, but we haven't researched this.
 
 Sorbet annotations take the form of references to functions and constants
 defined by the `sorbet-runtime` gem.  In addition to being recognized by the
-static checker, these annotations are evaluated at runtime to raise an error if
-a value does not have the claimed type.  The runtime checks are helpful for
+static checker, these annotations are executed at runtime and run code in
+`sorbet-runtime` that checks that each value has the claimed type and raises an
+error if not.  The runtime checks are helpful for
 catching inconsistencies between the code and the annotations, so we enable them
-for the test suite.  However, we currently don't want them during normal use of
+by default for the test suite.
+However, we currently don't want them during normal use of
 Braid by end users because of the risk of an incorrect annotation breaking
 previously working functionality that isn't covered by the test suite, as well
 as potential performance and compatibility concerns.  So by default, Braid uses
-a simple fake implementation of `sorbet-runtime` (in
-`lib/braid/sorbet/fake_runtime.rb`) that performs no checks.  We may enable the
-runtime checks by default in the future if the performance and compatibility
+a "fake" Sorbet runtime (in `lib/braid/sorbet/fake_runtime.rb`) that implements
+only the `sorbet-runtime` APIs that Braid uses in a simple way with no runtime
+type checks.  We may switch to
+the real Sorbet runtime in the future if the performance and compatibility
 concerns are addressed and we become confident enough in the correctness of our
 annotations that we think the benefit of catching problems sooner (before they
 lead to unexpected behavior) outweighs the risk of breaking otherwise working
-functionality.
+functionality.  Since Braid only loads `sorbet-runtime` during development,
+it is declared as a development dependency rather than a normal dependency.
 
 The environment variable `BRAID_USE_SORBET_RUNTIME=1` tells Braid to use the
-real `sorbet-runtime` with runtime type checks.  The test suite sets it by
-default, and you can also set it when running Braid manually during development.
-If you need to temporarily run the test suite without runtime type checks to
-facilitate some kind of debugging, you can set `BRAID_USE_SORBET_RUNTIME=0`.
-Note that since `sorbet-runtime` is declared only as a development dependency of
-Braid, if for some reason you want to use `BRAID_USE_SORBET_RUNTIME=1` in a
-context that doesn't recognize development dependencies, it's your
-responsibility to ensure that the correct version of `sorbet-runtime` is on the
-load path.
+real Sorbet runtime with runtime type checks.  The test suite sets it by
+default, which is typically what you want during development to catch incorrect
+annotations.  However, as part of the final validation of a change, it's
+important to run the test suite with `BRAID_USE_SORBET_RUNTIME=0` to detect if
+Braid has been changed to use an additional API of the real Sorbet runtime that
+isn't yet implemented in the fake one, since that would otherwise cause Braid to
+fail during use by end users.  You can also run the test suite with
+`BRAID_USE_SORBET_RUNTIME=0` during development to temporarily bypass the
+runtime type checks if they are getting in the way of other testing you want to
+do.
+
+When you run Braid directly rather than via the test suite, the default is
+`BRAID_USE_SORBET_RUNTIME=0` as it is for end users.  You can set
+`BRAID_USE_SORBET_RUNTIME=1` to use the real Sorbet runtime and get the runtime
+type checks, assuming you're running Braid from a development tree via the
+standard Bundler setup or via another mechanism that honors the development
+dependency on `sorbet-runtime`.  If you run Braid with
+`BRAID_USE_SORBET_RUNTIME=1` via a mechanism that does not honor development
+dependencies (e.g., from a released gem), it's your responsibility to ensure
+that the correct version of `sorbet-runtime` is on the load path, otherwise
+Braid will most likely fail.
 
 The Sorbet static analyzer (`sorbet-static`) is only available for [certain
 operating

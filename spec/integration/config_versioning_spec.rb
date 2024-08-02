@@ -106,7 +106,7 @@ describe 'Config versioning:' do
         output = run_command("#{BRAID_BIN} upgrade-config")
         # Check this on one of the test cases.
         expect(output).to match(/Configuration upgrade complete\./)
-        expect(File.exists?('.braids')).to eq(false)
+        expect(File.exist?('.braids')).to eq(false)
         assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
@@ -116,7 +116,7 @@ describe 'Config versioning:' do
 
       in_dir(@repository_dir) do
         run_command("#{BRAID_BIN} upgrade-config")
-        expect(File.exists?('.braids')).to eq(false)
+        expect(File.exist?('.braids')).to eq(false)
         assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
@@ -153,7 +153,7 @@ describe 'Config versioning:' do
         expect(output).to match(/skit1.*full-history/)
         expect(output).to match(/Run 'braid upgrade-config --allow-breaking-changes'/)
         assert_no_diff('.braids', "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
-        expect(File.exists?('.braids.json')).to eq(false)
+        expect(File.exist?('.braids.json')).to eq(false)
       end
     end
 
@@ -168,7 +168,7 @@ describe 'Config versioning:' do
         expect(output).to match(/You must pass --allow-breaking-changes/)
         # `braid upgrade-config` should not have changed any files.
         assert_no_diff('.braids', "#{FIXTURE_PATH}/shiny-conf-breaking-changes/.braids")
-        expect(File.exists?('.braids.json')).to eq(false)
+        expect(File.exist?('.braids.json')).to eq(false)
       end
     end
 
@@ -181,7 +181,7 @@ describe 'Config versioning:' do
         expect(output).to match(/Spoon-Knife.*Subversion/)
         expect(output).to match(/skit1.*full-history/)
         expect(output).to match(/Configuration upgrade complete\./)
-        expect(File.exists?('.braids')).to eq(false)
+        expect(File.exist?('.braids')).to eq(false)
         assert_no_diff_in_braids('.braids.json', 'expected.braids.json')
       end
     end
@@ -213,7 +213,7 @@ describe 'Config versioning:' do
       in_dir(@repository_dir) do
         output = run_command("#{BRAID_BIN} upgrade-config")
         expect(output).to match(/has no Braid configuration file/)
-        expect(File.exists?('.braids.json')).to eq(false)
+        expect(File.exist?('.braids.json')).to eq(false)
       end
     end
 

@@ -59,11 +59,6 @@ module Braid
 
   class BraidError < StandardError
     extend T::Sig
-    sig {returns(String)}
-    def message
-      value = super
-      value if value != self.class.name
-    end
   end
 
   class InternalError < BraidError

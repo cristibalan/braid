@@ -10,12 +10,11 @@ module Braid
 
   module Operations
     class ShellExecutionError < BraidError
-      # TODO (typing): Should this be nilable?
-      sig {returns(T.nilable(String))}
+      sig {returns(String)}
       attr_reader :err, :out
 
-      sig {params(err: T.nilable(String), out: T.nilable(String)).void}
-      def initialize(err = nil, out = nil)
+      sig {params(err: String, out: String).void}
+      def initialize(err, out)
         @err = err
         @out = out
       end
@@ -252,7 +251,7 @@ module Braid
         elsif out.match(/nothing.* to commit/)
           false
         else
-          raise ShellExecutionError, err
+          raise ShellExecutionError.new(err, out)
         end
       end
 
@@ -364,7 +363,7 @@ module Braid
             # This can happen if the user runs `braid add` with a `--path` that
             # doesn't exist.  TODO: Make the error message more user-friendly in
             # that case.
-            raise ShellExecutionError, 'No tree item exists at the given path'
+            raise BraidError, 'No tree item exists at the given path'
           end
           mode = T.must(m[1])
           type = T.must(m[2])
@@ -374,7 +373,7 @@ module Braid
           elsif type == 'blob'
             return BlobWithMode.new(hash, mode)
           else
-            raise ShellExecutionError, 'Tree item is not a tree or a blob'
+            raise BraidError, 'Tree item is not a tree or a blob'
           end
         end
       end

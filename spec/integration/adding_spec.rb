@@ -125,6 +125,21 @@ describe 'Adding a mirror in a clean repository' do
     end
   end
 
+  describe 'from a nonexistent git repository' do
+    # In general, Braid should show the full stderr of a failed command
+    # (https://github.com/cristibalan/braid/issues/90).  Adding a nonexistent
+    # repository is a convenient way to test the general behavior.
+    it 'should show the full stderr of the failed command' do
+      @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')
+      @vendor_repository_dir = File.join(TMP_PATH, 'nonexistent')
+
+      in_dir(@repository_dir) do
+        output = run_command_expect_failure("#{BRAID_BIN} add #{@vendor_repository_dir}")
+        expect(output).to match(/Please make sure you have the correct access rights/)
+      end
+    end
+  end
+
   describe 'from a nonexistent subdirectory in a git repository' do
     it 'should print a meaningful error message' do
       @repository_dir = create_git_repo_from_fixture('shiny', :name => 'Some body', :email => 'somebody@example.com')

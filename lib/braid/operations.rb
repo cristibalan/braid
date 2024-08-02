@@ -21,14 +21,7 @@ module Braid
 
       sig {returns(String)}
       def message
-        first_line = @err.to_s.split("\n").first
-        # Currently, first_line can be nil if @err was empty, but Sorbet thinks
-        # that the `message` method of an Exception should always return non-nil
-        # (although override checking isn't enforced as of this writing), so
-        # handle nil here.  This seems ad-hoc but better than putting in a
-        # `T.must` that we know has a risk of being wrong.  Hopefully this will
-        # be fixed better in https://github.com/cristibalan/braid/issues/90.
-        first_line.nil? ? '' : first_line
+        @err
       end
     end
     class VersionTooLow < BraidError

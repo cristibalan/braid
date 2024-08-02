@@ -10,10 +10,8 @@ code are annotated so far, but we are already seeing maintainability benefits
 for those parts.
 
 **Regarding IDE support:** Sorbet provides [an
-extension](https://sorbet.org/docs/vscode) for Visual Studio Code.  If you use
-VSCodium, the extension is not available in Open VSX as of this writing
-(2022-03-20), but it's easy enough to build and install from
-[source](https://github.com/sorbet/sorbet/tree/master/vscode_extension).  In
+extension](https://sorbet.org/docs/vscode) for Visual Studio Code.  The
+extension is also available in Open VSX for VSCodium users.  In
 theory, it should be possible to use the Sorbet language server with another
 IDE, but we haven't researched this.
 

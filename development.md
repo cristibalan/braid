@@ -70,3 +70,26 @@ system, and consider contributing a fix.  If `sorbet-static` is not installed,
 you won't be able to use its static type checking and code navigation
 functionality.  However, `sorbet-runtime` works the same way on all operating
 systems (when Braid is configured to use it as described above).
+
+## Matt's checklist for validating a change to Braid
+
+This is not an official policy at this point, but I thought I would go ahead and
+make it public in case anyone else wants to use it.
+
+TODO: Running all these steps is a big hassle.  Automate it better?
+
+- `bundle exec rake` in my regular development environment on Linux: runs the
+  test suite with the real Sorbet runtime, plus type checking and packaging.
+
+- `BRAID_USE_SORBET_RUNTIME=0 bundle exec rake spec` to catch missing
+  functionality in the fake Sorbet runtime.
+
+- `bundle exec rake spec` with the oldest version of Git that Braid claims to
+  support (`REQUIRED_GIT_VERSION`) added to `$PATH`.
+
+- `bundle exec rake spec` with Git built from the upstream `next` branch added
+  to `$PATH`.  This helps catch upcoming incompatibilities a little sooner.
+
+- `bundle exec rake spec` in my Windows VM.
+
+- Ask Peter to test on macOS as desired.

@@ -9,7 +9,7 @@ end
 
 require File.dirname(__FILE__) + '/../lib/braid'
 
-def new_from_options(url, options = {})
+def new_from_options(url, options = Braid::Mirror::Options.new)
   @mirror = Braid::Mirror.new_from_options(url, options)
 end
 

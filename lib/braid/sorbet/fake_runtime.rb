@@ -74,5 +74,24 @@ module Braid
       end
     end
 
+    class Struct
+      def initialize(**kwargs)
+        # The fake runtime isn't obliged to validate the property names or
+        # types.
+        #
+        # Note: If the caller passed a hash of keyword arguments, Ruby will copy
+        # it, so we don't need to copy `kwargs` again here to avoid aliasing.
+        @attrs = kwargs
+      end
+
+      def self.prop(prop_name, prop_type)
+        define_method(prop_name) {
+          @attrs[prop_name]
+        }
+        define_method(prop_name.name + '=') { |new_value|
+          @attrs[prop_name] = new_value
+        }
+      end
+    end
   end
 end

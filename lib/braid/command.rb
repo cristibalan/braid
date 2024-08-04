@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 module Braid
   class Command
     extend T::Sig
@@ -9,15 +9,13 @@ module Braid
     extend Operations::VersionControl
     include Operations::VersionControl
 
-    def self.run(command, *args)
+    sig {void}
+    def run
       verify_git_version!
       check_working_dir!
-
-      klass = Commands.const_get(command.to_s)
-      klass.new.run(*args)
-
+      run_internal
     rescue BraidError => error
-      handle_error(error)
+      Command.handle_error(error)
     end
 
     sig {params(error: BraidError).returns(T.noreturn)}
@@ -36,6 +34,11 @@ module Braid
       puts "Braid: #{str}"
     end
 
+    sig {void}
+    def initialize
+      @config = T.let(nil, T.nilable(Config))
+    end
+
     sig {params(str: String).void}
     def msg(str)
       self.class.msg(str)
@@ -43,7 +46,7 @@ module Braid
 
     sig {returns(Config)}
     def config
-      @config ||= Config.new({'mode' => config_mode})
+      @config ||= Config.new(mode: config_mode)
     end
 
     sig {returns(T::Boolean)}
@@ -58,23 +61,32 @@ module Braid
 
     private
 
+    # TODO (typing): We could make this method abstract if our fake Sorbet
+    # runtime supported abstract methods.
+    sig {void}
+    def run_internal
+      raise InternalError, 'Command.run_internal not overridden'
+    end
+
     sig {returns(Config::ConfigMode)}
     def config_mode
       Config::MODE_MAY_WRITE
     end
 
+    sig {params(mirror: Mirror).void}
     def setup_remote(mirror)
       existing_force = Braid.force
       begin
         Braid.force = true
-        Command.run(:Setup, mirror.path)
+        Commands::Setup.new(mirror.path).run
       ensure
         Braid.force = existing_force
       end
     end
 
-    def clear_remote(mirror, options)
-      git.remote_rm(mirror.remote) unless options['keep']
+    sig {params(mirror: Mirror).void}
+    def clear_remote(mirror)
+      git.remote_rm(mirror.remote)
     end
 
     sig {returns(T::Boolean)}
@@ -83,12 +95,12 @@ module Braid
     end
 
     sig {void}
-    def self.verify_git_version!
+    def verify_git_version!
       git.require_version!(REQUIRED_GIT_VERSION)
     end
 
     sig {void}
-    def self.check_working_dir!
+    def check_working_dir!
       # If we aren't in a git repository at all, git.is_inside_worktree will
       # propagate a "fatal: Not a git repository" ShellException.
       unless git.is_inside_worktree
@@ -104,7 +116,12 @@ module Braid
       git.ensure_clean!
     end
 
-    def with_reset_on_error
+    sig {
+      type_parameters(:R).params(
+        blk: T.proc.returns(T.type_parameter(:R))
+      ).returns(T.type_parameter(:R))
+    }
+    def with_reset_on_error(&blk)
       bail_on_local_changes!
 
       work_head = git.head
@@ -124,11 +141,16 @@ module Braid
       git.add(CONFIG_FILE)
     end
 
+    sig {params(mirror: Mirror, revision: T.nilable(String)).returns(String)}
     def display_revision(mirror, revision = nil)
-      revision ||= mirror.revision
+      # This shouldn't be called while `mirror.revision` is nil in the middle of
+      # `braid add`.  TODO (typing): Remove `T.must` if we restructure the code
+      # so `mirror.revision` is annotated as non-nil.
+      revision ||= T.must(mirror.revision)
       "'#{revision[0, 7]}'"
     end
 
+    sig {params(mirror: Mirror).returns(Operations::Git::ObjectID)}
     def determine_repository_revision(mirror)
       if mirror.tag
         if use_local_cache?
@@ -148,6 +170,7 @@ module Braid
       end
     end
 
+    sig {params(mirror: Mirror, revision: T.nilable(Operations::Git::ObjectExpr)).returns(Operations::Git::ObjectID)}
     def validate_new_revision(mirror, revision)
       if revision.nil?
         determine_repository_revision(mirror)

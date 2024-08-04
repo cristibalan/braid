@@ -1,9 +1,10 @@
-# typed: true
+# typed: strict
 require 'fileutils'
 require 'tmpdir'
 
 module Braid
     class NoPushToTag < BraidError
+      sig {returns(String)}
       def message
         "mirror is based off a tag. Can not push to a tag: #{super}"
       end
@@ -11,12 +12,26 @@ module Braid
 
   module Commands
     class Push < Command
-      def run(path, options = {})
-        mirror = config.get!(path)
+      class Options < T::Struct
+        prop :keep, T::Boolean
+        prop :branch, T.nilable(String)
+      end
 
-        branch = options['branch'] || mirror.branch
+      sig {params(path: String, options: Options).void}
+      def initialize(path, options)
+        @path = path
+        @options = options
+      end
 
-        raise NoPushToTag, path unless branch
+      private
+
+      sig {void}
+      def run_internal
+        mirror = config.get!(@path)
+
+        branch = @options.branch || mirror.branch
+
+        raise NoPushToTag, @path unless branch
 
         setup_remote(mirror)
         mirror.fetch
@@ -24,14 +39,14 @@ module Braid
         base_revision = determine_repository_revision(mirror)
         unless mirror.merged?(base_revision)
           msg 'Mirror is not up to date. Stopping.'
-          clear_remote(mirror, options)
+          clear_remote(mirror) unless @options.keep
           return
         end
 
         diff = mirror.diff
         if diff.empty?
           msg 'No local changes found. Stopping.'
-          clear_remote(mirror, options)
+          clear_remote(mirror) unless @options.keep
           return
         end
         local_mirror_item = git.get_tree_item('HEAD', mirror.path)
@@ -115,14 +130,13 @@ module Braid
         end
         FileUtils.rm_r(clone_dir)
 
-        clear_remote(mirror, options)
+        clear_remote(mirror) unless @options.keep
       end
-    end
 
-    private
-
-    def config_mode
-      Config::MODE_READ_ONLY  # Surprisingly enough.
+      sig {returns(Config::ConfigMode)}
+      def config_mode
+        Config::MODE_READ_ONLY  # Surprisingly enough.
+      end
     end
   end
 end

@@ -7,48 +7,48 @@ describe 'Braid::Mirror.new_from_options' do
   end
 
   it 'should strip trailing slash from specified path' do
-    new_from_options('http://path.git', 'path' => 'vendor/tools/mytool/')
+    new_from_options('http://path.git', Braid::Mirror::Options.new(path: 'vendor/tools/mytool/'))
     expect(@mirror.path).to eq('vendor/tools/mytool')
   end
 
   it 'should define local_ref correctly when explicit branch specified' do
-    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(branch: 'mybranch'))
     expect(@mirror.local_ref).to eq('mybranch_braid_mytool/mybranch')
   end
 
   it 'should define local_ref correctly when explicit tag specified' do
-    new_from_options('http://mytool.git', 'tag' => 'v1')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(tag: 'v1'))
     expect(@mirror.local_ref).to eq('tags/v1')
   end
 
   it 'should raise an exception if both tag and branch specified' do
     expect {
-      new_from_options('http://mytool.git', 'tag' => 'v1', 'branch' => 'mybranch')
+      new_from_options('http://mytool.git', Braid::Mirror::Options.new(tag: 'v1', branch: 'mybranch'))
     }.to raise_error(Braid::Mirror::NoTagAndBranch)
   end
 
   it 'should define remote_ref correctly when explicit branch specified' do
-    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(branch: 'mybranch'))
     expect(@mirror.remote_ref).to eq('+refs/heads/mybranch')
   end
 
   it 'should define remote_ref correctly when explicit tag specified' do
-    new_from_options('http://mytool.git', 'tag' => 'v1')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(tag: 'v1'))
     expect(@mirror.remote_ref).to eq('+refs/tags/v1')
   end
 
   it 'should define remote correctly when explicit branch specified' do
-    new_from_options('http://mytool.git', 'branch' => 'mybranch')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(branch: 'mybranch'))
     expect(@mirror.remote).to eq('mybranch_braid_mytool')
   end
 
   it 'should define remote correctly when explicit tag specified' do
-    new_from_options('http://mytool.git', 'tag' => 'v1')
+    new_from_options('http://mytool.git', Braid::Mirror::Options.new(tag: 'v1'))
     expect(@mirror.remote).to eq('v1_braid_mytool')
   end
 
   it 'should strip first dot from remote path for dot files and folders' do
-    new_from_options('http://path.git', 'branch' => 'master', 'path' => '.dotfolder/.dotfile.ext')
+    new_from_options('http://path.git', Braid::Mirror::Options.new(branch: 'master', path: '.dotfolder/.dotfile.ext'))
     expect(@mirror.path).to eq('.dotfolder/.dotfile.ext')
     expect(@mirror.remote).to eq('master_braid__dotfolder__dotfile_ext')
   end

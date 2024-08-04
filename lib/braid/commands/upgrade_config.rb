@@ -1,12 +1,26 @@
-# typed: true
+# typed: strict
 module Braid
   module Commands
     class UpgradeConfig < Command
+      class Options < T::Struct
+        prop :dry_run, T::Boolean
+        prop :allow_breaking_changes, T::Boolean
+      end
+
+      sig {params(options: Options).void}
+      def initialize(options)
+        @options = options
+      end
+
+      private
+
+      sig {returns(Config::ConfigMode)}
       def config_mode
         Config::MODE_UPGRADE
       end
 
-      def run(options)
+      sig {void}
+      def run_internal
         # Config loading in MODE_UPGRADE will bail out only if the config
         # version is too new.
 
@@ -38,11 +52,11 @@ The following breaking changes will occur:
 MSG
         end
 
-        if options['dry_run']
+        if @options.dry_run
           puts <<-MSG
 Run 'braid upgrade-config#{config.breaking_change_descs.empty? ? '' : ' --allow-breaking-changes'}' to perform the upgrade.
 MSG
-        elsif !config.breaking_change_descs.empty? && !options['allow_breaking_changes']
+        elsif !config.breaking_change_descs.empty? && !@options.allow_breaking_changes
           raise BraidError, 'You must pass --allow-breaking-changes to accept the breaking changes.'
         else
           config.write_db

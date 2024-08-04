@@ -1,23 +1,31 @@
-# typed: true
+# typed: strict
 module Braid
   module Commands
     class Status < Command
-      def run(path = nil, options = {})
-        path ? status_one(path, options) : status_all(options)
+      sig {params(path: T.nilable(String)).void}
+      def initialize(path)
+        @path = path
       end
 
       private
 
-      def status_all(options = {})
+      sig {void}
+      def run_internal
+        @path ? status_one(@path) : status_all
+      end
+
+      sig {void}
+      def status_all
         print "\n"
         msg "Listing all mirrors.\n=======================================================\n"
         config.mirrors.each do |path|
-          status_one(path, options)
+          status_one(path)
         end
         print "\n"
       end
 
-      def status_one(path, options = {})
+      sig {params(path: String).void}
+      def status_one(path)
         mirror = config.get!(path)
         setup_remote(mirror)
         mirror.fetch
@@ -31,7 +39,7 @@ module Braid
           print " [BRANCH=#{mirror.branch}]"
         end
         msg "Fetching new commits for '#{mirror.path}'." if verbose?
-        new_revision = validate_new_revision(mirror, options['revision'])
+        new_revision = validate_new_revision(mirror, nil)
         print ' (Remote Modified)' if new_revision.to_s != mirror.base_revision.to_s
         local_file_count = git.read_ls_files(mirror.path).split.size
         if 0 == local_file_count
@@ -40,9 +48,10 @@ module Braid
           print ' (Locally Modified)'
         end
         print "\n"
-        clear_remote(mirror, options)
+        clear_remote(mirror)
       end
 
+      sig {returns(Config::ConfigMode)}
       def config_mode
         Config::MODE_READ_ONLY
       end

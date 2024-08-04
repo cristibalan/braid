@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
 
   s.rdoc_options       = %w(--line-numbers --inline-source --title braid --main)
 
-  s.required_ruby_version = '>= 2.2.0'
+  s.required_ruby_version = '>= 2.5.0'
   s.add_dependency(%q<main>, ['>= 4.7.3'])
   # XXX: Minimum version?
   s.add_dependency(%q<json>)

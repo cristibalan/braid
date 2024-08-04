@@ -22,7 +22,7 @@ module Braid
       ).returns(T.type_parameter(:R))
     }
     def self.with_modified_environment(dict, &blk)
-      orig_dict = {}
+      orig_dict = T.let({}, T::Hash[String, T.nilable(String)])
       dict.each { |name, value|
         orig_dict[name] = ENV[name]
         ENV[name] = value

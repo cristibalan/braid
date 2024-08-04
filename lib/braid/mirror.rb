@@ -14,12 +14,6 @@ module Braid
         "unknown type: #{super}"
       end
     end
-    class PathRequired < BraidError
-      sig {returns(String)}
-      def message
-        'path is required'
-      end
-    end
     class NoTagAndBranch < BraidError
       sig {returns(String)}
       def message
@@ -32,16 +26,21 @@ module Braid
     sig {returns(String)}
     attr_reader :path
 
-    # It's going to take significant refactoring to be able to give this a type.
-    sig {returns(T::Hash[String, T.untyped])}
+    # It's going to take significant refactoring to be able to give
+    # `MirrorAttributes` a type.  Encapsulating the `T.untyped` in a type alias
+    # makes it easier to search for all the distinct root causes of untypedness
+    # in the code.
+    MirrorAttributes = T.type_alias { T::Hash[String, T.untyped] }
+
+    sig {returns(MirrorAttributes)}
     attr_reader :attributes
 
     BreakingChangeCallback = T.type_alias { T.proc.params(arg0: String).void }
 
-    sig {params(path: String, attributes: T::Hash[String, T.untyped], breaking_change_cb: BreakingChangeCallback).void}
+    sig {params(path: String, attributes: MirrorAttributes, breaking_change_cb: BreakingChangeCallback).void}
     def initialize(path, attributes = {}, breaking_change_cb = DUMMY_BREAKING_CHANGE_CB)
       @path       = T.let(path.sub(/\/$/, ''), String)
-      @attributes = T.let(attributes.dup, T::Hash[String, T.untyped])
+      @attributes = T.let(attributes.dup, MirrorAttributes)
 
       # Not that it's terribly important to check for such an old feature.  This
       # is mainly to demonstrate the RemoveMirrorDueToBreakingChange mechanism
@@ -79,19 +78,39 @@ DESC
       @attributes.delete('squashed')
     end
 
-    sig {params(url: String, options: T.untyped).returns(Mirror)}
-    def self.new_from_options(url, options = {})
+    # `Mirror::Options` doubles as the options struct for the `add` command, so
+    # some properties are meaningful only in that context.  TODO: Maybe the code
+    # could be organized in a better way.
+    class Options < T::Struct
+      prop :tag, T.nilable(String)
+      prop :branch, T.nilable(String)
+      # NOTE: Used only by the `add` command; ignored by
+      # `Mirror::new_from_options`.
+      prop :revision, T.nilable(Operations::Git::ObjectExpr)
+      prop :path, T.nilable(String)
+      prop :remote_path, T.nilable(String)
+    end
+
+    sig {params(url: String, options: Options).returns(Mirror)}
+    def self.new_from_options(url, options = Options.new)
       url    = url.sub(/\/$/, '')
+      # TODO: Ensure `url` is absolute?  The user is probably more likely to
+      # move the downstream repository by itself than to move it along with the
+      # vendor repository.  And we definitely don't want to use relative URLs in
+      # the cache.
 
-      raise NoTagAndBranch if options['tag'] && options['branch']
+      raise NoTagAndBranch if options.tag && options.branch
 
-      tag = options['tag']
-      branch = options['branch']
+      tag = options.tag
+      branch = options.branch
 
-      path = (options['path'] || extract_path_from_url(url, options['remote_path'])).sub(/\/$/, '')
-      raise PathRequired unless path
+      path = (options.path || extract_path_from_url(url, options.remote_path)).sub(/\/$/, '')
+      # TODO: Check that `path` is a valid relative path and not something like
+      # '.' or ''.  Some of these pathological cases will cause Braid to bail
+      # out later when something else fails, but it would be better to check up
+      # front.
 
-      remote_path = options['remote_path']
+      remote_path = options.remote_path
 
       attributes = {'url' => url, 'branch' => branch, 'path' => remote_path, 'tag' => tag}
       self.new(path, attributes)
@@ -353,24 +372,16 @@ DESC
       hash
     end
 
-    # TODO (typing): Return should not be nilable
-    sig {params(url: String, remote_path: T.nilable(String)).returns(T.nilable(String))}
+    sig {params(url: String, remote_path: T.nilable(String)).returns(String)}
     def self.extract_path_from_url(url, remote_path)
       if remote_path
         return File.basename(remote_path)
       end
 
-      # Avoid a Sorbet "unreachable code" error.
-      # TODO (typing): Fix this properly.  Probably just remove this line?
-      return nil unless T.let(url, T.nilable(String))
       name = File.basename(url)
 
-      if File.extname(name) == '.git'
-        # strip .git
-        name[0..-5]
-      else
-        name
-      end
+      # strip .git if present
+      name.delete_suffix('.git')
     end
   end
 end

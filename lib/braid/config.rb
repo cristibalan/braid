@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 require 'yaml'
 require 'json'
 require 'yaml/store'
@@ -84,20 +84,29 @@ module Braid
     sig {returns(T::Array[String])}
     attr_reader :breaking_change_descs
 
-    # options: config_file, old_config_files, mode
-    sig {params(options: T.untyped).void}
-    def initialize(options = {})
-      @config_file     = options['config_file']      || CONFIG_FILE
-      old_config_files = options['old_config_files'] || [OLD_CONFIG_FILE]
-      @mode            = options['mode']             || MODE_MAY_WRITE
+    sig {params(config_file: String, old_config_files: T::Array[String], mode: ConfigMode).void}
+    def initialize(config_file: CONFIG_FILE, old_config_files: [OLD_CONFIG_FILE], mode: MODE_MAY_WRITE)
+      @config_file     = config_file
+      old_config_files = old_config_files
+      @mode            = mode
 
       data = load_config(@config_file, old_config_files)
-      @config_existed = !data.nil?
+      @config_existed = T.let(!data.nil?, T::Boolean)
       if !@config_existed
-        @config_version = CURRENT_CONFIG_VERSION
-        @db = {}
+        @config_version = T.let(CURRENT_CONFIG_VERSION, Integer)
+        @db = T.let({}, T::Hash[String, Mirror::MirrorAttributes])
       elsif data['config_version'].is_a?(Numeric)
         @config_version = data['config_version']
+        # WARNING (typing): In general, slapping a type annotation on the loaded
+        # data without validating its structure could be misleading as we work
+        # on the rest of the code.  In the worst case, it might lead us to
+        # delete useful sanity checks because they trigger Sorbet unreachable
+        # code errors.  As of this writing (2024-08-04), we have nothing to lose
+        # because we don't attempt to defend against malformed data anyway, and
+        # there's a benefit to having the type information available.  If we add
+        # any validation, consider whether the annotations should be changed to
+        # verify that we did the validation correctly, e.g., by starting with a
+        # type like `T.anything` instead of `T.untyped`.
         @db = data['mirrors']
       else
         # Before config versioning (Braid < 1.1.0)
@@ -115,7 +124,7 @@ MSG
       end
 
       # In all modes, instantiate all mirrors to scan for breaking changes.
-      @breaking_change_descs = []
+      @breaking_change_descs = T.let([], T::Array[String])
       paths_to_delete = []
       @db.each do |path, attributes|
         begin
@@ -163,7 +172,7 @@ MSG
 
     end
 
-    sig {params(url: String, options: T.untyped).returns(Mirror)}
+    sig {params(url: String, options: Mirror::Options).returns(Mirror)}
     def add_from_options(url, options)
       mirror = Mirror.new_from_options(url, options)
 
@@ -171,7 +180,7 @@ MSG
       mirror
     end
 
-    sig {returns(T::Array[Mirror])}
+    sig {returns(T::Array[String])}
     def mirrors
       @db.keys
     end
@@ -213,11 +222,12 @@ MSG
     # Public for upgrade-config command only.
     sig {void}
     def write_db
-      new_db = {}
+      new_db = T.let({}, T::Hash[String, Mirror::MirrorAttributes])
       @db.keys.sort.each do |key|
-        new_db[key] = {}
+        attrs = T.must(@db[key])
+        new_db[key] = new_attrs = {}
         Braid::Mirror::ATTRIBUTES.each do |k|
-          new_db[key][k] = @db[key][k] if @db[key].has_key?(k)
+          new_attrs[k] = attrs[k] if attrs.has_key?(k)
         end
       end
       new_data = {
@@ -237,7 +247,7 @@ MSG
       (old_config_files + [config_file]).each do |file|
         next unless File.exist?(file)
         begin
-          store = T.let(YAML::Store, T.untyped).new(file)
+          store = T.unsafe(YAML::Store).new(file)
           data = {}
           store.transaction(true) do
             store.roots.each do |path|
@@ -258,7 +268,7 @@ MSG
       @db[mirror.path] = clean_attributes(mirror.attributes)
     end
 
-    sig {params(hash: T::Hash[String, T.untyped]).returns(T::Hash[String, T.untyped])}
+    sig {params(hash: Mirror::MirrorAttributes).returns(Mirror::MirrorAttributes)}
     def clean_attributes(hash)
       hash.reject { |_, v| v.nil? }
     end

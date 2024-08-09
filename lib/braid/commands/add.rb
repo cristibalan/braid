@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 module Braid
   module Commands
     class Add < Command
@@ -13,6 +13,7 @@ module Braid
       # the mirror to the remote HEAD revision, but that's probably not what the
       # user wants.  It's much more likely that something is wrong and Braid
       # should report an error.
+      sig {params(url: String).returns(T.nilable(String))}
       def get_default_branch_name(url)
         head_targets = []
         # The `HEAD` parameter here doesn't appear to do an exact match (it
@@ -30,28 +31,37 @@ module Braid
         m[1]
       end
 
-      def run(url, options = {})
+      sig {params(url: String, options: Mirror::Options).void}
+      def initialize(url, options)
+        @url = url
+        @options = options
+      end
+
+      private
+
+      sig {void}
+      def run_internal
         with_reset_on_error do
-          if options['branch'].nil? && options['tag'].nil? && options['revision'].nil?
-            default_branch = get_default_branch_name(url)
+          if @options.branch.nil? && @options.tag.nil? && @options.revision.nil?
+            default_branch = get_default_branch_name(@url)
             if default_branch.nil?
               raise BraidError, <<-MSG
 Failed to detect the default branch of the remote repository.  Please specify
 the branch you want to use via the --branch option.
 MSG
             end
-            options['branch'] = default_branch
+            @options.branch = default_branch
           end
 
-          mirror           = config.add_from_options(url, options)
+          mirror           = config.add_from_options(@url, @options)
           add_config_file
 
-          mirror.branch = nil if options['revision']
-          raise BraidError, 'Can not add mirror specifying both a revision and a tag' if options['revision'] && mirror.tag
+          mirror.branch = nil if @options.revision
+          raise BraidError, 'Can not add mirror specifying both a revision and a tag' if @options.revision && mirror.tag
 
           branch_message   = mirror.branch.nil? ? '' : " branch '#{mirror.branch}'"
           tag_message      = mirror.tag.nil? ? '' : " tag '#{mirror.tag}'"
-          revision_message = options['revision'] ? " at #{display_revision(mirror, options['revision'])}" : ''
+          revision_message = @options.revision ? " at #{display_revision(mirror, @options.revision)}" : ''
           msg "Adding mirror of '#{mirror.url}'#{branch_message}#{tag_message}#{revision_message}."
 
           # these commands are explained in the subtree merge guide
@@ -61,7 +71,7 @@ MSG
           setup_remote(mirror)
           mirror.fetch
 
-          new_revision = validate_new_revision(mirror, options['revision'])
+          new_revision = validate_new_revision(mirror, @options.revision)
           target_item = mirror.upstream_item_for_revision(new_revision)
 
           git.add_item_to_index(target_item, mirror.path, true)
@@ -73,7 +83,7 @@ MSG
           git.commit("Add mirror '#{mirror.path}' at #{display_revision(mirror)}")
           msg "Added mirror at #{display_revision(mirror)}."
 
-          clear_remote(mirror, options)
+          clear_remote(mirror)
         end
       end
     end

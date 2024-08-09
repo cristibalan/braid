@@ -1,13 +1,20 @@
-# typed: true
+# typed: strict
 module Braid
   module Commands
     class Setup < Command
-      def run(path = nil)
-        path ? setup_one(path) : setup_all
+      sig {params(path: T.nilable(String)).void}
+      def initialize(path = nil)
+        @path = path
       end
 
       private
 
+      sig {void}
+      def run_internal
+        @path ? setup_one(@path) : setup_all
+      end
+
+      sig {void}
       def setup_all
         msg 'Setting up all mirrors.'
         config.mirrors.each do |path|
@@ -15,6 +22,7 @@ module Braid
         end
       end
 
+      sig {params(path: String).void}
       def setup_one(path)
         mirror = config.get!(path)
 
@@ -33,6 +41,7 @@ module Braid
         git.remote_add(mirror.remote, url)
       end
 
+      sig {returns(Config::ConfigMode)}
       def config_mode
         Config::MODE_READ_ONLY
       end

@@ -50,8 +50,19 @@ describe 'Config versioning:' do
           f.write braids_content
         end
 
+        # Test all commands that are supposed to be read-only.  There was
+        # previously a bug in which the config mode for `push` was defined in
+        # the wrong place, leaving `push` to default to MODE_MAY_WRITE.
+
         output = run_command("#{BRAID_BIN} diff skit1")
         expect(output).to eq('')  # no diff
+
+        output = run_command("#{BRAID_BIN} push skit1")
+        expect(output).to match(/No local changes found\. Stopping\./)
+
+        output = run_command("#{BRAID_BIN} setup skit1")
+
+        output = run_command("#{BRAID_BIN} status skit1")
       end
     end
 

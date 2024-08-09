@@ -193,7 +193,9 @@ module Braid
       ObjectID = T.type_alias { String }
 
       # A string containing an expression that can be evaluated to an object ID
-      # by `git rev-parse`.  Ditto the remark about lack of enforcement.
+      # by `git rev-parse`.  This type is enforced even less than `ObjectID` (in
+      # some cases, we apply it directly to user input without validation), but
+      # it still serves to document our intent.
       ObjectExpr = T.type_alias { String } 
 
       # Get the physical path to a file in the git repository (e.g.,

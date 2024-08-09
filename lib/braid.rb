@@ -27,10 +27,7 @@ module Braid
     !!@verbose
   end
 
-  # TODO (typing): One would think `new_value` shouldn't be nilable, but
-  # apparently `lib/braid/main.rb` passes nil sometimes. Is that easy to fix?
-  # (Ditto with `self.force=` below.)
-  sig {params(new_value: T.nilable(T::Boolean)).void}
+  sig {params(new_value: T::Boolean).void}
   def self.verbose=(new_value)
     @verbose = !!new_value
   end
@@ -42,7 +39,7 @@ module Braid
     !!@force
   end
 
-  sig {params(new_value: T.nilable(T::Boolean)).void}
+  sig {params(new_value: T::Boolean).void}
   def self.force=(new_value)
     @force = !!new_value
   end

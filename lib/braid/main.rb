@@ -1,3 +1,11 @@
+# `typed: strict` doesn't seem worth the trouble for this file at this time:
+# there's not much for us to actually annotate, and it would take a crazy hack
+# to avoid a Sorbet error on the `@argv` references because Sorbet doesn't seem
+# to honor `T.bind` for instance variables (TODO: file a Sorbet bug about
+# that?).  Finding an approach to meaningfully check our code that uses the
+# `main` DSL is a bigger project that we may or may not undertake later.
+# ~ Matt 2024-08-04
+#
 # typed: true
 
 require 'braid'
@@ -31,8 +39,8 @@ T.unsafe(Main).run {
   # The "main" library doesn't provide a way to do this??
   def check_no_extra_args!
     if @argv.length > 0
-      Braid::Command.handle_error(
-        Braid::BraidError.new('Extra argument(s) passed to command.'))
+      Command.handle_error(
+        BraidError.new('Extra argument(s) passed to command.'))
     end
   end
 
@@ -61,7 +69,7 @@ T.unsafe(Main).run {
     run {
       check_no_extra_args!
       Braid.verbose = verbose
-      Braid::Command.run(:Add, url, {'path' => local_path, 'branch' => branch, 'tag' => tag, 'revision' => revision, 'remote_path' => path})
+      Commands::Add.new(url, Mirror::Options.new(path: local_path, branch: branch, tag: tag, revision: revision, remote_path: path)).run
     }
   }
 
@@ -86,15 +94,15 @@ T.unsafe(Main).run {
 
     run {
       check_no_extra_args!
-      options = {
-        'branch' => branch,
-        'tag' => tag,
-        'revision' => revision,
-        'head' => head,
-        'keep' => keep
-      }
+      options = Commands::Update::Options.new(
+        branch: branch,
+        tag: tag,
+        revision: revision,
+        head: head,
+        keep: keep
+      )
       Braid.verbose = verbose
-      Braid::Command.run(:Update, local_path, options)
+      Commands::Update.new(local_path, options).run
     }
   }
 
@@ -115,11 +123,11 @@ T.unsafe(Main).run {
 
     run {
       check_no_extra_args!
-      options = {
-        :keep => keep
-      }
+      options = Commands::Remove::Options.new(
+        keep: keep
+      )
       Braid.verbose = verbose
-      Braid::Command.run(:Remove, local_path, options)
+      Commands::Remove.new(local_path, options).run
     }
   }
 
@@ -141,12 +149,12 @@ T.unsafe(Main).run {
       if @argv.length > 0 && @argv[0] == '--'
         @argv.shift
       end
-      options = {
-        'keep' => keep,
-        'git_diff_args' => @argv
-      }
+      options = Commands::Diff::Options.new(
+        keep: keep,
+        git_diff_args: @argv
+      )
       Braid.verbose = verbose
-      Braid::Command.run(:Diff, local_path, options)
+      Commands::Diff.new(local_path, options).run
     }
   }
 
@@ -159,12 +167,12 @@ T.unsafe(Main).run {
 
     run {
       check_no_extra_args!
-      options = {
-        'keep' => keep,
-        'branch' => branch
-      }
+      options = Commands::Push::Options.new(
+        keep: keep,
+        branch: branch
+      )
       Braid.verbose = verbose
-      Braid::Command.run(:Push, local_path, options)
+      Commands::Push.new(local_path, options).run
     }
   }
 
@@ -179,7 +187,7 @@ T.unsafe(Main).run {
       check_no_extra_args!
       Braid.verbose = verbose
       Braid.force = force
-      Braid::Command.run(:Setup, local_path)
+      Commands::Setup.new(local_path).run
     }
   }
 
@@ -188,7 +196,7 @@ T.unsafe(Main).run {
 
     run {
       check_no_extra_args!
-      puts "braid #{Braid::VERSION}"
+      puts "braid #{VERSION}"
     }
   }
 
@@ -200,7 +208,7 @@ T.unsafe(Main).run {
     run {
       check_no_extra_args!
       Braid.verbose = verbose
-      Braid::Command.run(:Status, local_path)
+      Commands::Status.new(local_path).run
     }
   }
 
@@ -220,6 +228,7 @@ T.unsafe(Main).run {
       optional
       desc 'Explain the consequences of the upgrade without performing it.'
       attr :dry_run
+      default false
     }
 
     option('allow-breaking-changes') {
@@ -228,16 +237,17 @@ T.unsafe(Main).run {
         Perform the upgrade even if it involves breaking changes.
       DESC
       attr :allow_breaking_changes
+      default false
     }
 
     run {
       check_no_extra_args!
-      options = {
-        'dry_run' => dry_run,
-        'allow_breaking_changes' => allow_breaking_changes
-      }
+      options = Commands::UpgradeConfig::Options.new(
+        dry_run: dry_run,
+        allow_breaking_changes: allow_breaking_changes
+      )
       Braid.verbose = verbose
-      Braid::Command.run(:UpgradeConfig, options)
+      Commands::UpgradeConfig.new(options).run
     }
   }
 
@@ -301,6 +311,7 @@ T.unsafe(Main).run {
       optional
       desc 'unused option'
       attr
+      default false
     }
   }
 
@@ -309,6 +320,7 @@ T.unsafe(Main).run {
       optional
       desc 'log shell commands'
       attr
+      default false
     }
   }
 
@@ -317,6 +329,7 @@ T.unsafe(Main).run {
       optional
       desc 'force'
       attr
+      default false
     }
   }
 
@@ -325,6 +338,7 @@ T.unsafe(Main).run {
       optional
       desc 'do not remove the remote'
       attr
+      default false
     }
   }
 

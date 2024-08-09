@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Braid::Config, when empty' do
   before(:each) do
-    @config = Braid::Config.new({'config_file' => 'tmp.yml'})
+    @config = Braid::Config.new(config_file: 'tmp.yml')
   end
 
   after(:each) do
@@ -23,7 +23,7 @@ end
 
 describe 'Braid::Config, with one mirror' do
   before(:each) do
-    @config = Braid::Config.new({'config_file' => 'tmp.yml'})
+    @config = Braid::Config.new(config_file: 'tmp.yml')
     @mirror = build_mirror
     @config.add(@mirror)
   end

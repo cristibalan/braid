@@ -9,6 +9,8 @@ static type checking and code navigation in compatible IDEs.  Only parts of the
 code are annotated so far, but we are already seeing maintainability benefits
 for those parts.
 
+### Structure of the tools
+
 **Regarding IDE support:** Sorbet provides [an
 extension](https://sorbet.org/docs/vscode) for Visual Studio Code.  The
 extension is also available in Open VSX for VSCodium users.  In
@@ -70,6 +72,17 @@ system, and consider contributing a fix.  If `sorbet-static` is not installed,
 you won't be able to use its static type checking and code navigation
 functionality.  However, `sorbet-runtime` works the same way on all operating
 systems (when Braid is configured to use it as described above).
+
+### Issues we've run into
+
+- If you initialize a variable to `[]` or `{}` and then add items to it, Sorbet
+  may not figure out the intended element type and may miss errors.  To avoid
+  this problem, put a type annotation on the initialization: `T.let([],
+  T::Array[Foo])` or `T.let({}, T::Hash[Foo,Bar])`.  We currently don't have an
+  automated way to scan for code that is missing these annotations, but at least
+  if you see them, you'll know why they are there.  Related:
+  https://github.com/sorbet/sorbet/issues/3751,
+  https://github.com/sorbet/sorbet/issues/11.
 
 ## Matt's checklist for validating a change to Braid
 

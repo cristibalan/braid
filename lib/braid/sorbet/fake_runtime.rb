@@ -88,7 +88,7 @@ module Braid
         define_method(prop_name) {
           @attrs[prop_name]
         }
-        define_method(prop_name.name + '=') { |new_value|
+        define_method(:"#{prop_name}=") { |new_value|
           @attrs[prop_name] = new_value
         }
       end

@@ -144,6 +144,32 @@ Go back to tracking a particular branch.
 
     braid diff vendor/rails
 
+## License compliance for vendored content
+
+When you distribute a repository that includes vendored content (managed by
+Braid or any other tool), you are responsible for complying with the license for
+that content. Usually, one of the requirements is to include a copy of the
+license in your repository. If you vendor the entire upstream repository and the
+license is in there, then you've already met this requirement. However, if you
+vendor a subdirectory or single file from the upstream repository, you may need
+to add the license separately. One solution is to add the license file as its
+own Braid mirror. (Here is [an example `.braids.json`
+file](https://bitbucket.org/espalier-spreadsheet/espalier/src/287683797e0583d0cdf01677280482b1718f26d0/.braids.json?at=master)
+of a project that took this approach.)
+
+Note that if the upstream license ever changes, it's your responsibility to keep
+your copy of the license in sync with the version of the content in your
+repository. Normally, that would mean keeping the content and license mirrors at
+the same upstream revision. If your workflow is to run `braid update` on all
+mirrors, that should keep the two mirrors in sync, barring a race condition in
+which the upstream repository is updated while `braid update` is running.
+However, if you update the content mirror individually, it would be easy to
+forget to update the license mirror. We have an idea about how to solve this
+problem in Braid, but it would add significant complexity, so we're not
+implementing it until there's enough evidence of demand from users. See [this
+issue](https://github.com/cristibalan/braid/issues/125) for more information or
+to get involved.
+
 ## Supported environments
 
 As of this writing (2022-01-20), we try to keep Braid working at least on Linux,

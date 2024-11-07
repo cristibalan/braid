@@ -37,8 +37,15 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.5.0'
   s.add_dependency(%q<main>, ['>= 4.7.3'])
-  # XXX: Minimum version?
+  # XXX: Minimum versions?
   s.add_dependency(%q<json>)
+  s.add_dependency(%q<pstore>)
+  # Dependencies of `main` that are no longer in the default gems in Ruby 3.5.0.
+  # These should be declared by `main` itself
+  # (https://github.com/ahoward/main/pull/49); we declare them here as a
+  # workaround unless/until that change is released.
+  s.add_dependency(%q<logger>)
+  s.add_dependency(%q<ostruct>)
 
   s.add_development_dependency(%q<rspec>, ['>= 3.4.4'])
   s.add_development_dependency(%q<mocha>, ['>= 0.9.11'])

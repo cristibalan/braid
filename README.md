@@ -181,6 +181,19 @@ their own systems with whatever is installed.  So breakages may sometimes occur.
 If you run into an environment-related problem, please report it and we'll fix
 it if feasible.  Contributions to improve testing of Braid would be welcome.
 
+### Environment-specific notes
+
+- In our testing on Windows with RubyInstaller as of 2024-11-03, we ran into an
+  issue where running `bundle install` in the Braid repository failed to install
+  the native extension of the `psych` gem.  We found two workarounds that appear
+  to work: (1) use `gem install -g` instead, or (2) run `ridk exec pacman -Syu
+  mingw-w64-ucrt-x86_64-libyaml` to install the missing native library (this may
+  need to be run twice if the first run exits early due to an MSYS2 core system
+  upgrade).  We don't have a good understanding of what's going on here and
+  don't want to spend the time to research it, but we're providing this
+  information in case it helps anyone.  If you know more about this issue,
+  please tell us.
+
 ## Braid version compatibility
 
 Since Braid has been regularly changing the configuration format and adding new
